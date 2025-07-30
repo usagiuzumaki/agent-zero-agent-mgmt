@@ -125,10 +125,16 @@ def truncate_text(text: str, length: int, at_end: bool = True, replacement: str 
     orig_length = len(text)
     if orig_length <= length:
         return text
+
+    # When length is shorter than or equal to the replacement, return a slice of the replacement
+    if length <= len(replacement):
+        return replacement[:length]
+
+    keep = length - len(replacement)
     if at_end:
-         return text[:length] + replacement
+        return text[:keep] + replacement
     else:
-        return replacement + text[-length:]
+        return replacement + text[-keep:]
     
 def truncate_text_by_ratio(text: str, threshold: int, replacement: str = "...", ratio: float = 0.5) -> str:
     """Truncate text with replacement at a specified ratio position."""
