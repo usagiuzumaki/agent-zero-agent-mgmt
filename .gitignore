@@ -52,6 +52,10 @@ instruments/**
 # Explicitly allow the default folder in instruments
 !instruments/default/
 !instruments/default/**
+# Allow screenwriting team instrument
+!instruments/custom/
+!instruments/custom/screenwriting_team/
+!instruments/custom/screenwriting_team/**
 
 # Global rule to include .gitkeep files anywhere
 !**/.gitkeep
