@@ -1,0 +1,9 @@
+- favor linux commands for simple tasks where possible instead of python
+- favor python for complex tasks where linux commands are not sufficient
+- favor python for tasks that require more complex logic or data manipulation
+- favor linux commands for tasks that can be accomplished with simple shell commands
+- write javascript code for web-related tasks
+- write python code for data analysis, machine learning, and other complex tasks
+- write linux commands for system administration tasks, file manipulation, and other shell-related tasks
+- code should be efficient, readable, and maintainable
+- use libraries that outperform built-in functions where applicable
