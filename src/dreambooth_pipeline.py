@@ -1,6 +1,15 @@
-import os, logging, subprocess, sys, pathlib, requests, hashlib, shutil, torch
+import os, logging, subprocess, sys, pathlib, requests, hashlib, shutil
+try:
+    import torch
+except Exception as e:  # pragma: no cover - optional dependency
+    logging.warning("Torch not available: %s", e)
+    torch = None
 from PIL import Image
-from diffusers import StableDiffusionPipeline
+try:
+    from diffusers import StableDiffusionPipeline
+except Exception as e:  # pragma: no cover - optional dependency
+    logging.warning("Diffusers library not available: %s", e)
+    StableDiffusionPipeline = None
 
 MODEL_NAME = os.getenv("SD_MODEL_NAME", "runwayml/stable-diffusion-v1-5")
 OUTPUT_DIR = os.getenv("DB_OUTPUT_DIR", "outputs/dreambooth_model")
@@ -56,8 +65,10 @@ def train_dreambooth(instance_data_dir: str, class_data_dir: str = None, max_ste
 _persona_pipe = None
 def load_persona_pipeline(model_dir: str = OUTPUT_DIR):
     global _persona_pipe
+    if StableDiffusionPipeline is None or torch is None:
+        raise RuntimeError("Stable Diffusion dependencies missing.")
     _persona_pipe = StableDiffusionPipeline.from_pretrained(model_dir, torch_dtype=torch.float32)
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+    device = "cuda" if torch.cuda and torch.cuda.is_available() else "cpu"
     _persona_pipe.to(device)
     return _persona_pipe
 
