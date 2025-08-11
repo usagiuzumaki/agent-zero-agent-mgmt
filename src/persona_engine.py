@@ -3,14 +3,18 @@ from dotenv import load_dotenv
 load_dotenv()
 
 import openai
-from elevenlabs.client import ElevenLabs
+try:
+    from elevenlabs.client import ElevenLabs
+except Exception as e:  # pragma: no cover - optional dependency
+    logging.warning("ElevenLabs library not available: %s", e)
+    ElevenLabs = None
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 ELEVEN_API_KEY = os.getenv("ELEVENLABS_API_KEY")
 
 eleven_client = None
 voice_id = None
-if ELEVEN_API_KEY:
+if ELEVEN_API_KEY and ElevenLabs:
     try:
         eleven_client = ElevenLabs(api_key=ELEVEN_API_KEY)
         voice_id = os.getenv("PERSONA_VOICE_ID")

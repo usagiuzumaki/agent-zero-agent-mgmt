@@ -1,4 +1,4 @@
-from agents.agent import (
+from .agent import (
     AgentContextType,
     AgentContext,
     AgentConfig,

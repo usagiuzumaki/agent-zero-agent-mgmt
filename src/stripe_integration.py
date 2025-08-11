@@ -1,10 +1,17 @@
-import os, logging, stripe
+import os, logging
+try:
+    import stripe
+except Exception as e:  # pragma: no cover - optional dependency
+    stripe = None
+    logging.error("Stripe library not available: %s", e)
 
-stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
+STRIPE_KEY = os.getenv("STRIPE_SECRET_KEY")
+if stripe:
+    stripe.api_key = STRIPE_KEY
 
 def create_checkout_session(price_id: str, success_url: str | None = None, cancel_url: str | None = None):
-    if not stripe.api_key:
-        logging.error("STRIPE_SECRET_KEY missing.")
+    if not stripe or not stripe.api_key:
+        logging.error("Stripe not configured.")
         return None
     domain = os.getenv("DOMAIN_URL", "http://localhost:8000")
     success_url = success_url or f"{domain}/success?session_id={{CHECKOUT_SESSION_ID}}"

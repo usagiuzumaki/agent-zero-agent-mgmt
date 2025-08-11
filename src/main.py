@@ -53,7 +53,10 @@ if __name__ == "__main__":
 try:
     import os
     EGIRL_NAME = os.getenv("EGIRL_NAME","Aria")
-    EGIRL_PROMPT_PATH = os.getenv("EGIRL_PROMPT_PATH","agent/egirl/prompt.md")
+    EGIRL_PROMPT_PATH = os.getenv(
+        "EGIRL_PROMPT_PATH",
+        "agents/egirl/prompts/agent.system.main.md",
+    )
     if os.path.exists(EGIRL_PROMPT_PATH):
         with open(EGIRL_PROMPT_PATH,"r",encoding="utf-8") as f:
             ARIA_PROMPT = f.read()
