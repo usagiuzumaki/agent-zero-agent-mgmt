@@ -36,7 +36,10 @@ def train_dreambooth(instance_data_dir: str, class_data_dir: str = None, max_ste
 
     # Basic command; customize as needed
     cmd = [
-        sys.executable, "-m", "accelerate", "launch", script_path,
+        # Use accelerate's CLI entry point via its launch module. This avoids
+        # calling a non-existent ``accelerate.__main__`` module which previously
+        # caused a runtime failure when training the DreamBooth model.
+        sys.executable, "-m", "accelerate.commands.launch", script_path,
         "--pretrained_model_name_or_path", MODEL_NAME,
         "--instance_data_dir", instance_data_dir,
         "--output_dir", OUTPUT_DIR,
