@@ -1,14 +1,15 @@
 import os, logging
 from dotenv import load_dotenv
+
 load_dotenv()
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
-from dreambooth_pipeline import train_dreambooth, generate_persona_image
-from instagram_integration import post_image, comment_on_hashtags
-from video_generator import generate_video_from_image
-from persona_engine import PersonaEngine
-from stripe_integration import create_checkout_session
+from .dreambooth_pipeline import train_dreambooth, generate_persona_image
+from .instagram_integration import post_image, comment_on_hashtags
+from .video_generator import generate_video_from_image
+from .persona_engine import PersonaEngine
+from .stripe_integration import create_checkout_session
 
 def main():
     # Train DreamBooth if output dir doesn't exist and training images are present

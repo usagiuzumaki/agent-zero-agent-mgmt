@@ -19,6 +19,16 @@ from python.helpers.extract_tools import load_classes_from_folder
 from python.helpers.api import ApiHandler
 from python.helpers.print_style import PrintStyle
 
+# ensure Aria src modules are importable
+SRC_PATH = get_abs_path("./src")
+if SRC_PATH not in sys.path:
+    sys.path.append(SRC_PATH)
+
+try:
+    import src.main  # noqa: F401  # side effects for persona wiring
+except Exception as e:
+    PrintStyle().debug(f"Failed to import src modules: {e}")
+
 
 # Set the new timezone to 'UTC'
 os.environ["TZ"] = "UTC"
