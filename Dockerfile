@@ -7,6 +7,8 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY src/ ./src/
+# Copy the entire project into the image
+COPY . .
 
-CMD ["python", "src/main.py"]
+# Launch the web UI
+CMD ["python", "run_ui.py"]
