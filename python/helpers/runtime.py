@@ -2,7 +2,7 @@ import argparse
 import inspect
 import secrets
 from typing import TypeVar, Callable, Awaitable, Union, overload, cast
-from python.helpers import dotenv, rfc, settings, files
+from python.helpers import dotenv, rfc, files
 import asyncio
 import threading
 import queue
@@ -111,6 +111,8 @@ def _get_rfc_password() -> str:
 
 
 def _get_rfc_url() -> str:
+    from python.helpers import settings
+
     set = settings.get_settings()
     url = set["rfc_url"]
     if not "://" in url:
