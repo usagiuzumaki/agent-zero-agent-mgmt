@@ -1124,7 +1124,7 @@ def _adjust_to_version(settings: Settings, default: Settings):
     # switch to agent0 if the old default is used from v0.8
     if "version" not in settings or settings["version"].startswith("v0.8"):
         if "agent_profile" not in settings or settings["agent_profile"] == "default":
-            settings["agent_profile"] = "agent0"
+            settings["agent_profile"] = "egirl"
 
 def _read_settings_file() -> Settings | None:
     if os.path.exists(SETTINGS_FILE):
@@ -1217,7 +1217,7 @@ def get_default_settings() -> Settings:
         auth_login="",
         auth_password="",
         root_password="",
-        agent_profile="agent0",
+        agent_profile="egirl",
         agent_memory_subdir="default",
         agent_knowledge_subdir="custom",
         rfc_auto_docker=True,

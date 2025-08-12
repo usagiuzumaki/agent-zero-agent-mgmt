@@ -2,14 +2,20 @@ import os, logging
 from dotenv import load_dotenv
 load_dotenv()
 
-import openai
+try:
+    import openai
+except Exception as e:  # pragma: no cover - optional dependency
+    logging.warning("OpenAI library not available: %s", e)
+    openai = None
+
 try:
     from elevenlabs.client import ElevenLabs
 except Exception as e:  # pragma: no cover - optional dependency
     logging.warning("ElevenLabs library not available: %s", e)
     ElevenLabs = None
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
+if openai:
+    openai.api_key = os.getenv("OPENAI_API_KEY")
 ELEVEN_API_KEY = os.getenv("ELEVENLABS_API_KEY")
 
 eleven_client = None
@@ -39,6 +45,8 @@ class PersonaEngine:
     def generate_response(self, user_message: str):
         self.history.append({ "role": "user", "content": user_message })
         messages = [{ "role": "system", "content": self.system_prompt }] + self.history
+        if not openai:
+            raise RuntimeError("OpenAI library not available")
         try:
             resp = openai.chat.completions.create(model="gpt-4o-mini", messages=messages)
             text = resp.choices[0].message.content
