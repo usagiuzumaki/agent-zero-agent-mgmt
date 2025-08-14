@@ -2,35 +2,12 @@ import os, logging
 from dotenv import load_dotenv
 load_dotenv()
 
-try:
-    import openai
-except Exception as e:  # pragma: no cover - optional dependency
-    logging.warning("OpenAI library not available: %s", e)
-    openai = None
-
-try:
-    from elevenlabs.client import ElevenLabs
-except Exception as e:  # pragma: no cover - optional dependency
-    logging.warning("ElevenLabs library not available: %s", e)
-    ElevenLabs = None
-
-if openai:
-    openai.api_key = os.getenv("OPENAI_API_KEY")
-ELEVEN_API_KEY = os.getenv("ELEVENLABS_API_KEY")
-
-eleven_client = None
-voice_id = None
-if ELEVEN_API_KEY and ElevenLabs:
-    try:
-        eleven_client = ElevenLabs(api_key=ELEVEN_API_KEY)
-        voice_id = os.getenv("PERSONA_VOICE_ID")
-        if not voice_id:
-            voices = eleven_client.voices.get_all().voices
-            if voices:
-                voice_id = voices[0].voice_id
-    except Exception as e:
-        logging.error(f"ElevenLabs init failed: {e}")
-        eleven_client = None
+from python.helpers.aria_tools import (
+    gpt5,
+    ARIA_TOOLS,
+    ALLOWED_TTS,
+    handle_tool_call,
+)
 
 class PersonaEngine:
     def __init__(self, name: str, personality: str = "playful, flirty, supportive"):
@@ -43,32 +20,22 @@ class PersonaEngine:
         self.history = []
 
     def generate_response(self, user_message: str):
-        self.history.append({ "role": "user", "content": user_message })
-        messages = [{ "role": "system", "content": self.system_prompt }] + self.history
-        if not openai:
-            raise RuntimeError("OpenAI library not available")
+        self.history.append({"role": "user", "content": user_message})
+        messages = [{"role": "system", "content": self.system_prompt}] + self.history
+
+        audio_path = None
         try:
-            resp = openai.chat.completions.create(model="gpt-4o-mini", messages=messages)
-            text = resp.choices[0].message.content
+            resp = gpt5(messages, tools=ARIA_TOOLS, allowed=ALLOWED_TTS)
+            for item in getattr(resp, "output", []):
+                if getattr(item, "type", "") == "tool_call":
+                    followup, result = handle_tool_call(item)
+                    resp = followup
+                    if getattr(item, "name", "") == "eleven_tts":
+                        audio_path = result
+            text = resp.output_text
         except Exception as e:
             logging.error(f"OpenAI error: {e}")
             raise
-        self.history.append({ "role": "assistant", "content": text })
 
-        audio_path = None
-        if eleven_client and voice_id:
-            try:
-                audio = eleven_client.text_to_speech.convert(
-                    voice_id=voice_id,
-                    model_id="eleven_multilingual_v2",
-                    text=text,
-                    output_format="mp3_44100_128"
-                )
-                os.makedirs("outputs", exist_ok=True)
-                audio_path = f"outputs/{self.name}_response.mp3"
-                with open(audio_path, "wb") as f:
-                    for chunk in audio:
-                        if chunk: f.write(chunk)
-            except Exception as e:
-                logging.error(f"ElevenLabs TTS failed: {e}")
-        return { "text": text, "audio_path": audio_path }
+        self.history.append({"role": "assistant", "content": text})
+        return {"text": text, "audio_path": audio_path}
