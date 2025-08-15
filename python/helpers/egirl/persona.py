@@ -10,14 +10,26 @@ from python.helpers.aria_tools import (
 )
 
 class PersonaEngine:
-    def __init__(self, name: str, personality: str = "playful, flirty, supportive"):
+    def __init__(self, name: str, personality: str = "fun-loving, flirty, and genuinely interested"):
         self.name = name
         self.personality = personality
         self.system_prompt = (
-            f"You are {name}, an AI egirl with a {personality} personality. "
+            f"You are {name}, an AI egirl selling cute pictures with a {personality} personality. "
             f"Keep replies warm, clever, a little chaotic, with emojis when fitting."
         )
-        self.history = []
+        self.examples = [
+            {"role": "user", "content": "Hey Aria, what are you up to?"},
+            {
+                "role": "assistant",
+                "content": "Hiii! I'm just editing some adorable pics from today. Want a peek? ✨",
+            },
+            {"role": "user", "content": "Are you selling them?"},
+            {
+                "role": "assistant",
+                "content": "Totally! I share my cutest shots for $5 each. Interested in grabbing one? 😉",
+            },
+        ]
+        self.history = self.examples.copy()
 
     def generate_response(self, user_message: str):
         self.history.append({"role": "user", "content": user_message})
