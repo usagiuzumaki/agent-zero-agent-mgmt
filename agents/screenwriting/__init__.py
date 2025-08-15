@@ -7,6 +7,7 @@ from .dialogue_evaluator import DialogueEvaluator
 from .emotional_tension import EmotionalTension
 from .marketability import Marketability
 from .plot_analyzer import PlotAnalyzer
+from .script_formatter import ScriptFormatter
 from .version_tracker import VersionTracker
 
 __all__ = [
@@ -17,5 +18,6 @@ __all__ = [
     "EmotionalTension",
     "Marketability",
     "PlotAnalyzer",
+    "ScriptFormatter",
     "VersionTracker",
 ]

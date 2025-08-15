@@ -15,6 +15,7 @@ class PlotAnalyzer(Agent):
         Makes use of tools and instruments for deeper inspection.
         """
         self.hist_add_user_message(
-            "Use tools and instruments to analyze the plot structure of:\n" + outline
+            "Use tools such as the script_analyzer instrument to analyze the plot structure of:\n"
+            + outline
         )
         return await self.monologue()
