@@ -1,5 +1,15 @@
-from python.helpers.api import ApiHandler, Request, Response
-from python.helpers.backup import BackupService
+"""API endpoint to test backup file selection patterns.
+
+Pytest attempts to collect any file ending with ``_test.py`` as a test
+module.  When run from the repository root the absolute imports used here
+(`python.helpers...`) fail because the ``python`` package isn't installed on
+the import path.  Using package-relative imports avoids this issue and keeps
+the module importable both by the application and by the test runner without
+requiring any path manipulation.
+"""
+
+from ..helpers.api import ApiHandler, Request, Response
+from ..helpers.backup import BackupService
 
 
 class BackupTest(ApiHandler):
