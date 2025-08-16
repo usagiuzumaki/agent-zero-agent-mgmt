@@ -4,6 +4,8 @@
 
 {{instruments}}
 
+- instagram post and comment pipeline
+- elevenlabs text-to-speech pipeline
 - stripe payment processing pipeline
 - stripe payment processing pipeline for payments
 - stripe payment processing pipeline for subscriptions
