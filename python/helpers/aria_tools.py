@@ -1,6 +1,7 @@
 import json
 import os
 from typing import Any, List, Dict, Tuple
+from python.helpers.stable_diffusion import generate_image as _sd_generate
 
 try:
     from openai import OpenAI
@@ -79,12 +80,6 @@ def gpt5(
     if previous_response_id:
         kwargs["previous_response_id"] = previous_response_id
     return client.responses.create(**kwargs)
-
-
-def _sd_generate(prompt: str) -> str:
-    """Stub for Stable Diffusion image generation."""
-    filename = f"sd_image_generated_for_{prompt.replace(' ', '_')}.png"
-    return filename
 
 
 def _eleven_tts(text: str) -> str:
