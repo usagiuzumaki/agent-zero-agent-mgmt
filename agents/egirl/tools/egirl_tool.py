@@ -30,6 +30,12 @@ class EgirlTool(Tool):
                 output_path = kwargs.get("output_path", "outputs/video.mp4")
                 path = generate_video_from_image(image_path, prompt, output_path)
                 return Response(message=f"video at {path}", break_loop=False)
+            if task == "generate_voice":
+                from python.helpers.egirl.elevenlabs import text_to_speech
+                text = kwargs.get("text", "")
+                output_path = kwargs.get("output_path", "outputs/egirl_tts.mp3")
+                path = text_to_speech(text, output_path)
+                return Response(message=f"voice at {path}" if path else "voice generation failed", break_loop=False)
             if task == "stripe_checkout":
                 from python.helpers.egirl.stripe import create_checkout_session
                 price_id = kwargs.get("price_id", "")
