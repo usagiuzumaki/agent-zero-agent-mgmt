@@ -31,7 +31,9 @@ class BackupTest(ApiHandler):
 
             # Support legacy string patterns format for backward compatibility
             patterns_string = input.get("patterns", "")
-            if patterns_string and not include_patterns:
+            # Only parse legacy patterns string when pattern arrays are absent
+            # to maintain backward compatibility without mixing formats.
+            if patterns_string and not include_patterns and not exclude_patterns:
                 # Parse patterns string into arrays
                 lines = [line.strip() for line in patterns_string.split('\n') if line.strip() and not line.strip().startswith('#')]
                 for line in lines:
