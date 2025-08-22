@@ -7,3 +7,4 @@
 - run_ui.py loads persona prompt.
 - Dockerfile: please ensure deps installed (stripe, requests, elevenlabs, or diffusers stack).
 - Secrets: DO NOT COMMIT .env. Set at runtime.
+- Stable Diffusion model can be loaded from a local path via `SD_MODEL_PATH`.

@@ -1,5 +1,6 @@
 import os
 import uuid
+from pathlib import Path
 from typing import Optional
 
 try:  # pragma: no cover - optional dependency
@@ -13,6 +14,7 @@ except Exception:  # pragma: no cover
     StableDiffusionPipeline = None  # type: ignore
 
 _MODEL_ID = os.getenv("SD_MODEL_NAME", "runwayml/stable-diffusion-v1-5")
+_MODEL_PATH = os.getenv("SD_MODEL_PATH")
 _pipe: Optional["StableDiffusionPipeline"] = None
 
 
@@ -23,7 +25,14 @@ def _load_pipeline() -> "StableDiffusionPipeline":
             raise RuntimeError("Stable Diffusion dependencies missing.")
         device = "cuda" if torch.cuda and torch.cuda.is_available() else "cpu"
         dtype = torch.float16 if device == "cuda" else torch.float32
-        _pipe = StableDiffusionPipeline.from_pretrained(_MODEL_ID, torch_dtype=dtype)
+        if _MODEL_PATH:
+            model_path = Path(_MODEL_PATH).expanduser()
+            if model_path.is_file():
+                _pipe = StableDiffusionPipeline.from_single_file(str(model_path), torch_dtype=dtype)
+            else:
+                _pipe = StableDiffusionPipeline.from_pretrained(str(model_path), torch_dtype=dtype)
+        else:
+            _pipe = StableDiffusionPipeline.from_pretrained(_MODEL_ID, torch_dtype=dtype)
         _pipe.to(device)
     return _pipe
 
