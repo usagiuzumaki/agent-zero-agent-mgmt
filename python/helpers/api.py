@@ -76,7 +76,7 @@ class ApiHandler:
 
     # get context to run agent zero in
     def get_context(self, ctxid: str):
-        from agent import AgentContext
+        from agents import AgentContext
         from initialize import initialize_agent
 
         with self.thread_lock:

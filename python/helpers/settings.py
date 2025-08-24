@@ -1242,7 +1242,7 @@ def get_default_settings() -> Settings:
 def _apply_settings(previous: Settings | None):
     global _settings
     if _settings:
-        from agent import AgentContext
+        from agents import AgentContext
         from initialize import initialize_agent
 
         config = initialize_agent()

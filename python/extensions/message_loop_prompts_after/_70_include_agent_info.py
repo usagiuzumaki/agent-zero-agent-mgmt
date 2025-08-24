@@ -1,5 +1,5 @@
 from python.helpers.extension import Extension
-from agent import LoopData
+from agents import LoopData
 
 class IncludeAgentInfo(Extension):
     async def execute(self, loop_data: LoopData = LoopData(), **kwargs):

@@ -1,4 +1,4 @@
-from agent import Agent, UserMessage
+from agents import Agent, UserMessage
 from python.helpers.tool import Tool, Response
 from python.tools.code_execution_tool import CodeExecution
 

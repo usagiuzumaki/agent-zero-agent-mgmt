@@ -1,7 +1,7 @@
 import asyncio
 from python.helpers.extension import Extension
 from python.helpers.memory import Memory
-from agent import LoopData
+from agents import LoopData
 from python.tools.memory_load import DEFAULT_THRESHOLD as DEFAULT_MEMORY_THRESHOLD
 from python.helpers import dirty_json, errors, settings
 

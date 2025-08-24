@@ -3,7 +3,7 @@ from typing import Any
 from python.helpers import extract_tools, files 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from agent import Agent
+    from agents import Agent
 
 class Extension:
 

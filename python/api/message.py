@@ -1,4 +1,4 @@
-from agent import AgentContext, UserMessage
+from agents import AgentContext, UserMessage
 from python.helpers.api import ApiHandler, Request, Response
 
 from python.helpers import files

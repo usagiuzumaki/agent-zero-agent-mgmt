@@ -293,7 +293,7 @@ class Bulk(Record):
 
 class History(Record):
     def __init__(self, agent):
-        from agent import Agent
+        from agents import Agent
 
         self.bulks: list[Bulk] = []
         self.topics: list[Topic] = []

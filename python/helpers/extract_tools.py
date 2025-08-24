@@ -79,7 +79,13 @@ def load_classes_from_folder(folder: str, name_pattern: str, base_class: Type[T]
 
     # Get all .py files in the folder that match the pattern, sorted alphabetically
     py_files = sorted(
-        [file_name for file_name in os.listdir(abs_folder) if fnmatch(file_name, name_pattern) and file_name.endswith(".py")]
+        [
+            file_name
+            for file_name in os.listdir(abs_folder)
+            if fnmatch(file_name, name_pattern)
+            and file_name.endswith(".py")
+            and not file_name.endswith("_test.py")
+        ]
     )
 
     # Iterate through the sorted list of files

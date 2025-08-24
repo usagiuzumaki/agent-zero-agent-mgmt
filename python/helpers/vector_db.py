@@ -15,7 +15,7 @@ from langchain_community.vectorstores.utils import (
 )
 from langchain.embeddings import CacheBackedEmbeddings
 
-from agent import Agent
+from agents import Agent
 
 
 class MyFaiss(FAISS):

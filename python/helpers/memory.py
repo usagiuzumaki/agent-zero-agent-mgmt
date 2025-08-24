@@ -28,7 +28,7 @@ import uuid
 from python.helpers import knowledge_import
 from python.helpers.log import Log, LogItem
 from enum import Enum
-from agent import Agent
+from agents import Agent
 import models
 import logging
 from simpleeval import simple_eval

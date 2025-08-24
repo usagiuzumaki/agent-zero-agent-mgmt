@@ -1,5 +1,5 @@
 import json
-from agent import LoopData
+from agents import LoopData
 from python.helpers.extension import Extension
 
 

@@ -1,5 +1,5 @@
 from python.helpers.extension import Extension
-from agent import LoopData
+from agents import LoopData
 from python.helpers import persist_chat
 
 

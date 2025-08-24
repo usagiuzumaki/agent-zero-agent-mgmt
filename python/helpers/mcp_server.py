@@ -6,7 +6,7 @@ from openai import BaseModel
 from pydantic import Field
 from fastmcp import FastMCP
 
-from agent import AgentContext, AgentContextType, UserMessage
+from agents import AgentContext, AgentContextType, UserMessage
 from python.helpers.persist_chat import save_tmp_chat, remove_chat
 from initialize import initialize_agent
 from python.helpers.print_style import PrintStyle
@@ -295,16 +295,18 @@ class DynamicMcpProxy:
 
         # Create a new MCP app with updated settings
         with self._lock:
-            self.app = create_sse_app(
+            kwargs = dict(
                 server=mcp_server,
                 message_path=mcp_server.settings.message_path,
                 sse_path=mcp_server.settings.sse_path,
-                auth_server_provider=mcp_server._auth_server_provider,
-                auth_settings=mcp_server.settings.auth,
                 debug=mcp_server.settings.debug,
                 routes=mcp_server._additional_http_routes,
                 middleware=[Middleware(BaseHTTPMiddleware, dispatch=mcp_middleware)],
             )
+            auth_provider = getattr(mcp_server, "_auth_server_provider", None)
+            if auth_provider is not None:
+                kwargs["auth_server_provider"] = auth_provider
+            self.app = create_sse_app(**kwargs)
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
         """Forward the ASGI calls to the current app"""
