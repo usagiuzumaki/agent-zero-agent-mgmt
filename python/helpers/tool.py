@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from dataclasses import dataclass
 
-from agent import Agent, LoopData
+from agents import Agent, LoopData
 from python.helpers.print_style import PrintStyle
 from python.helpers.strings import sanitize_string
 

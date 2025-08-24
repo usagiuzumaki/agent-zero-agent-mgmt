@@ -3,7 +3,7 @@ from python.helpers import settings
 from python.helpers.extension import Extension
 from python.helpers.memory import Memory
 from python.helpers.dirty_json import DirtyJson
-from agent import LoopData
+from agents import LoopData
 from python.helpers.log import LogItem
 from python.tools.memory_load import DEFAULT_THRESHOLD as DEFAULT_MEMORY_THRESHOLD
 

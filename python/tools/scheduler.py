@@ -8,7 +8,7 @@ from python.helpers.task_scheduler import (
     TaskScheduler, ScheduledTask, AdHocTask, PlannedTask,
     serialize_task, TaskState, TaskSchedule, TaskPlan, parse_datetime, serialize_datetime
 )
-from agent import AgentContext
+from agents import AgentContext
 from python.helpers import persist_chat
 
 DEFAULT_WAIT_TIMEOUT = 300

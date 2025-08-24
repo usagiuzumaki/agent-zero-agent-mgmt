@@ -1,7 +1,7 @@
 import asyncio
 import time
 from typing import Optional
-from agent import Agent, InterventionException
+from agents import Agent, InterventionException
 from pathlib import Path
 
 

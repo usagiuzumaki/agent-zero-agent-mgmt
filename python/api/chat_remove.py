@@ -1,5 +1,5 @@
 from python.helpers.api import ApiHandler, Input, Output, Request, Response
-from agent import AgentContext
+from agents import AgentContext
 from python.helpers import persist_chat
 from python.helpers.task_scheduler import TaskScheduler
 

@@ -1,7 +1,7 @@
 from typing import Any
 from python.helpers.extension import Extension
 from python.helpers.mcp_handler import MCPConfig
-from agent import Agent, LoopData
+from agents import Agent, LoopData
 
 
 class SystemPrompt(Extension):

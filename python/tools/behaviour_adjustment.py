@@ -1,6 +1,6 @@
 from python.helpers import files, memory
 from python.helpers.tool import Tool, Response
-from agent import Agent
+from agents import Agent
 from python.helpers.log import LogItem
 
 

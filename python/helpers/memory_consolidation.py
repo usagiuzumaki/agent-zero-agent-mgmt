@@ -12,7 +12,7 @@ from python.helpers.dirty_json import DirtyJson
 from python.helpers.log import LogItem
 from python.helpers.print_style import PrintStyle
 from python.tools.memory_load import DEFAULT_THRESHOLD as DEFAULT_MEMORY_THRESHOLD
-from agent import Agent
+from agents import Agent
 
 
 class ConsolidationAction(Enum):
