@@ -243,18 +243,24 @@ def get_unique_filenames_in_dirs(dir_paths: list[str], pattern: str = "*"):
     result.sort(key=lambda path: os.path.basename(path))
     return result
 
-def remove_code_fences(text):
-    # Pattern to match code fences with optional language specifier
-    pattern = r"(```|~~~)(.*?\n)(.*?)(\1)"
+def remove_code_fences(text: str) -> str:
+    """Remove Markdown-style code fences while preserving the inner code.
 
-    # Function to replace the code fences
-    def replacer(match):
-        return match.group(3)  # Return the code without fences
+    Parameters
+    ----------
+    text: str
+        The text that may contain fenced code blocks.
 
-    # Use re.DOTALL to make '.' match newlines
-    result = re.sub(pattern, replacer, text, flags=re.DOTALL)
+    Returns
+    -------
+    str
+        The text with any ``` or ~~~ fences stripped out, leaving only the code
+        content.
+    """
 
-    return result
+    pattern = re.compile(r"(```|~~~)(.*?\n)(.*?)(\1)", re.DOTALL)
+    # Inline replacer removes the opening and closing fence markers
+    return pattern.sub(lambda match: match.group(3), text)
 
 
 def is_full_json_template(text):
