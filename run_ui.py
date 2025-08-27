@@ -179,7 +179,7 @@ def run():
             pass  # Override to suppress request logging
 
     # Get configuration from environment
-    port = runtime.get_web_ui_port()
+    port = int(os.getenv("PORT") or runtime.get_web_ui_port())
     host = (
         runtime.get_arg("host") or dotenv.get_dotenv_value("WEB_UI_HOST") or "localhost"
     )
@@ -221,8 +221,6 @@ def run():
         },
     )
 
-    PrintStyle().debug(f"Starting server at http://{host}:{port} ...")
-
     server = make_server(
         host=host,
         port=port,
@@ -231,6 +229,9 @@ def run():
         threaded=True,
     )
     process.set_server(server)
+    port = server.server_port
+    runtime.args["port"] = port
+    PrintStyle().debug(f"Starting server at http://{host}:{port} ...")
     server.log_startup()
 
     # Start init_a0 in a background thread when server starts

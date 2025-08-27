@@ -42,6 +42,7 @@ open-clip-torch
 openai>=1.30.0
 openai-whisper==20240930
 paramiko==3.5.0
+pathspec
 peft>=0.10.0
 pillow>=10.3.0
 pillow-avif-plugin==1.4.3
