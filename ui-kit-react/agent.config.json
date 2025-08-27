@@ -1,0 +1,8 @@
+{
+  "apiEndpoint": "/api",
+  "features": {
+    "voice": false,
+    "memory": true,
+    "toolAccess": true
+  }
+}
