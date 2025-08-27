@@ -36,11 +36,27 @@ class EgirlTool(Tool):
                 output_path = kwargs.get("output_path", "outputs/egirl_tts.mp3")
                 path = text_to_speech(text, output_path)
                 return Response(message=f"voice at {path}" if path else "voice generation failed", break_loop=False)
-            if task == "stripe_checkout":
+            if task in ("stripe_checkout", "stripe_payment"):
                 from python.helpers.egirl.stripe import create_checkout_session
                 price_id = kwargs.get("price_id", "")
                 url = create_checkout_session(price_id, kwargs.get("success_url"), kwargs.get("cancel_url"))
                 return Response(message=url or "", break_loop=False)
+            if task == "stripe_subscription":
+                from python.helpers.egirl.stripe import create_subscription_session
+                price_id = kwargs.get("price_id", "")
+                url = create_subscription_session(price_id, kwargs.get("success_url"), kwargs.get("cancel_url"))
+                return Response(message=url or "", break_loop=False)
+            if task == "stripe_refund":
+                from python.helpers.egirl.stripe import create_refund
+                payment_intent = kwargs.get("payment_intent", "")
+                refund_id = create_refund(payment_intent)
+                return Response(message=refund_id or "", break_loop=False)
+            if task == "stripe_payout":
+                from python.helpers.egirl.stripe import create_payout
+                amount = kwargs.get("amount")
+                currency = kwargs.get("currency", "usd")
+                payout_id = create_payout(amount, currency)
+                return Response(message=payout_id or "", break_loop=False)
             if task == "persona_chat":
                 from python.helpers.egirl.persona import PersonaEngine
                 name = kwargs.get("name", "Aria")
