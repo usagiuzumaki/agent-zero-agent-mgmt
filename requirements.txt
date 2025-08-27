@@ -72,3 +72,7 @@ unstructured-client==0.25.9
 webcolors==24.6.0
 litellm
 a2wsgi
+
+pytesseract
+mss
+treys
