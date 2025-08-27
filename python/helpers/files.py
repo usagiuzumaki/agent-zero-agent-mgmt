@@ -17,7 +17,11 @@ import glob
 
 class VariablesPlugin(ABC):
     @abstractmethod
-    def get_variables(self, file: str, backup_dirs: list[str] | None = None) -> dict[str, Any]:  # type: ignore
+    def get_variables(
+        self,
+        file: str | None = None,
+        backup_dirs: list[str] | None = None,
+    ) -> dict[str, Any]:  # type: ignore
         pass
 
 
@@ -39,9 +43,18 @@ def load_plugin_variables(file: str, backup_dirs: list[str] | None = None) -> di
     if plugin_file and exists(plugin_file):
         
         from python.helpers import extract_tools
-        classes = extract_tools.load_classes_from_file(plugin_file, VariablesPlugin, one_per_file=False)
+        classes = extract_tools.load_classes_from_file(
+            plugin_file, VariablesPlugin, one_per_file=False
+        )
         for cls in classes:
-            return cls().get_variables(file, backup_dirs) # type: ignore < abstract class here is ok, it is always a subclass
+            plugin = cls()
+            try:
+                return plugin.get_variables(file, backup_dirs)  # type: ignore
+            except TypeError:
+                try:
+                    return plugin.get_variables(file)  # type: ignore
+                except TypeError:
+                    return plugin.get_variables()  # type: ignore
 
         # load python code and extract variables variables from it
         # module = None
