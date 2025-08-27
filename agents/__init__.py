@@ -21,3 +21,6 @@ __all__ = [
     "HandledException",
     "Agent",
 ]
+
+from .poker_ocr_agent import PokerOcrAgent
+__all__.append("PokerOcrAgent")
