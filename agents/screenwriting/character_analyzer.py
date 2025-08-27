@@ -1,9 +1,10 @@
 """Agent that evaluates character development and consistency."""
 
-from agents import Agent, AgentConfig
+from agents import AgentConfig
+from .base import ScreenwritingAgent
 
 
-class CharacterAnalyzer(Agent):
+class CharacterAnalyzer(ScreenwritingAgent):
     """Analyze character arcs and traits within a script."""
 
     def __init__(self, number: int, config: AgentConfig, context=None):

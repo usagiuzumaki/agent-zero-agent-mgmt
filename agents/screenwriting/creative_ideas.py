@@ -1,9 +1,10 @@
 """Agent that proposes plot twists, themes and creative concepts."""
 
-from agents import Agent, AgentConfig
+from agents import AgentConfig
+from .base import ScreenwritingAgent
 
 
-class CreativeIdeas(Agent):
+class CreativeIdeas(ScreenwritingAgent):
     """Generate creative ideas for screenwriting projects."""
 
     def __init__(self, number: int, config: AgentConfig, context=None):

@@ -1,9 +1,10 @@
 """Agent that tracks and amplifies emotional stakes in scripts."""
 
-from agents import Agent, AgentConfig
+from agents import AgentConfig
+from .base import ScreenwritingAgent
 
 
-class EmotionalTension(Agent):
+class EmotionalTension(ScreenwritingAgent):
     """Analyze emotional pacing and suggest tension improvements."""
 
     def __init__(self, number: int, config: AgentConfig, context=None):

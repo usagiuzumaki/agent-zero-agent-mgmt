@@ -1,9 +1,10 @@
 """Agent that formats a script into shareable HTML."""
 
-from agents import Agent, AgentConfig
+from agents import AgentConfig
+from .base import ScreenwritingAgent
 
 
-class ScriptFormatter(Agent):
+class ScriptFormatter(ScreenwritingAgent):
     """Produce formatted HTML from a Fountain script."""
 
     def __init__(self, number: int, config: AgentConfig, context=None):

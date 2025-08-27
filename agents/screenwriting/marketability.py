@@ -1,9 +1,10 @@
 """Agent that evaluates commercial potential and audience appeal."""
 
-from agents import Agent, AgentConfig
+from agents import AgentConfig
+from .base import ScreenwritingAgent
 
 
-class Marketability(Agent):
+class Marketability(ScreenwritingAgent):
     """Judge the market potential of a screenplay."""
 
     def __init__(self, number: int, config: AgentConfig, context=None):
