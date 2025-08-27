@@ -9,30 +9,30 @@
 
 :root {
   /* Dark mode */
-  --color-background-dark: #131313;
-  --color-text-dark: #d4d4d4;
-  --color-primary-dark: #737a81;
-  --color-secondary-dark: #656565;
-  --color-accent-dark: #cf6679;
-  --color-message-bg-dark: #2d2d2d;
-  --color-message-text-dark: #e0e0e0;
-  --color-panel-dark: #171717;
-  --color-border-dark: #444444a8;
-  --color-input-dark: #131313;
-  --color-input-focus-dark: #101010;
+  --color-background-dark: #2d021f;
+  --color-text-dark: #ffd1dc;
+  --color-primary-dark: #ff69b4;
+  --color-secondary-dark: #ff85c1;
+  --color-accent-dark: #ff1493;
+  --color-message-bg-dark: #3f0627;
+  --color-message-text-dark: #ffe4ec;
+  --color-panel-dark: #3a0229;
+  --color-border-dark: #ff85c1a8;
+  --color-input-dark: #2d021f;
+  --color-input-focus-dark: #3f0627;
 
   /* Light mode */
-  --color-background-light: #dbdbdb;
-  --color-text-light: #333333;
-  --color-primary-light: #384653;
-  --color-secondary-light: #e8eaf6;
-  --color-accent-light: #b00020;
-  --color-message-bg-light: #ffffff;
-  --color-message-text-light: #333333;
-  --color-panel-light: #f0f0f0;
-  --color-border-light: #e0e0e0c7;
-  --color-input-light: #e4e4e4;
-  --color-input-focus-light: #dadada;
+  --color-background-light: #ffe4ec;
+  --color-text-light: #33001a;
+  --color-primary-light: #ff69b4;
+  --color-secondary-light: #ffd1dc;
+  --color-accent-light: #ff1493;
+  --color-message-bg-light: #fff0f6;
+  --color-message-text-light: #33001a;
+  --color-panel-light: #ffe4ec;
+  --color-border-light: #ffb6c1c7;
+  --color-input-light: #ffd1dc;
+  --color-input-focus-light: #ffb6c1;
 
   /* Default to dark mode */
   --color-background: var(--color-background-dark);
@@ -2345,48 +2345,48 @@ nav ul li a img {
 }
 
 .scheduler-status-idle {
-  background-color: rgba(0, 100, 0, 0.2);
-  color: #2a9d8f; /* Dark green that works with both light and dark themes */
-  border: 1px solid rgba(42, 157, 143, 0.3);
+  background-color: rgba(255, 182, 193, 0.2);
+  color: #ffb6c1;
+  border: 1px solid rgba(255, 182, 193, 0.3);
 }
 
 .scheduler-status-running {
-  background-color: rgba(0, 60, 120, 0.2);
-  color: #4361ee; /* Dark blue that works with both light and dark themes */
-  border: 1px solid rgba(67, 97, 238, 0.3);
+  background-color: rgba(255, 105, 180, 0.2);
+  color: #ff69b4;
+  border: 1px solid rgba(255, 105, 180, 0.3);
 }
 
 .scheduler-status-disabled {
-  background-color: rgba(70, 70, 70, 0.2);
-  color: #6c757d; /* Dark grey that works with both light and dark themes */
-  border: 1px solid rgba(108, 117, 125, 0.3);
+  background-color: rgba(219, 112, 147, 0.2);
+  color: #db7093;
+  border: 1px solid rgba(219, 112, 147, 0.3);
 }
 
 .scheduler-status-error {
-  background-color: rgba(120, 0, 0, 0.2);
-  color: #e63946; /* Dark red that works with both light and dark themes */
-  border: 1px solid rgba(230, 57, 70, 0.3);
+  background-color: rgba(255, 20, 147, 0.2);
+  color: #ff1493;
+  border: 1px solid rgba(255, 20, 147, 0.3);
 }
 
 /* Light mode adjustments */
 .light-mode .scheduler-status-idle {
-  background-color: rgba(42, 157, 143, 0.1);
-  color: #1a6f65; /* Darker green for light mode */
+  background-color: rgba(255, 182, 193, 0.1);
+  color: #c71585;
 }
 
 .light-mode .scheduler-status-running {
-  background-color: rgba(67, 97, 238, 0.1);
-  color: #2540b3; /* Darker blue for light mode */
+  background-color: rgba(255, 105, 180, 0.1);
+  color: #ff1493;
 }
 
 .light-mode .scheduler-status-disabled {
-  background-color: rgba(108, 117, 125, 0.1);
-  color: #495057; /* Darker grey for light mode */
+  background-color: rgba(219, 112, 147, 0.1);
+  color: #b03060;
 }
 
 .light-mode .scheduler-status-error {
-  background-color: rgba(230, 57, 70, 0.1);
-  color: #c5283d; /* Darker red for light mode */
+  background-color: rgba(255, 20, 147, 0.1);
+  color: #c71585;
 }
 
 .scheduler-empty {
