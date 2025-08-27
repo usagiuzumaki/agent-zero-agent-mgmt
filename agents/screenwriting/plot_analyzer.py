@@ -1,9 +1,10 @@
 """Agent that inspects plot structure and pacing."""
 
-from agents import Agent, AgentConfig
+from agents import AgentConfig
+from .base import ScreenwritingAgent
 
 
-class PlotAnalyzer(Agent):
+class PlotAnalyzer(ScreenwritingAgent):
     """Examine plot coherence and structural elements."""
 
     def __init__(self, number: int, config: AgentConfig, context=None):

@@ -1,9 +1,10 @@
 """Agent that collaborates on drafting and editing scenes."""
 
-from agents import Agent, AgentConfig
+from agents import AgentConfig
+from .base import ScreenwritingAgent
 
 
-class CoWriter(Agent):
+class CoWriter(ScreenwritingAgent):
     """Assist in writing or rewriting screenplay content."""
 
     def __init__(self, number: int, config: AgentConfig, context=None):

@@ -1,9 +1,10 @@
 """Agent that tracks revisions and manages screenplay versions."""
 
-from agents import Agent, AgentConfig
+from agents import AgentConfig
+from .base import ScreenwritingAgent
 
 
-class VersionTracker(Agent):
+class VersionTracker(ScreenwritingAgent):
     """Keep history of script versions and changes."""
 
     def __init__(self, number: int, config: AgentConfig, context=None):

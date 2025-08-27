@@ -1,9 +1,10 @@
 """Agent that reviews and improves dialogue for natural flow."""
 
-from agents import Agent, AgentConfig
+from agents import AgentConfig
+from .base import ScreenwritingAgent
 
 
-class DialogueEvaluator(Agent):
+class DialogueEvaluator(ScreenwritingAgent):
     """Assess dialogue quality and suggest enhancements."""
 
     def __init__(self, number: int, config: AgentConfig, context=None):

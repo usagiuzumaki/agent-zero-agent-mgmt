@@ -1,5 +1,6 @@
 """Screenwriting agents package."""
 
+from .base import ScreenwritingAgent
 from .character_analyzer import CharacterAnalyzer
 from .co_writer import CoWriter
 from .creative_ideas import CreativeIdeas
@@ -11,6 +12,7 @@ from .script_formatter import ScriptFormatter
 from .version_tracker import VersionTracker
 
 __all__ = [
+    "ScreenwritingAgent",
     "CharacterAnalyzer",
     "CoWriter",
     "CreativeIdeas",
