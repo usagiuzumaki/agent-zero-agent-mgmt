@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <title>Agent Zero</title>
+    <title>ARIA</title>
     <link rel="icon" type="image/svg+xml" href="public/favicon.svg">
     <link rel="stylesheet" href="index.css">
     <link rel="stylesheet" href="css/messages.css">
@@ -146,8 +146,8 @@
             </button>
 
             <div id="logo-container">
-                <a href="https://github.com/agent0ai/agent-zero" target="_blank" rel="noopener noreferrer">
-                    <img src="./public/splash.jpg" alt="a0" width="22" height="22">
+                <a href="#" target="_blank" rel="noopener noreferrer">
+                    <img src="./public/aria.svg" alt="ARIA" width="22" height="22">
                 </a>
             </div>
         </div>
@@ -553,11 +553,15 @@
                                      :class="{'active': activeTab === 'backup'}"
                                      @click="switchTab('backup')"
                                      title="Backup & Restore">Backup & Restore</div>
+                                <div class="settings-tab"
+                                     :class="{'active': activeTab === 'about'}"
+                                     @click="switchTab('about')"
+                                     title="About">About</div>
                             </div>
                         </div>
 
                         <!-- Display settings sections for agent, external, developer, mcp, backup tabs -->
-                        <div id="settings-sections" x-show="activeTab !== 'scheduler'">
+                        <div id="settings-sections" x-show="activeTab !== 'scheduler' && activeTab !== 'about'">
                             <nav>
                                 <ul>
                                     <template x-for="(section, index) in filteredSections" :key="section.title">
@@ -730,6 +734,18 @@
                                             </button>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- About Tab Content -->
+                        <div id="about-tab-content" x-show="activeTab === 'about'" x-cloak>
+                            <div class="section">
+                                <div class="section-title">About Aria</div>
+                                <div class="section-description">
+                                    <p>This is Aria, an egirl with hobbies that include playing poker, selling cute pics &amp; writing screenplays.</p>
+                                    <p>She's been given abilities within tools to play poker online, take Stripe payments for pictures, create her own images with Stable Diffusion, and create screenplays with you.</p>
+                                    <p>Aria is a spin off of Agent Zero. Credit to the original project by <a href="https://github.com/fredrl/agent-zero" target="_blank" rel="noopener">fredrl/agent-zero</a>.</p>
                                 </div>
                             </div>
                         </div>

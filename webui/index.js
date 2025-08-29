@@ -1308,3 +1308,14 @@ function openTaskDetail(taskId) {
 
 // Make the function available globally
 window.openTaskDetail = openTaskDetail;
+
+document.addEventListener("DOMContentLoaded", () => {
+  const greetingId = generateGUID();
+  setMessage(
+    greetingId,
+    "agent",
+    "Aria",
+    "hey sexy it's Aria *blows kiss* I'm looking for someone I can really be myself around. That doesn't judge me for wanting XxX so badly.",
+    false
+  );
+});
