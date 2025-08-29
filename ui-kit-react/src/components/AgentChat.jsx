@@ -11,15 +11,21 @@ export default function AgentChat({ onLog }) {
 
   const sendMessage = () => {
     if (!input.trim()) return;
-    const userMsg = { sender: 'user', text: input };
-    setMessages([...messages, userMsg]);
-    onLog && onLog(`user: ${input}`);
+    const text = input;
+    setMessages((prev) => [
+      ...prev,
+      { id: crypto.randomUUID(), sender: 'user', text },
+    ]);
+    onLog && onLog(`user: ${text}`);
     setInput('');
   };
 
   const handleTool = (tool) => {
     tool.action((msg) => {
-      setMessages((prev) => [...prev, { sender: 'agent', text: msg }]);
+      setMessages((prev) => [
+        ...prev,
+        { id: crypto.randomUUID(), sender: 'agent', text: msg },
+      ]);
       onLog && onLog(`agent: ${msg}`);
     });
   };
@@ -27,8 +33,8 @@ export default function AgentChat({ onLog }) {
   return (
     <div className="agent-chat">
       <div className="messages">
-        {messages.map((m, i) => (
-          <div key={i} className={`msg msg-${m.sender}`}>{m.text}</div>
+        {messages.map((m) => (
+          <div key={m.id} className={`msg msg-${m.sender}`}>{m.text}</div>
         ))}
       </div>
       <div className="tool-bar">
