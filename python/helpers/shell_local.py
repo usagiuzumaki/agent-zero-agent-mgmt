@@ -1,3 +1,4 @@
+import asyncio
 import select
 import subprocess
 import time
@@ -65,17 +66,12 @@ class LocalInteractiveSession:
                 if line:
                     partial_output += line
                     self.full_output += line
-                    data_received = True
 
-            if stderr in rlist:
-                line = stderr.readline()
-                if line:
-                    partial_output += line
-                    self.full_output += line
-                    data_received = True
-
-            if not data_received:
-                time.sleep(0.1)
+                    await asyncio.sleep(0.1)
+                else:
+                    break  # No more output
+            else:
+                break  # No data available
 
         if not partial_output:
             return self.full_output, None
