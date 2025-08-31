@@ -1,3 +1,4 @@
+import asyncio
 import select
 import subprocess
 import time
@@ -60,7 +61,7 @@ class LocalInteractiveSession:
                 if line:
                     partial_output += line
                     self.full_output += line
-                    time.sleep(0.1)
+                    await asyncio.sleep(0.1)
                 else:
                     break  # No more output
             else:
