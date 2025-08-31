@@ -98,28 +98,36 @@ def gpt5(
 
 
 def _eleven_tts(text: str) -> str:
-    """Convert text to speech with ElevenLabs if available."""
-    api_key = os.getenv("ELEVENLABS_API_KEY")
-    voice_id = os.getenv("PERSONA_VOICE_ID")
-    if ElevenLabs and api_key and voice_id:
-        try:
-            client = ElevenLabs(api_key=api_key)
-            audio = client.text_to_speech.convert(
-                voice_id=voice_id,
-                model_id="eleven_multilingual_v2",
-                text=text,
-                output_format="mp3_44100_128",
-            )
-            os.makedirs("outputs", exist_ok=True)
-            path = os.path.join("outputs", "aria_tts.mp3")
-            with open(path, "wb") as f:
-                for chunk in audio:
-                    if chunk:
-                        f.write(chunk)
-            return path
-        except Exception:
-            pass
-    return ""
+    """Convert text to speech with ElevenLabs.
+
+    Requires ``ELEVENLABS_API_KEY`` and ``PERSONA_VOICE_ID`` to be set. Raises
+    ``RuntimeError`` if the service is not configured or fails."""
+
+    api_key = (os.getenv("ELEVENLABS_API_KEY") or "").strip()
+    voice_id = (os.getenv("PERSONA_VOICE_ID") or "").strip()
+
+    if ElevenLabs is None:
+        raise RuntimeError("ElevenLabs library not installed")
+    if not api_key or not voice_id:
+        raise RuntimeError("ELEVENLABS_API_KEY and PERSONA_VOICE_ID must be set")
+
+    client = ElevenLabs(api_key=api_key)
+    try:  # pragma: no cover - network interaction
+        audio = client.text_to_speech.convert(
+            voice_id=voice_id,
+            model_id="eleven_multilingual_v2",
+            text=text,
+            output_format="mp3_44100_128",
+        )
+        os.makedirs("outputs", exist_ok=True)
+        path = os.path.join("outputs", "aria_tts.mp3")
+        with open(path, "wb") as f:
+            for chunk in audio:
+                if chunk:
+                    f.write(chunk)
+        return path
+    except Exception as e:  # pragma: no cover - network interaction
+        raise RuntimeError(f"ElevenLabs TTS error: {e}") from e
 
 
 def _post_to_instagram(image_path: str, caption: str) -> str:
