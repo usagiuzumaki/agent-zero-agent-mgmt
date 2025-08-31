@@ -13,7 +13,9 @@ try:  # pragma: no cover - optional dependency
 except Exception:  # pragma: no cover
     StableDiffusionPipeline = None  # type: ignore
 
-_MODEL_ID = os.getenv("SD_MODEL_NAME", "runwayml/stable-diffusion-v1-5")
+# Default to a hyper-realistic model capable of NSFW generation.
+# The model can be overridden via the ``SD_MODEL_NAME`` environment variable.
+_MODEL_ID = os.getenv("SD_MODEL_NAME", "SG161222/Realistic_Vision_V5.1_noVAE")
 _MODEL_PATH = os.getenv("SD_MODEL_PATH")
 _pipe: Optional["StableDiffusionPipeline"] = None
 
@@ -28,12 +30,33 @@ def _load_pipeline() -> "StableDiffusionPipeline":
         if _MODEL_PATH:
             model_path = Path(_MODEL_PATH).expanduser()
             if model_path.is_file():
-                _pipe = StableDiffusionPipeline.from_single_file(str(model_path), torch_dtype=dtype)
+                _pipe = StableDiffusionPipeline.from_single_file(
+                    str(model_path),
+                    torch_dtype=dtype,
+                    safety_checker=None,
+                    feature_extractor=None,
+                    requires_safety_checker=False,
+                )
             else:
-                _pipe = StableDiffusionPipeline.from_pretrained(str(model_path), torch_dtype=dtype)
+                _pipe = StableDiffusionPipeline.from_pretrained(
+                    str(model_path),
+                    torch_dtype=dtype,
+                    safety_checker=None,
+                    feature_extractor=None,
+                    requires_safety_checker=False,
+                )
         else:
-            _pipe = StableDiffusionPipeline.from_pretrained(_MODEL_ID, torch_dtype=dtype)
+            _pipe = StableDiffusionPipeline.from_pretrained(
+                _MODEL_ID,
+                torch_dtype=dtype,
+                safety_checker=None,
+                feature_extractor=None,
+                requires_safety_checker=False,
+            )
         _pipe.to(device)
+        # Ensure safety checker is disabled for unrestricted generation
+        if hasattr(_pipe, "safety_checker"):
+            _pipe.safety_checker = None
     return _pipe
 
 
