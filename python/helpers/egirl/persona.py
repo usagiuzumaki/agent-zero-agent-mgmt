@@ -6,6 +6,8 @@ from python.helpers.aria_tools import (
     gpt5,
     ARIA_TOOLS,
     ALLOWED_TTS,
+    ALLOWED_IMAGE,
+    ALLOWED_STRIPE,
     handle_tool_call,
 )
 
@@ -36,18 +38,22 @@ class PersonaEngine:
         messages = [{"role": "system", "content": self.system_prompt}] + self.history
 
         audio_path = None
+        tool_result = None
         try:
-            resp = gpt5(messages, tools=ARIA_TOOLS, allowed=ALLOWED_TTS)
+            allowed = ALLOWED_TTS + ALLOWED_IMAGE + ALLOWED_STRIPE
+            resp = gpt5(messages, tools=ARIA_TOOLS, allowed=allowed)
             for item in getattr(resp, "output", []):
                 if getattr(item, "type", "") == "tool_call":
                     followup, result = handle_tool_call(item)
                     resp = followup
                     if getattr(item, "name", "") == "eleven_tts":
                         audio_path = result
+                    else:
+                        tool_result = result
             text = resp.output_text
         except Exception as e:
             logging.error(f"OpenAI error: {e}")
             raise
 
         self.history.append({"role": "assistant", "content": text})
-        return {"text": text, "audio_path": audio_path}
+        return {"text": text, "audio_path": audio_path, "tool_result": tool_result}

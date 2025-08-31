@@ -41,12 +41,27 @@ ARIA_TOOLS: List[Dict[str, Any]] = [
             "required": ["image_path", "caption"],
         },
     },
+    {
+        "type": "function",
+        "name": "stripe_checkout",
+        "description": "Create a Stripe checkout session and return the payment URL.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "price_id": {"type": "string"},
+                "success_url": {"type": "string"},
+                "cancel_url": {"type": "string"},
+            },
+            "required": ["price_id"],
+        },
+    },
 ]
 
 # allowed tool groupings
 ALLOWED_IMAGE = [{"type": "custom", "name": "sd_image"}]
 ALLOWED_TTS = [{"type": "custom", "name": "eleven_tts"}]
 ALLOWED_INSTAGRAM = [{"type": "function", "name": "post_to_instagram"}]
+ALLOWED_STRIPE = [{"type": "function", "name": "stripe_checkout"}]
 
 def gpt5(
     prompt: Any,
@@ -112,6 +127,15 @@ def _post_to_instagram(image_path: str, caption: str) -> str:
     return f"posted {image_path} with caption {caption}"
 
 
+def _stripe_checkout(price_id: str, success_url: str | None = None, cancel_url: str | None = None) -> str:
+    """Create a Stripe checkout session if Stripe is configured."""
+    try:
+        from python.helpers.egirl.stripe import create_checkout_session
+        return create_checkout_session(price_id, success_url, cancel_url) or ""
+    except Exception:
+        return ""
+
+
 def handle_tool_call(msg: Any) -> Tuple[Any, str | None]:
     """Handle tool calls returned by the model.
 
@@ -142,6 +166,17 @@ def handle_tool_call(msg: Any) -> Tuple[Any, str | None]:
         image_path = args.get("image_path", "")
         caption = args.get("caption", "")
         result = _post_to_instagram(image_path, caption)
+    elif name == "stripe_checkout":
+        args = getattr(msg, "arguments", {})
+        if isinstance(args, str):
+            try:
+                args = json.loads(args)
+            except Exception:
+                args = {}
+        price_id = args.get("price_id", "")
+        success_url = args.get("success_url")
+        cancel_url = args.get("cancel_url")
+        result = _stripe_checkout(price_id, success_url, cancel_url)
     else:
         return msg, None
 

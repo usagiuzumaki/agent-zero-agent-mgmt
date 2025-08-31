@@ -1,4 +1,6 @@
-import os, logging
+import os
+import logging
+
 try:
     import stripe
 except Exception as e:  # pragma: no cover - optional dependency
