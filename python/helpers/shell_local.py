@@ -53,20 +53,31 @@ class LocalInteractiveSession:
         partial_output = ''
         start_time = time.time()
         
-        while (timeout <= 0 or time.time() - start_time < timeout):
-            rlist, _, _ = select.select([self.process.stdout], [], [], 0.1)
-            if rlist:
-                line = self.process.stdout.readline()  # type: ignore
+        stdout = self.process.stdout  # type: ignore
+        stderr = self.process.stderr  # type: ignore
+
+        while timeout <= 0 or time.time() - start_time < timeout:
+            rlist, _, _ = select.select([stdout, stderr], [], [], 0.1)
+            data_received = False
+
+            if stdout in rlist:
+                line = stdout.readline()
                 if line:
                     partial_output += line
                     self.full_output += line
-                    time.sleep(0.1)
-                else:
-                    break  # No more output
-            else:
-                break  # No data available
+                    data_received = True
+
+            if stderr in rlist:
+                line = stderr.readline()
+                if line:
+                    partial_output += line
+                    self.full_output += line
+                    data_received = True
+
+            if not data_received:
+                time.sleep(0.1)
 
         if not partial_output:
             return self.full_output, None
-        
+
         return self.full_output, partial_output
