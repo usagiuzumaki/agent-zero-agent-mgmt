@@ -115,7 +115,18 @@ class LiteLLMChatWrapper(SimpleChatModel):
     kwargs: dict = {}
 
     def __init__(self, model: str, provider: str, **kwargs: Any):
-        model_value = f"{provider}/{model}"
+        """Initialize the wrapper ensuring a clean model name.
+
+        Users may provide model identifiers with surrounding quotes or the
+        provider prefix already included. Normalise the string to avoid
+        duplicated prefixes and whitespace that can cause provider API
+        lookups to fail.
+        """
+        model_clean = model.strip().strip("\"").strip("'")
+        if not model_clean.startswith(f"{provider}/"):
+            model_value = f"{provider}/{model_clean}"
+        else:
+            model_value = model_clean
         super().__init__(model_name=model_value, provider=provider, kwargs=kwargs)  # type: ignore
 
     @property
@@ -467,7 +478,8 @@ def _merge_provider_defaults(
         extra_kwargs = cfg.get("kwargs") if isinstance(cfg, dict) else None  # type: ignore[arg-type]
         if isinstance(extra_kwargs, dict):
             for k, v in extra_kwargs.items():
-                kwargs.setdefault(k, v)
+                if k not in kwargs or kwargs[k] in (None, ""):
+                    kwargs[k] = v
 
     # Inject API key based on the *original* provider id if still missing
     if "api_key" not in kwargs:
