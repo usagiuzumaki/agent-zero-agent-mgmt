@@ -18,10 +18,15 @@ class EgirlTool(Tool):
                 comment_on_hashtags(tags, text, max_posts)
                 return Response(message="comments attempted", break_loop=False)
             if task == "generate_image":
-                from python.helpers.egirl.dreambooth import generate_persona_image
+                from python.helpers.stable_diffusion import generate_image
+                import os
                 prompt = kwargs.get("prompt", "")
-                output_path = kwargs.get("output_path", "outputs/persona.png")
-                path = generate_persona_image(prompt, output_path)
+                # allow either output_dir or legacy output_path argument
+                output_dir = kwargs.get("output_dir")
+                if not output_dir:
+                    output_path = kwargs.get("output_path", "outputs")
+                    output_dir = os.path.dirname(output_path) or "outputs"
+                path = generate_image(prompt, output_dir=output_dir)
                 return Response(message=f"generated {path}", break_loop=False)
             if task == "generate_video":
                 from python.helpers.egirl.video import generate_video_from_image
@@ -62,8 +67,13 @@ class EgirlTool(Tool):
                 name = kwargs.get("name", "Aria")
                 msg = kwargs.get("message", "")
                 persona = PersonaEngine(name)
-                reply = persona.generate_response(msg)
-                return Response(message=str(reply), break_loop=False)
+                result = persona.generate_response(msg)
+                message = result.get("text", "")
+                if result.get("audio_path"):
+                    message += f" (audio: {result['audio_path']})"
+                if result.get("tool_result"):
+                    message += f" (result: {result['tool_result']})"
+                return Response(message=message, break_loop=False)
         except Exception as e:
             return Response(message=f"error: {e}", break_loop=False)
         return Response(message="unknown task", break_loop=False)

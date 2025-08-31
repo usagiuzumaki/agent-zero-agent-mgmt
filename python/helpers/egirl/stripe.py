@@ -1,7 +1,6 @@
 import os
 import logging
 
-try:  # pragma: no cover - optional dependency
     import stripe
 except Exception as e:  # pragma: no cover
     stripe = None  # type: ignore
