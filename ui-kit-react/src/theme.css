@@ -72,3 +72,19 @@ body {
   overflow: auto;
   font-size: 0.8rem;
 }
+
+/* Custom UI section selector */
+.ui-select {
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+/* Screenwriting and E-girl headings */
+.screenwriting-ui h2,
+.egirl-ui h2 {
+  margin-top: 0;
+}
+
+.egirl-ui h2 {
+  color: #db2777;
+}
