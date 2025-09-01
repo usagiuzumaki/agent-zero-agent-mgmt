@@ -158,12 +158,17 @@ def handle_tool_call(msg: Any) -> Tuple[Any, str | None]:
 
     name = getattr(msg, "name", "")
     result: str | None = None
+    error: str | None = None
     if name == "sd_image":
         prompt = getattr(msg, "arguments", "")
         result = _sd_generate(prompt)
     elif name == "eleven_tts":
         text = getattr(msg, "arguments", "")
-        result = _eleven_tts(text)
+        try:
+            result = _eleven_tts(text)
+        except Exception as e:  # pragma: no cover - network interaction
+            error = str(e)
+            result = None
     elif name == "post_to_instagram":
         args = getattr(msg, "arguments", {})
         if isinstance(args, str):
@@ -188,12 +193,16 @@ def handle_tool_call(msg: Any) -> Tuple[Any, str | None]:
     else:
         return msg, None
 
+    content = {"result": result}
+    if error:
+        content = {"error": error}
+
     followup = client.responses.create(
         model="gpt-5",
         input=[
             {
                 "role": "tool",
-                "content": json.dumps({"result": result}),
+                "content": json.dumps(content),
                 "tool_call_id": getattr(msg, "id", ""),
             }
         ],
