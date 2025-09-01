@@ -56,14 +56,10 @@ class LocalInteractiveSession:
             self.full_output = ""
         partial_output = ''
         start_time = time.time()
-
-        while time.time() - start_time < timeout:
-            rlist, _, _ = select.select([self.process.stdout], [], [], 0.1)
-            if rlist:
-                line = self.process.stdout.readline()  # type: ignore
                 if line:
                     partial_output += line
                     self.full_output += line
+
                     await asyncio.sleep(0.1)
                 else:
                     break  # No more output
