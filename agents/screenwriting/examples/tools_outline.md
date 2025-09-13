@@ -30,11 +30,23 @@ Converts Fountain scripts into shareable HTML using the `fountain_to_html` instr
 Maintains a history of screenplay revisions and notes.
 
 ## ScreamAnalyzer *(new)*
-Identifies and highlights moments of heightened emotion or "screams" within text to ensure intense beats land effectively.
+Identifies, highlights, and now classifies the intensity of emotional outbursts to ensure dramatic beats land effectively.
+
+## PacingMetrics *(new)*
+Computes basic pacing statistics, such as sentence counts and average sentence length, with automated tests.
+
+## WorldBuilder *(new)*
+Checks lore or setting notes for world-building consistency and contradictions.
+
+## StoryboardGenerator *(new)*
+Creates concise scene-by-scene visual prompts to aid storyboard artists.
+
+## MBTIEvaluator *(new)*
+Provides a lightweight MBTI-style personality assessment based on character descriptions.
 
 ---
 
 ### Ideas for Further Enhancement
-- Integrate automated testing for pacing metrics.
-- Expand ScreamAnalyzer to classify different intensity levels.
-- Add tools for world-building consistency and visual storyboard generation.
+- Visualize pacing metrics across acts or scenes.
+- Enrich MBTI evaluation with deeper narrative context.
+- Develop collaborative world-building editors with version tracking.
