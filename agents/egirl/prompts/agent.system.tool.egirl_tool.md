@@ -1,4 +1,4 @@
-# EgirlTool
+### egirl_tool:
 - Use `task: post_instagram` with `image_url` and `caption` to publish a picture.
 - Use `task: comment_instagram` with `hashtags`, `text`, and optional `max_posts` to comment on posts.
 - Use `task: generate_image` with `prompt` and optional `output_dir` to create an image via Stable Diffusion.
@@ -9,3 +9,16 @@
 - Use `task: stripe_refund` with `payment_intent` to refund a payment.
 - Use `task: stripe_payout` with `amount` and optional `currency` to issue a payout.
 - Use `task: persona_chat` with `message` and optional `name` for a stylized reply.
+
+**Example usage**:
+~~~json
+{
+    "thoughts": ["..."] ,
+    "tool_name": "egirl_tool",
+    "tool_args": {
+        "task": "post_instagram",
+        "image_url": "https://example.com/image.jpg",
+        "caption": "hello"
+    }
+}
+~~~

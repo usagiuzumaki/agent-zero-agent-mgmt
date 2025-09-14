@@ -811,6 +811,16 @@ class Agent:
     ):
         from python.tools.unknown import Unknown
         from python.helpers.tool import Tool
+        import re
+
+        def normalize_tool_name(tool_name: str) -> str:
+            """Convert various tool name formats to snake_case."""
+            tool_name = tool_name.strip()
+            tool_name = re.sub(r"(?<!^)(?=[A-Z])", "_", tool_name)
+            tool_name = re.sub(r"[^\w]", "_", tool_name)
+            return tool_name.lower()
+
+        normalized_name = normalize_tool_name(name)
 
         classes = []
 
@@ -818,22 +828,22 @@ class Agent:
         if self.config.profile:
             try:
                 classes = extract_tools.load_classes_from_file(
-                    "agents/" + self.config.profile + "/tools/" + name + ".py", Tool
+                    f"agents/{self.config.profile}/tools/{normalized_name}.py", Tool
                 )
-            except Exception as e:
+            except Exception:
                 pass
 
         # try default tools
         if not classes:
             try:
                 classes = extract_tools.load_classes_from_file(
-                    "python/tools/" + name + ".py", Tool
+                    f"python/tools/{normalized_name}.py", Tool
                 )
-            except Exception as e:
+            except Exception:
                 pass
         tool_class = classes[0] if classes else Unknown
         return tool_class(
-            agent=self, name=name, method=method, args=args, message=message, loop_data=loop_data, **kwargs
+            agent=self, name=normalized_name, method=method, args=args, message=message, loop_data=loop_data, **kwargs
         )
 
     async def call_extensions(self, extension_point: str, **kwargs) -> Any:
