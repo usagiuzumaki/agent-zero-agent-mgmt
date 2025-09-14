@@ -33,9 +33,18 @@ def get_mcp_tools_prompt(agent: Agent):
     mcp_config = MCPConfig.get_instance()
     if mcp_config.servers:
         pre_progress = agent.context.log.progress
-        agent.context.log.set_progress("Collecting MCP tools") # MCP might be initializing, better inform via progress bar
-        tools = MCPConfig.get_instance().get_tools_prompt()
-        agent.context.log.set_progress(pre_progress) # return original progress
+        agent.context.log.set_progress(
+            "Collecting MCP tools"
+        )  # MCP might be initializing, better inform via progress bar
+        tools = mcp_config.get_tools_prompt()
+        agent.context.log.set_progress(pre_progress)  # return original progress
+
+        # allow agents to customize how the tools are presented by providing
+        # a `agent.system.mcp_tools.md` prompt file. The placeholder
+        # `{{tools}}` will be replaced with the generated tool list.
+        template = agent.read_prompt("agent.system.mcp_tools.md")
+        if template:
+            return template.replace("{{tools}}", tools)
         return tools
     return ""
         

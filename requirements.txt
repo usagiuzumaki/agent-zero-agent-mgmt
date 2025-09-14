@@ -23,6 +23,7 @@ inflection
 inputimeout==1.0.4
 jsonmerge
 kornia
+kokoro
 langchain-anthropic==0.1.19
 langchain-community==0.2.7
 langchain-google-genai==1.0.7
