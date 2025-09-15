@@ -24,3 +24,6 @@ __all__ = [
 
 from .poker_ocr_agent import PokerOcrAgent
 __all__.append("PokerOcrAgent")
+
+from .poker import PokerAgent
+__all__.append("PokerAgent")
