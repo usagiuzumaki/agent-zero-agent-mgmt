@@ -21,3 +21,6 @@
 {{ include './agent.system.tool.document_query.md' }}
 
 {{ include './agent.system.tool.egirl_tool.md' }}
+
+{{ include './agent.system.tool.egirl_sd_colab_tool.md' }}
+
