@@ -1,10 +1,8 @@
-"""Tool package for the egirl agent.
-
-Exposes the :class:`EgirlTool` and the shared :class:`CodeExecution`
-so the agent can register them during dynamic tool discovery."""
+"""Tool package for the egirl agent."""
 
 from python.tools.code_execution_tool import CodeExecution
 from .egirl_tool import EgirlTool
+from .egirl_sd_colab_tool import EgirlStableDiffusionColabTool
 
-__all__ = ["EgirlTool", "CodeExecution"]
+__all__ = ["EgirlTool", "EgirlStableDiffusionColabTool", "CodeExecution"]
 
