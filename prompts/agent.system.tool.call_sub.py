@@ -43,12 +43,18 @@ class CallSubordinate(VariablesPlugin):
         """
         # Collect all agent profile contexts from subdirectories of ``agents``
         profiles: list[dict[str, Any]] = []
-        agent_subdirs = files.get_subdirectories("agents", exclude=["_example"])
+        agent_subdirs = files.get_subdirectories(
+            "agents", exclude=["_example", "__pycache__"]
+        )
         for agent_subdir in agent_subdirs:
             try:
-                context = files.read_file(
-                    files.get_abs_path("agents", agent_subdir, "_context.md")
+                context_path = files.get_abs_path(
+                    "agents", agent_subdir, "_context.md"
                 )
+                if not files.exists("agents", agent_subdir, "_context.md"):
+                    continue
+
+                context = files.read_file(context_path)
                 profiles.append({"name": agent_subdir, "context": context})
             except Exception as e:
                 # Log and skip any profile that fails to load rather than

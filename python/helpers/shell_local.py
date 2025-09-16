@@ -54,17 +54,31 @@ class LocalInteractiveSession:
 
         if reset_full_output:
             self.full_output = ""
+
         partial_output = ''
         start_time = time.time()
-                if line:
-                    partial_output += line
-                    self.full_output += line
 
-                    await asyncio.sleep(0.1)
-                else:
-                    break  # No more output
-            else:
+        while time.time() - start_time < timeout:
+            stdout = self.process.stdout
+            if stdout is None:
+                break
+
+            rlist, _, _ = select.select([stdout], [], [], 0.1)
+            if not rlist:
                 break  # No data available
+
+            line = stdout.readline()  # type: ignore[arg-type]
+            if not line:
+                break  # No more output
+
+            partial_output += line
+            self.full_output += line
+
+            # Give the subprocess a tiny bit of time to flush any
+            # additional output before we loop back around.  This helps
+            # avoid returning prematurely when commands emit output in
+            # rapid bursts.
+            await asyncio.sleep(0.1)
 
         if not partial_output:
             return self.full_output, None
