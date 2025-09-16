@@ -2,6 +2,7 @@ import argparse
 import inspect
 import secrets
 from typing import TypeVar, Callable, Awaitable, Union, overload, cast
+from urllib.parse import urlparse, urlunparse
 from python.helpers import dotenv, rfc, files
 import asyncio
 import threading
@@ -82,7 +83,8 @@ async def call_development_function(func: Union[Callable[..., T], Callable[..., 
     if is_development():
         url = _get_rfc_url()
         password = _get_rfc_password()
-        module = files.deabsolute_path(func.__code__.co_filename).replace("/", ".").removesuffix(".py") # __module__ is not reliable
+        rel_path = files.deabsolute_path(func.__code__.co_filename)
+        module = rel_path.replace("\\", "/").replace("/", ".").removesuffix(".py")  # __module__ is not reliable
         result = await rfc.call_rfc(
             url=url,
             password=password,
@@ -114,14 +116,42 @@ def _get_rfc_url() -> str:
     from python.helpers import settings
 
     set = settings.get_settings()
-    url = set["rfc_url"]
-    if not "://" in url:
-        url = "http://"+url
-    if url.endswith("/"):
-        url = url[:-1]
-    url = url+":"+str(set["rfc_port_http"])
-    url += "/rfc"
-    return url
+
+    raw_url = set["rfc_url"].strip()
+    if not raw_url:
+        raw_url = "localhost"
+
+    if "://" not in raw_url:
+        raw_url = f"http://{raw_url}"
+
+    parsed = urlparse(raw_url)
+
+    scheme = parsed.scheme or "http"
+    host = parsed.hostname or parsed.path or "localhost"
+
+    # Always expose the RFC HTTP endpoint on port 5000 for consistency across environments.
+    port = 5000
+
+    # normalize IPv6 formatting
+    formatted_host = host
+    if ":" in host and not host.startswith("["):
+        formatted_host = f"[{host}]"
+
+    if parsed.username:
+        userinfo = parsed.username
+        if parsed.password:
+            userinfo = f"{userinfo}:{parsed.password}"
+        formatted_host = f"{userinfo}@{formatted_host}"
+
+    netloc = formatted_host
+    if port:
+        netloc = f"{formatted_host}:{port}"
+
+    base_path = parsed.path if parsed.netloc else ""
+    base_path = base_path.rstrip("/")
+    final_path = f"{base_path}/rfc" if base_path else "/rfc"
+
+    return urlunparse((scheme, netloc, final_path, "", "", ""))
 
 
 def call_development_function_sync(func: Union[Callable[..., T], Callable[..., Awaitable[T]]], *args, **kwargs) -> T:
