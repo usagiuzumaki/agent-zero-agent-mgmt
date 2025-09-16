@@ -5,7 +5,7 @@ agent profiles.  Currently it registers the :class:`CodeExecution`
 plugin which provides the ``code_execution_tool`` used for running
 code and shell commands."""
 
-from .code_execution_tool import CodeExecution
+from python.tools.code_execution_tool import CodeExecution
 
 __all__ = ["CodeExecution"]
 
