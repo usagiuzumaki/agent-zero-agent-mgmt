@@ -1069,7 +1069,7 @@ def get_settings() -> Settings:
     if not _settings:
         _settings = get_default_settings()
     norm = normalize_settings(_settings)
-    return norm
+    return _apply_env_overrides(norm)
 
 
 def set_settings(settings: Settings, apply: bool = True):
@@ -1119,12 +1119,52 @@ def normalize_settings(settings: Settings) -> Settings:
     return copy
 
 
+def _apply_env_overrides(settings: Settings) -> Settings:
+    dotenv.load_dotenv()
+
+    overrides: dict[str, Any] = {}
+
+    url = dotenv.get_dotenv_value("RFC_URL")
+    if isinstance(url, str) and url.strip():
+        overrides["rfc_url"] = url.strip()
+
+    port_http = dotenv.get_dotenv_value("RFC_PORT_HTTP")
+    if isinstance(port_http, str) and port_http.strip():
+        try:
+            overrides["rfc_port_http"] = int(port_http.strip())
+        except ValueError:
+            pass
+
+    port_ssh = dotenv.get_dotenv_value("RFC_PORT_SSH")
+    if isinstance(port_ssh, str) and port_ssh.strip():
+        try:
+            overrides["rfc_port_ssh"] = int(port_ssh.strip())
+        except ValueError:
+            pass
+
+    if overrides:
+        updated = settings.copy()
+        updated.update(overrides)
+        return cast(Settings, updated)
+
+    return settings
+
+
 def _adjust_to_version(settings: Settings, default: Settings):
     # starting with 0.9, the default prompt subfolder for agent no. 0 is agent0
     # switch to agent0 if the old default is used from v0.8
     if "version" not in settings or settings["version"].startswith("v0.8"):
         if "agent_profile" not in settings or settings["agent_profile"] == "default":
             settings["agent_profile"] = "egirl"
+
+    legacy_http_port = 55080
+    try:
+        current_http_port = int(settings.get("rfc_port_http", legacy_http_port))
+    except (TypeError, ValueError):
+        current_http_port = legacy_http_port
+
+    if current_http_port == legacy_http_port:
+        settings["rfc_port_http"] = default["rfc_port_http"]
 
 def _read_settings_file() -> Settings | None:
     if os.path.exists(SETTINGS_FILE):
@@ -1223,7 +1263,7 @@ def get_default_settings() -> Settings:
         rfc_auto_docker=True,
         rfc_url="localhost",
         rfc_password="",
-        rfc_port_http=55080,
+        rfc_port_http=5000,
         rfc_port_ssh=55022,
         stt_model_size="base",
         stt_language="en",

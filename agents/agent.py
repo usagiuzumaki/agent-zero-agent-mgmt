@@ -217,7 +217,7 @@ class AgentConfig:
     code_exec_docker_name: str = "A0-dev"
     code_exec_docker_image: str = "agent0ai/agent-zero-run:development"
     code_exec_docker_ports: dict[str, int] = field(
-        default_factory=lambda: {"22/tcp": 55022, "80/tcp": 55080}
+        default_factory=lambda: {"22/tcp": 55022, "80/tcp": 5000}
     )
     code_exec_docker_volumes: dict[str, dict[str, str]] = field(
         default_factory=lambda: {

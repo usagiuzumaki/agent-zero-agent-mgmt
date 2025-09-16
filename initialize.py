@@ -82,7 +82,7 @@ def initialize_agent():
         code_exec_docker_enabled=False,
         # code_exec_docker_name = "A0-dev",
         # code_exec_docker_image = "agent0ai/agent-zero:development",
-        # code_exec_docker_ports = { "22/tcp": 55022, "80/tcp": 55080 }
+        # code_exec_docker_ports = { "22/tcp": 55022, "80/tcp": 5000 }
         # code_exec_docker_volumes = {
         # files.get_base_dir(): {"bind": "/a0", "mode": "rw"},
         # files.get_abs_path("work_dir"): {"bind": "/root", "mode": "rw"},
