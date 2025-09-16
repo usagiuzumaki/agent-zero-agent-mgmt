@@ -7,7 +7,13 @@ import json
 from python.helpers.vector_db import VectorDB
 
 os.environ["USER_AGENT"] = "@mixedbread-ai/unstructured"  # noqa E402
-from langchain_unstructured import UnstructuredLoader  # noqa E402
+
+try:  # pragma: no cover - optional dependency
+    from langchain_unstructured import UnstructuredLoader  # type: ignore
+except ModuleNotFoundError as _unstructured_exc:  # pragma: no cover
+    UnstructuredLoader = None  # type: ignore[assignment]
+else:
+    _unstructured_exc = None
 
 from urllib.parse import urlparse
 from typing import Callable, Sequence, List, Optional, Tuple
@@ -17,7 +23,13 @@ from langchain_community.document_loaders import AsyncHtmlLoader
 from langchain_community.document_loaders.text import TextLoader
 from langchain_community.document_loaders.pdf import PyMuPDFLoader
 from langchain_community.document_transformers import MarkdownifyTransformer
-from langchain_community.document_loaders.parsers.images import TesseractBlobParser
+
+try:  # pragma: no cover - optional dependency may not exist in older releases
+    from langchain_community.document_loaders.parsers.images import (
+        TesseractBlobParser,
+    )
+except (ModuleNotFoundError, AttributeError):  # pragma: no cover
+    TesseractBlobParser = None  # type: ignore[assignment]
 
 from langchain_core.documents import Document
 from langchain.schema import SystemMessage, HumanMessage
@@ -366,6 +378,14 @@ class DocumentQueryHelper:
         self.store = DocumentQueryStore.get(agent)
         self.progress_callback = progress_callback or (lambda x: None)
 
+    def _ensure_unstructured_loader(self) -> None:
+        if UnstructuredLoader is None:
+            raise ModuleNotFoundError(
+                "Optional dependency 'langchain-unstructured' is required for "
+                "document parsing. Install it with `pip install langchain-unstructured` "
+                "to enable this tool."
+            ) from _unstructured_exc
+
     async def document_qa(
         self, document_uri: str, questions: Sequence[str]
     ) -> Tuple[bool, str]:
@@ -608,14 +628,19 @@ class DocumentQueryHelper:
 
         try:
             try:
-                loader = PyMuPDFLoader(
-                    temp_file_path,
+                loader_kwargs = dict(
                     mode="single",
                     extract_tables="markdown",
                     extract_images=True,
                     images_inner_format="text",
-                    images_parser=TesseractBlobParser(),
                     pages_delimiter="\n",
+                )
+                if TesseractBlobParser is not None:
+                    loader_kwargs["images_parser"] = TesseractBlobParser()
+
+                loader = PyMuPDFLoader(
+                    temp_file_path,
+                    **loader_kwargs,
                 )
                 elements: list[Document] = loader.load()
                 contents = "\n".join([element.page_content for element in elements])
@@ -643,6 +668,7 @@ class DocumentQueryHelper:
             os.unlink(temp_file_path)
 
     def handle_unstructured_document(self, document: str, scheme: str) -> str:
+        self._ensure_unstructured_loader()
         elements: list[Document] = []
         if scheme in ["http", "https"]:
             # loader = UnstructuredURLLoader(urls=[document], mode="single")

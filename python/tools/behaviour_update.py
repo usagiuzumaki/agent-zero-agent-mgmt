@@ -1,4 +1,4 @@
-from .behaviour_adjustment import UpdateBehaviour
+from python.tools.behaviour_adjustment import UpdateBehaviour
 
 
 class BehaviourUpdate(UpdateBehaviour):
