@@ -1,5 +1,6 @@
 import argparse
 import inspect
+import logging
 import secrets
 from typing import TypeVar, Callable, Awaitable, Union, overload, cast
 from urllib.parse import urlparse, urlunparse
@@ -107,8 +108,15 @@ async def handle_rfc(rfc_call: rfc.RFCCall):
 
 def _get_rfc_password() -> str:
     password = dotenv.get_dotenv_value(dotenv.KEY_RFC_PASSWORD)
-    if not password:
-        raise Exception("No RFC password, cannot handle RFC calls.")
+    if password:
+        return password
+
+    password = secrets.token_urlsafe(24)
+    dotenv.save_dotenv_value(dotenv.KEY_RFC_PASSWORD, password)
+    logging.getLogger(__name__).warning(
+        "RFC password was missing; generated a new one and stored it in .env. "
+        "Configure remote peers with the same value via Settings → Development."
+    )
     return password
 
 
