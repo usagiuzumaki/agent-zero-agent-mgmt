@@ -16,4 +16,9 @@ def _provide_root_password(public_key_pem: str):
     return enc
 
 def _get_root_password():
-    return dotenv.get_dotenv_value(dotenv.KEY_ROOT_PASSWORD) or ""
+    return runtime.ensure_secret(
+        dotenv.KEY_ROOT_PASSWORD,
+        label="root password",
+        length=48,
+        show_value=False,
+    )
