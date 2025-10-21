@@ -5,13 +5,15 @@ import sys
 import time
 import socket
 import struct
+import asyncio
+import inspect
 from functools import wraps
 import threading
 import signal
 from flask import Flask, request, Response, session
 from flask_basicauth import BasicAuth
 import initialize
-from python.helpers import errors, files, git, mcp_server
+from python.helpers import files, git, mcp_server
 from python.helpers.files import get_abs_path
 from python.helpers import runtime, dotenv, process
 from python.helpers.extract_tools import load_classes_from_folder
@@ -77,9 +79,33 @@ def is_loopback_address(address):
         return True
 
 
+def _run_maybe_async(result):
+    """Run the given result if it's awaitable, otherwise return it as-is."""
+
+    if inspect.isawaitable(result):
+        # ``asyncio.run`` creates and manages an event loop which avoids the
+        # ``get_event_loop`` failures observed when Werkzeug handles requests in
+        # worker threads without a default loop.
+        try:
+            return asyncio.run(result)
+        except RuntimeError as exc:
+            # ``asyncio.run`` raises when called from within a running loop.
+            if "asyncio.run() cannot be called" not in str(exc):
+                raise
+
+            loop = asyncio.new_event_loop()
+            try:
+                asyncio.set_event_loop(loop)
+                return loop.run_until_complete(result)
+            finally:
+                asyncio.set_event_loop(None)
+                loop.close()
+    return result
+
+
 def requires_api_key(f):
     @wraps(f)
-    async def decorated(*args, **kwargs):
+    def decorated(*args, **kwargs):
         valid_api_key = dotenv.get_dotenv_value("API_KEY")
         if api_key := request.headers.get("X-API-KEY"):
             if api_key != valid_api_key:
@@ -90,7 +116,7 @@ def requires_api_key(f):
                 return Response("API key required", 401)
         else:
             return Response("API key required", 401)
-        return await f(*args, **kwargs)
+        return _run_maybe_async(f(*args, **kwargs))
 
     return decorated
 
@@ -98,14 +124,14 @@ def requires_api_key(f):
 # allow only loopback addresses
 def requires_loopback(f):
     @wraps(f)
-    async def decorated(*args, **kwargs):
+    def decorated(*args, **kwargs):
         if not is_loopback_address(request.remote_addr):
             return Response(
                 "Access denied.",
                 403,
                 {},
             )
-        return await f(*args, **kwargs)
+        return _run_maybe_async(f(*args, **kwargs))
 
     return decorated
 
@@ -113,7 +139,7 @@ def requires_loopback(f):
 # require authentication for handlers
 def requires_auth(f):
     @wraps(f)
-    async def decorated(*args, **kwargs):
+    def decorated(*args, **kwargs):
         user = dotenv.get_dotenv_value("AUTH_LOGIN")
         password = dotenv.get_dotenv_value("AUTH_PASSWORD")
         if user and password:
@@ -125,21 +151,21 @@ def requires_auth(f):
                     401,
                     {"WWW-Authenticate": 'Basic realm="Login Required"'},
                 )
-        return await f(*args, **kwargs)
+        return _run_maybe_async(f(*args, **kwargs))
 
     return decorated
 
 
 def csrf_protect(f):
     @wraps(f)
-    async def decorated(*args, **kwargs):
+    def decorated(*args, **kwargs):
         token = session.get("csrf_token")
         header = request.headers.get("X-CSRF-Token")
         cookie = request.cookies.get("csrf_token_" + runtime.get_runtime_id())
         sent = header or cookie
         if not token or not sent or token != sent:
             return Response("CSRF token missing or invalid", 403)
-        return await f(*args, **kwargs)
+        return _run_maybe_async(f(*args, **kwargs))
 
     return decorated
 
@@ -170,7 +196,7 @@ def run():
     from werkzeug.serving import WSGIRequestHandler
     from werkzeug.serving import make_server
     from werkzeug.middleware.dispatcher import DispatcherMiddleware
-    from a2wsgi import ASGIMiddleware, WSGIMiddleware
+    from a2wsgi import ASGIMiddleware
 
     PrintStyle().print("Starting server...")
 
@@ -189,8 +215,8 @@ def run():
         name = handler.__module__.split(".")[-1]
         instance = handler(app, lock)
 
-        async def handler_wrap():
-            return await instance.handle_request(request=request)
+        def handler_wrap():
+            return _run_maybe_async(instance.handle_request(request=request))
 
         if handler.requires_loopback():
             handler_wrap = requires_loopback(handler_wrap)
