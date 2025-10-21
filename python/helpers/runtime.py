@@ -7,6 +7,7 @@ from python.helpers import dotenv, rfc, files
 import asyncio
 import threading
 import queue
+import sys
 
 T = TypeVar('T')
 R = TypeVar('R')
@@ -105,11 +106,54 @@ async def handle_rfc(rfc_call: rfc.RFCCall):
     return await rfc.handle_rfc(rfc_call=rfc_call, password=_get_rfc_password())
 
 
+def ensure_secret(
+    key: str,
+    *,
+    label: str,
+    length: int = 32,
+    show_value: bool = False,
+) -> str:
+    """Ensure a persistent secret exists in ``.env`` and return it.
+
+    Args:
+        key: Environment variable key to read/write.
+        label: Human readable label used for console notices.
+        length: Amount of entropy to request from :func:`secrets.token_urlsafe`.
+        show_value: When ``True`` include the generated secret in the notice
+            message.  Defaults to ``False`` to avoid leaking credentials in
+            shared logs.
+    """
+
+    value = (dotenv.get_dotenv_value(key) or "").strip()
+    if value:
+        return value
+
+    token = secrets.token_urlsafe(length)
+    dotenv.save_dotenv_value(key, token)
+
+    notice = (
+        f"[runtime] Auto-generated {label}. It has been stored under {key} in "
+        f"{dotenv.get_dotenv_file_path()}. Ensure peer runtimes use the same "
+        "value if they need to communicate."
+    )
+
+    try:
+        print(notice, file=sys.stderr)
+        if show_value:
+            print(f"[runtime] {label}: {token}", file=sys.stderr)
+    except Exception:
+        pass
+
+    return token
+
+
 def _get_rfc_password() -> str:
-    password = dotenv.get_dotenv_value(dotenv.KEY_RFC_PASSWORD)
-    if not password:
-        raise Exception("No RFC password, cannot handle RFC calls.")
-    return password
+    return ensure_secret(
+        dotenv.KEY_RFC_PASSWORD,
+        label="RFC password",
+        length=48,
+        show_value=False,
+    )
 
 
 def _get_rfc_url() -> str:

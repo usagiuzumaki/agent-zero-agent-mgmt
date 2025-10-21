@@ -23,19 +23,17 @@ class _MissingBrowserUseAttr:
     def __init__(self, exc: ModuleNotFoundError):
         self._exc = exc
 
+    _HELP_TEXT = (
+        "Optional dependency 'browser-use' is required for the browser agent tool. "
+        "Install the UI extras with `pip install -r requirements.txt` and run "
+        "`playwright install chromium --only-shell` to finish the setup."
+    )
+
     def __call__(self, *args: Any, **kwargs: Any) -> Any:  # pragma: no cover
-        raise ModuleNotFoundError(
-            "Optional dependency 'browser-use' is required for the browser agent "
-            "tool. Install it with `pip install browser-use` to enable this "
-            "functionality."
-        ) from self._exc
+        raise ModuleNotFoundError(self._HELP_TEXT) from self._exc
 
     def __getattr__(self, item: str) -> Any:  # pragma: no cover
-        raise ModuleNotFoundError(
-            "Optional dependency 'browser-use' is required for the browser agent "
-            "tool. Install it with `pip install browser-use` to enable this "
-            "functionality."
-        ) from self._exc
+        raise ModuleNotFoundError(self._HELP_TEXT) from self._exc
 
 
 class _MissingBrowserUseProxy:
