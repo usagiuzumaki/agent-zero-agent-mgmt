@@ -1,10 +1,11 @@
-"""Helper utilities for Stripe integration used by the eGirl agent."""
-
-from __future__ import annotations
-
+import importlib
 import logging
 import os
+import subprocess
+import sys
 from typing import Optional
+
+from python.helpers import dotenv
 
 try:  # pragma: no cover - optional dependency during runtime
     import stripe  # type: ignore
@@ -15,18 +16,27 @@ except ModuleNotFoundError:  # pragma: no cover - dependency missing
 _DOMAIN_FALLBACK = "http://localhost:8000"
 _STRIPE_INITIALISED = False
 
+_LOGGER = logging.getLogger(__name__)
+
 
 def _ensure_stripe() -> "stripe":
     """Return the configured ``stripe`` module or raise a helpful error."""
 
+    global stripe
+
     if stripe is None:
-        raise RuntimeError(
-            "Stripe integration requires the optional 'stripe' package. "
-            "Install it with `pip install stripe` to enable payment workflows."
-        )
+        _install_stripe_package()
+        try:
+            stripe = importlib.import_module("stripe")  # type: ignore[assignment]
+        except ModuleNotFoundError as exc:  # pragma: no cover - unexpected failure
+            raise RuntimeError(
+                "Stripe integration requires the optional 'stripe' package. "
+                "Automatic installation failed; install it manually with `pip install stripe`."
+            ) from exc
 
     global _STRIPE_INITIALISED
     if not _STRIPE_INITIALISED:
+        dotenv.load_dotenv()
         key = (os.getenv("STRIPE_SECRET_KEY") or "").strip()
         if not key:
             raise RuntimeError(
@@ -36,6 +46,21 @@ def _ensure_stripe() -> "stripe":
         stripe.api_key = key
         _STRIPE_INITIALISED = True
     return stripe
+
+
+def _install_stripe_package() -> None:
+    """Ensure the ``stripe`` package is installed before use."""
+
+    _LOGGER.warning(
+        "Stripe python package not found. Attempting automatic installation..."
+    )
+    try:
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "stripe"])
+    except subprocess.CalledProcessError as exc:  # pragma: no cover - subprocess failure
+        raise RuntimeError(
+            "Stripe integration requires the optional 'stripe' package. "
+            "Automatic installation failed; install it manually with `pip install stripe`."
+        ) from exc
 
 
 def _domain_url() -> str:
@@ -61,7 +86,7 @@ def create_checkout_session(
         )
         return session.url
     except Exception as exc:  # pragma: no cover - network interaction
-        logging.exception("Stripe checkout error: %s", exc)
+        _LOGGER.exception("Stripe checkout error: %s", exc)
         raise RuntimeError(f"Stripe error: {exc}") from exc
 
 
@@ -86,7 +111,7 @@ def create_subscription_session(
         )
         return session.url
     except Exception as exc:  # pragma: no cover - network interaction
-        logging.exception("Stripe subscription error: %s", exc)
+        _LOGGER.exception("Stripe subscription error: %s", exc)
         raise RuntimeError(f"Stripe subscription error: {exc}") from exc
 
 
@@ -98,7 +123,7 @@ def create_refund(payment_intent: str) -> str:
         refund = client.Refund.create(payment_intent=payment_intent)
         return refund.id
     except Exception as exc:  # pragma: no cover - network interaction
-        logging.exception("Stripe refund error: %s", exc)
+        _LOGGER.exception("Stripe refund error: %s", exc)
         raise RuntimeError(f"Stripe refund error: {exc}") from exc
 
 
@@ -110,5 +135,5 @@ def create_payout(amount: int, currency: str = "usd") -> str:
         payout = client.Payout.create(amount=amount, currency=currency)
         return payout.id
     except Exception as exc:  # pragma: no cover - network interaction
-        logging.exception("Stripe payout error: %s", exc)
+        _LOGGER.exception("Stripe payout error: %s", exc)
         raise RuntimeError(f"Stripe payout error: {exc}") from exc

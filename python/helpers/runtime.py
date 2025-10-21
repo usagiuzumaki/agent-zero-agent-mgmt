@@ -2,6 +2,7 @@ import argparse
 import inspect
 import logging
 import secrets
+from contextlib import suppress
 from typing import TypeVar, Callable, Awaitable, Union, overload, cast
 from urllib.parse import urlparse, urlunparse
 from python.helpers import dotenv, rfc, files
@@ -107,6 +108,9 @@ async def handle_rfc(rfc_call: rfc.RFCCall):
 
 
 def _get_rfc_password() -> str:
+    # Reload environment variables to pick up updates from other runtimes sharing
+    # the same .env file (e.g. local dev instance <-> dockerized instance).
+    dotenv.load_dotenv()
     password = dotenv.get_dotenv_value(dotenv.KEY_RFC_PASSWORD)
     if password:
         return password
@@ -164,21 +168,40 @@ def _get_rfc_url() -> str:
 
 def call_development_function_sync(func: Union[Callable[..., T], Callable[..., Awaitable[T]]], *args, **kwargs) -> T:
     # run async function in sync manner
-    result_queue = queue.Queue()
-    
+    result_queue: "queue.Queue[tuple[str, object]]" = queue.Queue()
+
     def run_in_thread():
-        result = asyncio.run(call_development_function(func, *args, **kwargs))
-        result_queue.put(result)
-    
+        loop = asyncio.new_event_loop()
+        try:
+            asyncio.set_event_loop(loop)
+            result = loop.run_until_complete(
+                call_development_function(func, *args, **kwargs)
+            )
+            result_queue.put(("result", result))
+        except Exception as exc:  # pragma: no cover - propagate to caller
+            result_queue.put(("error", exc))
+        finally:
+            with suppress(Exception):
+                loop.run_until_complete(loop.shutdown_asyncgens())
+            asyncio.set_event_loop(None)
+            loop.close()
+
     thread = threading.Thread(target=run_in_thread)
     thread.start()
     thread.join(timeout=30)  # wait for thread with timeout
-    
+
     if thread.is_alive():
         raise TimeoutError("Function call timed out after 30 seconds")
-    
-    result = result_queue.get_nowait()
-    return cast(T, result)
+
+    if result_queue.empty():  # pragma: no cover - defensive guard
+        raise RuntimeError("Function call finished without returning a result")
+
+    status, payload = result_queue.get_nowait()
+    if status == "error":
+        exc = cast(Exception, payload)
+        raise exc
+
+    return cast(T, payload)
 
 
 def get_web_ui_port():
