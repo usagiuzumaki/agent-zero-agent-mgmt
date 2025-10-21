@@ -8,6 +8,7 @@ import asyncio
 import threading
 import queue
 import sys
+import aiohttp
 
 T = TypeVar('T')
 R = TypeVar('R')
@@ -16,6 +17,7 @@ parser = argparse.ArgumentParser()
 args = {}
 dockerman = None
 runtime_id = None
+_rfc_connection_notified: set[str] = set()
 
 
 def initialize():
@@ -81,11 +83,15 @@ async def call_development_function(func: Callable[..., Awaitable[T]], *args, **
 async def call_development_function(func: Callable[..., T], *args, **kwargs) -> T: ...
 
 async def call_development_function(func: Union[Callable[..., T], Callable[..., Awaitable[T]]], *args, **kwargs) -> T:
-    if is_development():
-        url = _get_rfc_url()
-        password = _get_rfc_password()
-        rel_path = files.deabsolute_path(func.__code__.co_filename)
-        module = rel_path.replace("\\", "/").replace("/", ".").removesuffix(".py")  # __module__ is not reliable
+    if not is_development():
+        return await _execute_locally(func, *args, **kwargs)
+
+    url = _get_rfc_url()
+    password = _get_rfc_password()
+    rel_path = files.deabsolute_path(func.__code__.co_filename)
+    module = rel_path.replace("\\", "/").replace("/", ".").removesuffix(".py")  # __module__ is not reliable
+
+    try:
         result = await rfc.call_rfc(
             url=url,
             password=password,
@@ -94,16 +100,51 @@ async def call_development_function(func: Union[Callable[..., T], Callable[..., 
             args=list(args),
             kwargs=kwargs,
         )
-        return cast(T, result)
-    else:
-        if inspect.iscoroutinefunction(func):
-            return await func(*args, **kwargs)
-        else:
-            return func(*args, **kwargs) # type: ignore
+    except (aiohttp.ClientError, asyncio.TimeoutError) as exc:
+        _log_rfc_connection_issue(url, exc)
+        return await _execute_locally(func, *args, **kwargs)
+    except Exception as exc:  # pragma: no cover - propagated runtime errors
+        raise RuntimeError(
+            "RFC call to {module}.{function} via {url} failed: {error}".format(
+                module=module,
+                function=func.__name__,
+                url=url,
+                error=exc,
+            )
+        ) from exc
+
+    return cast(T, result)
 
 
 async def handle_rfc(rfc_call: rfc.RFCCall):
     return await rfc.handle_rfc(rfc_call=rfc_call, password=_get_rfc_password())
+
+
+async def _execute_locally(
+    func: Union[Callable[..., T], Callable[..., Awaitable[T]]], *args, **kwargs
+) -> T:
+    if inspect.iscoroutinefunction(func):
+        return cast(T, await func(*args, **kwargs))
+    return cast(T, func(*args, **kwargs))
+
+
+def _log_rfc_connection_issue(url: str, exc: Exception) -> None:
+    fingerprint = f"{url}|{type(exc).__name__}"
+    if fingerprint in _rfc_connection_notified:
+        return
+
+    _rfc_connection_notified.add(fingerprint)
+
+    message = (
+        "[runtime] Unable to reach RFC endpoint at {url} ({error_name}: {error}). "
+        "Falling back to local execution. Start the Agent Zero UI (run_ui.py) "
+        "and confirm RFC_URL/RFC_PASSWORD match across instances for remote calls."
+    ).format(url=url, error_name=type(exc).__name__, error=exc)
+
+    try:
+        print(message, file=sys.stderr)
+    except Exception:
+        pass
 
 
 def ensure_secret(
