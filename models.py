@@ -36,7 +36,8 @@ from langchain_core.messages import (
     SystemMessage,
 )
 from langchain.embeddings.base import Embeddings
-from sentence_transformers import SentenceTransformer
+# Lazy import to avoid loading heavy ML dependencies at module level
+# from sentence_transformers import SentenceTransformer
 
 
 # disable extra logging, must be done repeatedly, otherwise browser-use will turn it back on for some reason
@@ -362,6 +363,9 @@ class LocalSentenceTransformerWrapper(Embeddings):
     """Local wrapper for sentence-transformers models to avoid HuggingFace API calls"""
 
     def __init__(self, provider: str, model: str, **kwargs: Any):
+        # Lazy import to avoid loading heavy ML dependencies
+        from sentence_transformers import SentenceTransformer
+        
         # Clean common user-input mistakes
         model = model.strip().strip('"').strip("'")
 
