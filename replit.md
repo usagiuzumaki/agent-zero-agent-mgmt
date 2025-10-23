@@ -100,13 +100,33 @@ run_ui.py        - Web server entry point
    - Manage agent behaviors
    - Import knowledge documents
 
+## Stable Diffusion Image Generation
+
+**Status:** ✅ Fully functional via Replicate API
+
+Agent Zero now supports Stable Diffusion image generation through the Replicate API, which provides cloud-based image generation without requiring heavy ML dependencies.
+
+### Setup
+1. Get a free API token from https://replicate.com/account/api-tokens
+2. Add the token to Replit Secrets as `REPLICATE_API_TOKEN`
+3. Agent Zero will automatically use the Replicate API for image generation
+
+### Pricing
+- Approximately $0.01 per image generation (SDXL model)
+- Pay-as-you-go, no monthly fees
+- Very affordable for testing and production use
+
+### Configuration
+You can customize the Stable Diffusion model by setting environment variables:
+- `REPLICATE_SD_MODEL`: Model to use (default: `stability-ai/sdxl:latest`)
+- Supports all Stable Diffusion models available on Replicate
+
 ## Known Limitations on Replit
 
 1. **Local Embeddings**: sentence-transformers not installed - use OpenAI embeddings instead
 2. **Browser Automation**: Playwright not available - web scraping features limited
-3. **Image Generation**: Stable Diffusion features unavailable
-4. **TTS/STT**: Whisper and Kokoro models will show errors but won't break the app
-5. **Docker Execution**: Code execution runs locally, not in Docker container
+3. **TTS/STT**: Whisper and Kokoro models will show errors but won't break the app
+4. **Docker Execution**: Code execution runs locally, not in Docker container
 
 ## Deployment
 
@@ -128,6 +148,12 @@ Most heavy ML dependencies are optional. The app will continue to work with core
 
 ## Recent Changes
 
+- **2025-10-23**: Stable Diffusion Integration
+  - Added Replicate API integration for image generation
+  - Installed replicate Python SDK
+  - Modified `python/helpers/stable_diffusion.py` to support both local and API-based generation
+  - Configured REPLICATE_API_TOKEN secret
+  
 - **2025-10-23**: Initial Replit setup
   - Installed minimal dependency set for disk space
   - Made sentence_transformers import lazy

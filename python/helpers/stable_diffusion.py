@@ -32,23 +32,35 @@ _REPLICATE_MODEL = os.getenv("REPLICATE_SD_MODEL", "stability-ai/sdxl:latest")
 def _generate_image_via_replicate(
     prompt: str,
     *,
+    api_token: str,
     output_dir: str = "outputs",
     seed: int | None = None,
     steps: int = 30,
     guidance_scale: float = 7.5,
 ) -> str:
-    """Generate image using Replicate API."""
-    if replicate is None:
-        raise RuntimeError("Replicate SDK not installed. Install with: pip install replicate")
+    """Generate image using Replicate API.
     
-    if not _REPLICATE_API_TOKEN:
+    Args:
+        prompt: Text prompt describing the image.
+        api_token: Replicate API token.
+        output_dir: Directory where the image will be saved.
+        seed: Optional random seed for reproducible results.
+        steps: Number of inference steps.
+        guidance_scale: CFG guidance scale.
+        
+    Returns:
+        Path to the generated image file.
+        
+    Raises:
+        RuntimeError: If replicate SDK or httpx is not installed.
+    """
+    if replicate is None:
         raise RuntimeError(
-            "REPLICATE_API_TOKEN environment variable not set. "
-            "Get your API token from https://replicate.com/account/api-tokens"
+            "Replicate SDK not installed. Install with: pip install replicate"
         )
     
-    # Configure Replicate client
-    os.environ["REPLICATE_API_TOKEN"] = _REPLICATE_API_TOKEN
+    # Configure Replicate client with the provided token
+    os.environ["REPLICATE_API_TOKEN"] = api_token
     
     # Prepare input parameters
     input_params = {
@@ -61,10 +73,17 @@ def _generate_image_via_replicate(
         input_params["seed"] = seed
     
     # Run the model
-    output = replicate.run(_REPLICATE_MODEL, input=input_params)
+    model = os.getenv("REPLICATE_SD_MODEL", _REPLICATE_MODEL)
+    output = replicate.run(model, input=input_params)
     
     # Download the generated image
-    import httpx
+    try:
+        import httpx
+    except ImportError:
+        raise RuntimeError(
+            "httpx library not installed. Install with: pip install httpx"
+        )
+    
     os.makedirs(output_dir, exist_ok=True)
     filename = os.path.join(output_dir, f"sd_image_{uuid.uuid4().hex}.png")
     
@@ -151,14 +170,32 @@ def generate_image(
     Raises:
         RuntimeError: If neither Replicate API token nor local dependencies are available.
     """
+    # Re-read token from environment in case it was added after import
+    replicate_token = os.getenv("REPLICATE_API_TOKEN")
+    
     # Prioritize Replicate API if available
-    if _REPLICATE_API_TOKEN and replicate is not None:
+    if replicate_token and replicate is not None:
         return _generate_image_via_replicate(
             prompt,
+            api_token=replicate_token,
             output_dir=output_dir,
             seed=seed,
             steps=steps,
             guidance_scale=guidance_scale,
+        )
+    
+    # Check if local dependencies are available
+    if StableDiffusionPipeline is None or torch is None:
+        # Neither API nor local dependencies available
+        raise RuntimeError(
+            "Stable Diffusion is not available. Please choose one of the following options:\n\n"
+            "1. Use Replicate API (recommended for Replit):\n"
+            "   - Get a free API token from https://replicate.com/account/api-tokens\n"
+            "   - Add it to your environment as REPLICATE_API_TOKEN\n"
+            "   - Cost: ~$0.01 per image\n\n"
+            "2. Install local dependencies (requires ~10GB disk space):\n"
+            "   - pip install torch diffusers transformers accelerate\n"
+            "   - Note: May not work on Replit due to disk limitations\n"
         )
     
     # Fall back to local generation
