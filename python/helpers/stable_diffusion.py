@@ -13,11 +13,72 @@ try:  # pragma: no cover - optional dependency
 except Exception:  # pragma: no cover
     StableDiffusionPipeline = None  # type: ignore
 
+try:  # pragma: no cover - optional dependency
+    import replicate
+except Exception:  # pragma: no cover
+    replicate = None  # type: ignore
+
 # Default to a hyper-realistic model capable of NSFW generation.
 # The model can be overridden via the ``SD_MODEL_NAME`` environment variable.
 _MODEL_ID = os.getenv("SD_MODEL_NAME", "SG161222/Realistic_Vision_V5.1_noVAE")
 _MODEL_PATH = os.getenv("SD_MODEL_PATH")
 _pipe: Optional["StableDiffusionPipeline"] = None
+
+# Replicate configuration
+_REPLICATE_API_TOKEN = os.getenv("REPLICATE_API_TOKEN")
+_REPLICATE_MODEL = os.getenv("REPLICATE_SD_MODEL", "stability-ai/sdxl:latest")
+
+
+def _generate_image_via_replicate(
+    prompt: str,
+    *,
+    output_dir: str = "outputs",
+    seed: int | None = None,
+    steps: int = 30,
+    guidance_scale: float = 7.5,
+) -> str:
+    """Generate image using Replicate API."""
+    if replicate is None:
+        raise RuntimeError("Replicate SDK not installed. Install with: pip install replicate")
+    
+    if not _REPLICATE_API_TOKEN:
+        raise RuntimeError(
+            "REPLICATE_API_TOKEN environment variable not set. "
+            "Get your API token from https://replicate.com/account/api-tokens"
+        )
+    
+    # Configure Replicate client
+    os.environ["REPLICATE_API_TOKEN"] = _REPLICATE_API_TOKEN
+    
+    # Prepare input parameters
+    input_params = {
+        "prompt": prompt,
+        "num_inference_steps": steps,
+        "guidance_scale": guidance_scale,
+    }
+    
+    if seed is not None:
+        input_params["seed"] = seed
+    
+    # Run the model
+    output = replicate.run(_REPLICATE_MODEL, input=input_params)
+    
+    # Download the generated image
+    import httpx
+    os.makedirs(output_dir, exist_ok=True)
+    filename = os.path.join(output_dir, f"sd_image_{uuid.uuid4().hex}.png")
+    
+    # Output is typically a URL or list of URLs
+    image_url = output[0] if isinstance(output, list) else output
+    
+    # Download the image
+    response = httpx.get(image_url)
+    response.raise_for_status()
+    
+    with open(filename, "wb") as f:
+        f.write(response.content)
+    
+    return filename
 
 
 def _load_pipeline() -> "StableDiffusionPipeline":
@@ -69,6 +130,13 @@ def generate_image(
     guidance_scale: float = 7.5,
 ) -> str:
     """Generate an image from ``prompt`` using Stable Diffusion.
+    
+    This function supports two modes:
+    1. Replicate API (cloud-based): If REPLICATE_API_TOKEN is set
+    2. Local model: If torch and diffusers are installed
+    
+    The Replicate API is preferred when available as it doesn't require
+    heavy ML dependencies and works better in resource-constrained environments.
 
     Args:
         prompt: Text prompt describing the image.
@@ -79,7 +147,21 @@ def generate_image(
 
     Returns:
         Path to the generated image file.
+        
+    Raises:
+        RuntimeError: If neither Replicate API token nor local dependencies are available.
     """
+    # Prioritize Replicate API if available
+    if _REPLICATE_API_TOKEN and replicate is not None:
+        return _generate_image_via_replicate(
+            prompt,
+            output_dir=output_dir,
+            seed=seed,
+            steps=steps,
+            guidance_scale=guidance_scale,
+        )
+    
+    # Fall back to local generation
     pipe = _load_pipeline()
     generator = None
     if seed is not None and torch is not None:
