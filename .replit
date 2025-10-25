@@ -4,7 +4,7 @@ expertMode = true
 
 [nix]
 channel = "stable-25_05"
-packages = ["antlr", "awsebcli", "cargo", "ffmpeg-full", "freetype", "gitFull", "jre", "lcms2", "libiconv", "libimagequant", "libjpeg", "libsndfile", "libtiff", "libwebp", "libxcrypt", "openjpeg", "playwright-driver", "rustc", "tcl", "tesseract", "tk", "zlib", "gcc-unwrapped"]
+packages = ["antlr", "awsebcli", "cargo", "ffmpeg-full", "freetype", "gcc-unwrapped", "gitFull", "jre", "lcms2", "libiconv", "libimagequant", "libjpeg", "libsndfile", "libtiff", "libwebp", "libxcrypt", "openjpeg", "playwright-driver", "rustc", "tcl", "tesseract", "tk", "zlib"]
 
 [workflows]
 runButton = "Project"

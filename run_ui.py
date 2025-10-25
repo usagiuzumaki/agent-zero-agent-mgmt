@@ -10,7 +10,7 @@ import inspect
 from functools import wraps
 import threading
 import signal
-from flask import Flask, request, Response, session
+from flask import Flask, request, Response, session, render_template_string
 from flask_basicauth import BasicAuth
 import initialize
 from python.helpers import files, git, mcp_server
@@ -19,6 +19,19 @@ from python.helpers import runtime, dotenv, process
 from python.helpers.extract_tools import load_classes_from_folder
 from python.helpers.api import ApiHandler
 from python.helpers.print_style import PrintStyle
+
+try:
+    from auth_models import init_db
+    from replit_auth import init_replit_auth, require_login
+    from stripe_payments import init_stripe_routes
+    from flask_login import current_user
+    _auth_available = True
+except Exception as e:
+    PrintStyle().print(f"Warning: Auth/Payment modules not available: {e}")
+    _auth_available = False
+    
+    def require_login(f):
+        return f
 
 
 # Set the new timezone to 'UTC'
@@ -189,6 +202,55 @@ async def serve_index():
     )
 
 
+@webapp.route("/login")
+def login_page():
+    if _auth_available:
+        try:
+            return files.read_file("./webui/login.html")
+        except Exception:
+            pass
+    return "Login page not available", 404
+
+
+@webapp.route("/dashboard")
+@require_login
+def dashboard_page():
+    if _auth_available:
+        try:
+            return files.read_file("./webui/dashboard.html")
+        except Exception:
+            pass
+    return "Dashboard not available", 404
+
+
+@webapp.route("/payment")
+@require_login
+def payment_page():
+    if _auth_available:
+        try:
+            return files.read_file("./webui/payment.html")
+        except Exception:
+            pass
+    return "Payment page not available", 404
+
+
+@webapp.route("/payment-success")
+@require_login
+def payment_success():
+    session_id = request.args.get('session_id', 'unknown')
+    return f"""
+    <!DOCTYPE html>
+    <html>
+    <head><title>Payment Success</title></head>
+    <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; text-align: center;">
+        <h1 style="color: #4CAF50;">Payment Successful!</h1>
+        <p>Thank you for your payment. Session ID: {session_id}</p>
+        <a href="/dashboard" style="display: inline-block; margin-top: 20px; padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">Return to Dashboard</a>
+    </body>
+    </html>
+    """
+
+
 def run():
     PrintStyle().print("Initializing framework...")
 
@@ -199,6 +261,16 @@ def run():
     from a2wsgi import ASGIMiddleware
 
     PrintStyle().print("Starting server...")
+    
+    if _auth_available:
+        try:
+            PrintStyle().print("Initializing database and authentication...")
+            init_db(webapp)
+            init_replit_auth(webapp)
+            init_stripe_routes(webapp)
+            PrintStyle().print("Authentication and payment routes configured successfully")
+        except Exception as e:
+            PrintStyle().print(f"Warning: Failed to initialize auth/payment: {e}")
 
     class NoRequestLoggingWSGIRequestHandler(WSGIRequestHandler):
         def log_request(self, code="-", size="-"):
