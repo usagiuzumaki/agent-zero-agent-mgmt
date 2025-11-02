@@ -26,7 +26,7 @@ _pipe: Optional["StableDiffusionPipeline"] = None
 
 # Replicate configuration
 _REPLICATE_API_TOKEN = os.getenv("REPLICATE_API_TOKEN")
-_REPLICATE_MODEL = os.getenv("REPLICATE_SD_MODEL", "stability-ai/sdxl:latest")
+_REPLICATE_MODEL = os.getenv("REPLICATE_SD_MODEL", "stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b")
 
 
 def _generate_image_via_replicate(
