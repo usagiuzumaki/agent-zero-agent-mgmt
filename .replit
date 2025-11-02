@@ -34,6 +34,10 @@ outputType = "webview"
 localPort = 5000
 externalPort = 80
 
+[[ports]]
+localPort = 40397
+externalPort = 3000
+
 [deployment]
 deploymentTarget = "vm"
 run = ["python", "run_ui.py", "--host=0.0.0.0", "--port=5000"]
