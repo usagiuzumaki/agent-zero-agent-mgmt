@@ -186,13 +186,48 @@ stripe_payments.py - Stripe payment routes and webhook handling
    - Manage agent behaviors
    - Import knowledge documents
 
+## Code Execution & Package Installation Capabilities
+
+### Enhanced Code Execution System
+Agent Zero (Aria) now has improved code execution capabilities that work reliably in Replit's deployed environment:
+
+1. **DeploymentCodeRunner**: Custom code runner that avoids sandboxing issues
+   - Executes Python code in isolated subprocesses with timeouts
+   - Runs shell commands safely without hanging
+   - Tests package imports before using them
+
+2. **Direct Package Installation**: New tools bypass sandboxing limitations
+   - `PackageInstaller`: Install/uninstall Python packages directly
+   - `SystemCommand`: Execute system commands without session hanging
+   - `EnhancedCodeExecution`: Improved code execution for deployed environments
+
+3. **API-Based Workarounds**: For problematic packages like `replicate`
+   - Direct HTTP endpoints bypass sandboxed execution
+   - Image generation via `/api/generate-image` endpoint
+   - Works reliably without import hanging issues
+
+### When Deployed, Agent Zero Can:
+✅ Install Python packages via pip  
+✅ Execute Python code and shell commands  
+✅ Access external APIs and services  
+✅ Manage files and directories  
+✅ Generate images via Replicate API  
+✅ Process payments via Stripe  
+✅ Authenticate users via Replit Auth
+
+### Deployment Environment Notes:
+- **No Docker Support**: Replit doesn't allow nested virtualization
+- **Local Execution Only**: Code runs in subprocess, not containers
+- **API Workarounds Available**: For packages that hang in sandboxed execution
+- **Full pip Access**: Can install most Python packages at runtime
+
 ## Known Limitations on Replit
 
 1. **Local Embeddings**: sentence-transformers not installed - use OpenAI embeddings instead
 2. **Browser Automation**: Playwright not available - web scraping features limited
 3. **Local Image Generation**: Heavy ML dependencies not installed - use Replicate API instead (enabled by default)
 4. **TTS/STT**: Whisper and Kokoro models will show errors but won't break the app
-5. **Docker Execution**: Code execution runs locally, not in Docker container
+5. **Docker Execution**: Not available - use LocalInteractiveSession or enhanced tools instead
 
 ## Deployment
 
