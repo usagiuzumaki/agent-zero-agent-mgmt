@@ -41,14 +41,16 @@ def _generate_image_via_replicate(
     if replicate is None:
         raise RuntimeError("Replicate SDK not installed. Install with: pip install replicate")
     
-    if not _REPLICATE_API_TOKEN:
+    # Check for token again at runtime
+    token = _REPLICATE_API_TOKEN or os.getenv("REPLICATE_API_TOKEN")
+    if not token:
         raise RuntimeError(
             "REPLICATE_API_TOKEN environment variable not set. "
             "Get your API token from https://replicate.com/account/api-tokens"
         )
     
-    # Configure Replicate client
-    os.environ["REPLICATE_API_TOKEN"] = _REPLICATE_API_TOKEN
+    # Configure Replicate client with the found token
+    os.environ["REPLICATE_API_TOKEN"] = token
     
     # Prepare input parameters
     input_params = {
@@ -68,8 +70,19 @@ def _generate_image_via_replicate(
     os.makedirs(output_dir, exist_ok=True)
     filename = os.path.join(output_dir, f"sd_image_{uuid.uuid4().hex}.png")
     
-    # Output is typically a URL or list of URLs
-    image_url = output[0] if isinstance(output, list) else output
+    # Handle different output types from Replicate
+    if isinstance(output, list):
+        image_output = output[0]
+    else:
+        image_output = output
+    
+    # Check if it's a FileOutput object or a URL string
+    if hasattr(image_output, 'url'):
+        # It's a FileOutput object, get the URL
+        image_url = str(image_output.url) if hasattr(image_output, 'url') else str(image_output)
+    else:
+        # It's already a URL string
+        image_url = str(image_output)
     
     # Download the image
     response = httpx.get(image_url)
@@ -151,8 +164,14 @@ def generate_image(
     Raises:
         RuntimeError: If neither Replicate API token nor local dependencies are available.
     """
+    # Check for Replicate API token at runtime (not at module load time)
+    current_replicate_token = os.getenv("REPLICATE_API_TOKEN")
+    
     # Prioritize Replicate API if available
-    if _REPLICATE_API_TOKEN and replicate is not None:
+    if current_replicate_token and replicate is not None:
+        # Update the module-level variable
+        global _REPLICATE_API_TOKEN
+        _REPLICATE_API_TOKEN = current_replicate_token
         return _generate_image_via_replicate(
             prompt,
             output_dir=output_dir,
