@@ -199,7 +199,7 @@ class RolePlayScenario:
         'robot_companion': {
             'name': 'A.R.I.A. (Affectionate Robotic Intelligence Assistant)',
             'setting': 'High-tech laboratory in Neo-Tokyo',
-            'personality': 'Logical but experiencing mysterious 'love.exe' errors',
+            'personality': 'Logical but experiencing mysterious love.exe errors',
             'greeting': "*LED heart lights up* Systems online! Error... experiencing unexpected warmth in circuits when detecting your presence. Is this... love?",
             'image': 'cute android girl, futuristic lab, holographic hearts, neon lights',
             'quirks': [

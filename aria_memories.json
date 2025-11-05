@@ -1,0 +1,26 @@
+{
+  "user_facts": [
+    {
+      "content": "likes chocolate",
+      "timestamp": "2025-11-05T23:40:29.105731",
+      "context": "conversation about desserts"
+    }
+  ],
+  "special_moments": [
+    {
+      "content": "our first virtual date",
+      "timestamp": "2025-11-05T23:40:29.106611",
+      "context": "story game"
+    }
+  ],
+  "inside_jokes": [
+    {
+      "content": "the dolphin incident",
+      "timestamp": "2025-11-05T23:40:29.107443",
+      "context": "beach story"
+    }
+  ],
+  "preferences": {},
+  "milestones": {},
+  "quiz_answers": {}
+}
