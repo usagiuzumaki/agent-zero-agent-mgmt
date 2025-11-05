@@ -137,7 +137,7 @@ def _load_pipeline() -> "StableDiffusionPipeline":
 def generate_image(
     prompt: str,
     *,
-    output_dir: str = "outputs",
+    output_dir: str = "outputs", 
     seed: int | None = None,
     steps: int = 30,
     guidance_scale: float = 7.5,
@@ -166,6 +166,16 @@ def generate_image(
     """
     # Check for Replicate API token at runtime (not at module load time)
     current_replicate_token = os.getenv("REPLICATE_API_TOKEN")
+    
+    # Try using simple subprocess method first (avoids import hangs)
+    if current_replicate_token:
+        try:
+            # Use the simple subprocess method that avoids import hangs
+            from python.helpers.stable_diffusion_simple import generate_image as generate_simple
+            return generate_simple(prompt, output_dir=output_dir, steps=steps, guidance_scale=guidance_scale)
+        except Exception as e:
+            # Fall back to the original method if simple method fails
+            pass
     
     # Prioritize Replicate API if available
     if current_replicate_token and replicate is not None:
