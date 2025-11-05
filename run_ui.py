@@ -24,6 +24,7 @@ try:
     from auth_models import init_db
     from replit_auth import init_replit_auth, require_login
     from stripe_payments import init_stripe_routes
+    from python.api.image_generation_endpoint import register_image_routes
     from flask_login import current_user
     _auth_available = True
 except Exception as e:
@@ -268,6 +269,7 @@ def run():
             init_db(webapp)
             init_replit_auth(webapp)
             init_stripe_routes(webapp)
+            register_image_routes(webapp)
             PrintStyle().print("Authentication and payment routes configured successfully")
         except Exception as e:
             PrintStyle().print(f"Warning: Failed to initialize auth/payment: {e}")
