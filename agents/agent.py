@@ -289,7 +289,8 @@ class Agent:
 
         # non-config vars
         self.number = number
-        self.agent_name = f"A{self.number}"
+        # Use "Aria" for main agent (A0), keep numbering for subordinates
+        self.agent_name = "Aria" if self.number == 0 else f"A{self.number}"
 
         self.history = history.History(self)
         self.last_user_message: history.Message | None = None

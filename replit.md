@@ -249,8 +249,12 @@ Most heavy ML dependencies are optional. The app will continue to work with core
 
 ## Recent Changes
 
-- **2025-11-06**: Added Activities Dropdown Menu
-  - Created interactive activities dropdown menu in chat interface
+- **2025-11-06**: Personalized Welcome Messages & Activities Menu
+  - **Dynamic Welcome System**: Replaced generic "Agent Zero" with personalized "Aria" greetings
+  - Created `python/helpers/aria_welcome.py` for dynamic, time-based welcome messages
+  - Welcome messages now change based on time of day, weekday, and randomized personality
+  - Updated agent name from "A0" to "Aria" throughout the interface
+  - **Activities Dropdown Menu**: Created interactive activities dropdown menu in chat interface
   - Added 8 interactive activities including personality quiz, mood sharing, story creation
   - Integrated with Aria's personality features (python/helpers/aria_personality.py)
   - Added custom CSS for dark theme styling
