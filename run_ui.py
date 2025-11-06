@@ -280,7 +280,31 @@ def payment_success():
     """
 
 
+@webapp.errorhandler(404)
+def not_found(error):
+    """Handle 404 errors"""
+    return {"error": "Resource not found", "status": 404}, 404
+
+
+@webapp.errorhandler(500)
+def internal_error(error):
+    """Handle 500 errors"""
+    PrintStyle().error(f"Internal server error: {error}")
+    return {"error": "Internal server error", "status": 500}, 500
+
+
+@webapp.errorhandler(Exception)
+def handle_exception(error):
+    """Handle all uncaught exceptions"""
+    PrintStyle().error(f"Unhandled exception: {error}")
+    return {"error": "An unexpected error occurred", "status": 500}, 500
+
+
 def run():
+    # Log startup information
+    commit_hash = os.getenv("GITHUB_SHA", "unknown")[:7]
+    port = int(os.getenv("PORT") or runtime.get_web_ui_port())
+    PrintStyle().print(f"[BOOT] Agent Zero (Aria) | commit: {commit_hash} | port: {port}")
     PrintStyle().print("Initializing framework...")
 
     # Suppress only request logs but keep the startup messages
