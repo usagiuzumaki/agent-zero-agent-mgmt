@@ -249,6 +249,13 @@ Most heavy ML dependencies are optional. The app will continue to work with core
 
 ## Recent Changes
 
+- **2025-11-06**: Added Activities Dropdown Menu
+  - Created interactive activities dropdown menu in chat interface
+  - Added 8 interactive activities including personality quiz, mood sharing, story creation
+  - Integrated with Aria's personality features (python/helpers/aria_personality.py)
+  - Added custom CSS for dark theme styling
+  - Activities automatically populate chat input with contextual prompts
+
 - **2025-10-25**: Added Stripe payments, authentication, and Replicate image generation
   - Integrated Replicate API for Stable Diffusion image generation (~$0.01/image)
   - Added PostgreSQL database for user management
