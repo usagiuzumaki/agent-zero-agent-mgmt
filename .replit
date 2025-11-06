@@ -35,7 +35,7 @@ localPort = 5000
 externalPort = 80
 
 [[ports]]
-localPort = 36537
+localPort = 34643
 externalPort = 3001
 
 [[ports]]
@@ -45,4 +45,4 @@ externalPort = 3000
 [deployment]
 deploymentTarget = "vm"
 run = ["python", "run_ui.py", "--host=0.0.0.0", "--port=5000"]
-build = ["sh", "-c", "pip install -r requirements.txt"]
+build = ["pip", "install", "--upgrade", "pip", "&&", "pip", "install", "-r", "requirements.txt"]
