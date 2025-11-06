@@ -249,7 +249,16 @@ Most heavy ML dependencies are optional. The app will continue to work with core
 
 ## Recent Changes
 
-- **2025-11-06**: Personalized Welcome Messages & Activities Menu
+- **2025-11-06**: Screenwriting Tools, Personalized Welcome Messages & Activities Menu
+  - **Screenwriting Dropdown Menu**: Added professional screenwriting tools with persistent storage
+    - Book Outline management with chapters, scenes, and plot progression
+    - Story Bible for world-building, lore, and universe guidelines  
+    - Character Profiles with backstories, motivations, and development arcs
+    - Sick Quotes collection for memorable dialogue
+    - Sketches & Imagery for visual concepts and mood boards
+    - Scene Generator and Dialogue Workshop tools
+    - Plot Analyzer for story structure analysis
+    - All data persists in `screenwriting_data` directory
   - **Dynamic Welcome System**: Replaced generic "Agent Zero" with personalized "Aria" greetings
   - Created `python/helpers/aria_welcome.py` for dynamic, time-based welcome messages
   - Welcome messages now change based on time of day, weekday, and randomized personality
