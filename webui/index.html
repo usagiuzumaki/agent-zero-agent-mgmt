@@ -18,6 +18,7 @@
     <link rel="stylesheet" href="css/scheduler-datepicker.css">
     <link rel="stylesheet" href="css/tunnel.css">
     <link rel="stylesheet" href="css/activities.css">
+    <link rel="stylesheet" href="css/screenwriting.css">
 
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="vendor/font-awesome/all.min.css">
@@ -129,6 +130,7 @@
     <script type="text/javascript" src="js/modal.js"></script>
     <script type="module" src="js/tunnel.js"></script>
     <script type="text/javascript" src="js/activities.js"></script>
+    <script type="text/javascript" src="js/screenwriting.js"></script>
 </head>
 
 <body class="dark-mode device-pointer">
@@ -446,6 +448,18 @@
                             const placeholder = document.getElementById('activities-dropdown-placeholder');
                             if (placeholder && window.activities) {
                                 placeholder.innerHTML = window.activities.createDropdownHTML();
+                            }
+                        });
+                    </script>
+
+                    <!-- Screenwriting Dropdown (inserted via JavaScript) -->
+                    <div id="screenwriting-dropdown-placeholder"></div>
+                    <script>
+                        // Insert screenwriting dropdown when DOM is ready
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const placeholder = document.getElementById('screenwriting-dropdown-placeholder');
+                            if (placeholder && window.screenwriting) {
+                                placeholder.innerHTML = window.screenwriting.createDropdownHTML();
                             }
                         });
                     </script>
