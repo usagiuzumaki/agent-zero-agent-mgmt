@@ -206,29 +206,9 @@ async def serve_index():
 @webapp.route("/healthz")
 @webapp.route("/api/health")
 def health_check():
-    """Health check endpoint for deployment monitoring"""
-    try:
-        # Basic health check - can be expanded to check database, etc.
-        health_status = {
-            "status": "healthy",
-            "service": "Agent Zero (Aria)",
-            "timestamp": time.strftime("%Y-%m-%d %H:%M:%S UTC"),
-            "port": int(os.getenv("PORT") or runtime.get_web_ui_port()),
-            "environment": os.getenv("REPLIT_DEPLOYMENT_ID", "development")
-        }
-        
-        # Check database if available
-        if _auth_available:
-            try:
-                from auth_models import db
-                db.engine.execute("SELECT 1")
-                health_status["database"] = "connected"
-            except Exception:
-                health_status["database"] = "disconnected"
-        
-        return health_status, 200
-    except Exception as e:
-        return {"status": "unhealthy", "error": str(e)}, 500
+    """Fast health check endpoint for deployment monitoring - responds under 1 second"""
+    # Minimal response for quick health checks
+    return {"status": "healthy", "service": "Aria"}, 200
 
 
 @webapp.route("/login")
