@@ -1,0 +1,168 @@
+/* Activities Dropdown Styles */
+
+.activities-dropdown-container {
+    position: relative;
+    display: inline-block;
+}
+
+.activities-button {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s ease;
+}
+
+.activities-button:hover {
+    background: var(--hover-bg);
+    color: var(--text-primary);
+    border-color: var(--accent-color);
+    transform: translateY(-1px);
+}
+
+.activities-button:active {
+    transform: translateY(0);
+}
+
+.activities-dropdown-menu {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 0;
+    min-width: 280px;
+    max-width: 320px;
+    background: var(--modal-bg, #1a1a1a);
+    border: 1px solid var(--border-color, #333);
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    overflow: hidden;
+    animation: slideUp 0.2s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.activity-option {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.activity-option:last-child {
+    border-bottom: none;
+}
+
+.activity-option:hover {
+    background: linear-gradient(90deg, 
+        rgba(139, 92, 246, 0.1) 0%, 
+        rgba(236, 72, 153, 0.1) 100%);
+}
+
+.activity-option:active {
+    transform: scale(0.98);
+}
+
+.activity-icon {
+    font-size: 24px;
+    margin-right: 12px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.activity-info {
+    flex: 1;
+}
+
+.activity-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary, #fff);
+    margin-bottom: 2px;
+}
+
+.activity-description {
+    font-size: 11px;
+    color: var(--text-secondary, #999);
+    opacity: 0.8;
+}
+
+/* Dark mode specific adjustments */
+.dark-mode .activities-dropdown-menu {
+    background: #1f1f1f;
+    border-color: #3a3a3a;
+}
+
+.dark-mode .activities-button {
+    color: #b0b0b0;
+    border-color: #3a3a3a;
+}
+
+.dark-mode .activities-button:hover {
+    background: rgba(139, 92, 246, 0.1);
+    color: #fff;
+    border-color: #8b5cf6;
+}
+
+.dark-mode .activity-option:hover {
+    background: linear-gradient(90deg, 
+        rgba(139, 92, 246, 0.15) 0%, 
+        rgba(236, 72, 153, 0.15) 100%);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .activities-dropdown-menu {
+        min-width: 240px;
+        left: auto;
+        right: 0;
+    }
+    
+    .activity-option {
+        padding: 10px 12px;
+    }
+    
+    .activity-icon {
+        font-size: 20px;
+    }
+    
+    .activity-label {
+        font-size: 13px;
+    }
+    
+    .activity-description {
+        font-size: 10px;
+    }
+}
+
+/* Animation for selected activity */
+.activity-selected {
+    animation: pulse 0.3s ease-out;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}

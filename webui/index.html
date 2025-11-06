@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="css/history.css">
     <link rel="stylesheet" href="css/scheduler-datepicker.css">
     <link rel="stylesheet" href="css/tunnel.css">
+    <link rel="stylesheet" href="css/activities.css">
 
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="vendor/font-awesome/all.min.css">
@@ -127,6 +128,7 @@
     <script type="text/javascript" src="js/file_browser.js"></script>
     <script type="text/javascript" src="js/modal.js"></script>
     <script type="module" src="js/tunnel.js"></script>
+    <script type="text/javascript" src="js/activities.js"></script>
 </head>
 
 <body class="dark-mode device-pointer">
@@ -435,6 +437,18 @@
 
                 <!-- Bottom row with text buttons -->
                 <div class="text-buttons-row">
+
+                    <!-- Activities Dropdown (inserted via JavaScript) -->
+                    <div id="activities-dropdown-placeholder"></div>
+                    <script>
+                        // Insert activities dropdown when DOM is ready
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const placeholder = document.getElementById('activities-dropdown-placeholder');
+                            if (placeholder && window.activities) {
+                                placeholder.innerHTML = window.activities.createDropdownHTML();
+                            }
+                        });
+                    </script>
 
                     <button class="text-button" @click="pauseAgent(!paused)">
                         <!-- Dynamic path that switches between pause and play icons -->
