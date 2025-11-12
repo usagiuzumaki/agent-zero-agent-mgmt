@@ -61,6 +61,8 @@ def load_user(user_id):
 
 @login_manager.unauthorized_handler
 def unauthorized():
+    if current_user.is_authenticated and not current_user.has_paid:
+        return redirect('/payment/required')
     return redirect(url_for('replit_auth.login'))
 
 
@@ -69,6 +71,21 @@ def require_login(f):
     def decorated_function(*args, **kwargs):
         if not current_user.is_authenticated:
             return redirect(url_for('replit_auth.login'))
+        # Check if user has paid
+        if not current_user.has_paid:
+            return redirect('/payment/required')
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+def require_payment(f):
+    """Decorator that requires user to be authenticated AND have paid"""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated:
+            return redirect(url_for('replit_auth.login'))
+        if not current_user.has_paid:
+            return redirect('/payment/required')
         return f(*args, **kwargs)
     return decorated_function
 
@@ -185,7 +202,11 @@ def callback():
         
         session.pop('oauth_state', None)
         
-        return redirect(url_for('dashboard_page'))
+        # Check if user has paid
+        if not user.has_paid:
+            return redirect('/payment/required')
+        
+        return redirect('/')
     
     except Exception as e:
         current_app.logger.error(f"Callback error: {str(e)}")

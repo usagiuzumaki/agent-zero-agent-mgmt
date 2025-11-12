@@ -188,6 +188,14 @@ def csrf_protect(f):
 @webapp.route("/", methods=["GET"])
 @requires_auth
 async def serve_index():
+    # Check if user is authenticated and hasn't paid
+    if _auth_available:
+        try:
+            from flask_login import current_user
+            if current_user.is_authenticated and not current_user.has_paid:
+                return redirect('/payment/required')
+        except:
+            pass
     gitinfo = None
     try:
         gitinfo = git.get_git_info()
@@ -303,7 +311,16 @@ def run():
                 init_replit_auth(webapp)
                 init_stripe_routes(webapp)
                 register_image_routes(webapp)
-                PrintStyle().print("✅ Replit Auth is ready! Users can login at /auth/login")
+                
+                # Register payment gate blueprint
+                from payment_gate import payment_gate
+                webapp.register_blueprint(payment_gate)
+                
+                # Register user data API
+                from python.api.user_data import init_user_data_api
+                init_user_data_api(webapp)
+                
+                PrintStyle().print("✅ Replit Auth with $19 payment gate is ready!")
             else:
                 PrintStyle().print("⚠️ Database is sleeping, auth features temporarily disabled")
             PrintStyle().print("Authentication and payment routes configured successfully")
