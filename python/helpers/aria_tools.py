@@ -22,6 +22,17 @@ ARIA_TOOLS: List[Dict[str, Any]] = [
         "type": "custom",
         "name": "sd_image",
         "description": "Generate an image from a text prompt using Stable Diffusion.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "prompt": {"type": "string"},
+                "seed": {"type": "integer"},
+                "steps": {"type": "integer", "minimum": 1},
+                "guidance_scale": {"type": "number", "minimum": 0},
+                "output_dir": {"type": "string"},
+            },
+            "required": ["prompt"],
+        },
     },
     {
         "type": "custom",
@@ -62,6 +73,117 @@ ALLOWED_IMAGE = [{"type": "custom", "name": "sd_image"}]
 ALLOWED_TTS = [{"type": "custom", "name": "eleven_tts"}]
 ALLOWED_INSTAGRAM = [{"type": "function", "name": "post_to_instagram"}]
 ALLOWED_STRIPE = [{"type": "function", "name": "stripe_checkout"}]
+
+
+def _parse_tool_arguments(raw: Any) -> Dict[str, Any]:
+    """Normalize tool arguments into a dictionary."""
+
+    if isinstance(raw, dict):
+        return raw
+
+    if isinstance(raw, str):
+        text = raw.strip()
+        if not text:
+            return {}
+        try:
+            loaded = json.loads(text)
+        except Exception:
+            return {"prompt": text}
+        if isinstance(loaded, dict):
+            return loaded
+        # If it's a list or scalar, return under a generic key
+        return {"value": loaded}
+
+    # Unsupported types -> empty dict
+    return {}
+
+
+def _coerce_int(value: Any) -> int | None:
+    """Best-effort conversion of ``value`` to ``int``."""
+
+    if value is None:
+        return None
+    if isinstance(value, bool):
+        return int(value)
+    if isinstance(value, int):
+        return value
+    if isinstance(value, float):
+        return int(value)
+    if isinstance(value, str):
+        value = value.strip()
+        if not value:
+            return None
+        try:
+            return int(float(value))
+        except ValueError:
+            return None
+    return None
+
+
+def _coerce_float(value: Any) -> float | None:
+    """Best-effort conversion of ``value`` to ``float``."""
+
+    if value is None:
+        return None
+    if isinstance(value, bool):
+        return float(value)
+    if isinstance(value, (int, float)):
+        return float(value)
+    if isinstance(value, str):
+        value = value.strip()
+        if not value:
+            return None
+        try:
+            return float(value)
+        except ValueError:
+            return None
+    return None
+
+
+def _extract_sd_request(arguments: Any) -> tuple[str | None, Dict[str, Any]]:
+    """Extract prompt and keyword arguments for Stable Diffusion."""
+
+    parsed = _parse_tool_arguments(arguments)
+
+    prompt: str | None = None
+    if isinstance(parsed, dict):
+        prompt = parsed.get("prompt")
+        if not prompt:
+            if isinstance(parsed.get("input"), dict):
+                input_dict = parsed["input"]
+                prompt = input_dict.get("prompt") or input_dict.get("text")
+            elif isinstance(parsed.get("input"), str):
+                prompt = parsed.get("input")
+        if not prompt and isinstance(parsed.get("text"), str):
+            prompt = parsed.get("text")
+    else:
+        parsed = {}
+
+    if prompt is None and isinstance(arguments, str):
+        stripped = arguments.strip()
+        prompt = stripped or None
+        parsed = {}
+
+    kwargs: Dict[str, Any] = {}
+    if isinstance(parsed, dict):
+        if parsed.get("output_dir") is not None:
+            kwargs["output_dir"] = parsed["output_dir"]
+        if parsed.get("seed") is not None:
+            seed = _coerce_int(parsed.get("seed"))
+            if seed is not None:
+                kwargs["seed"] = seed
+        step_value = parsed.get("steps", parsed.get("num_inference_steps"))
+        if step_value is not None:
+            steps = _coerce_int(step_value)
+            if steps and steps > 0:
+                kwargs["steps"] = steps
+        guidance_value = parsed.get("guidance_scale", parsed.get("cfg"))
+        if guidance_value is not None:
+            guidance = _coerce_float(guidance_value)
+            if guidance is not None and guidance >= 0:
+                kwargs["guidance_scale"] = guidance
+
+    return prompt, kwargs
 
 def gpt5(
     prompt: Any,
@@ -160,8 +282,28 @@ def handle_tool_call(msg: Any) -> Tuple[Any, str | None]:
     result: str | None = None
     error: str | None = None
     if name == "sd_image":
-        prompt = getattr(msg, "arguments", "")
-        result = _sd_generate(prompt)
+        prompt, options = _extract_sd_request(getattr(msg, "arguments", ""))
+        if not prompt:
+            error = "Stable Diffusion tool requires a 'prompt' argument."
+        else:
+            kwargs: Dict[str, Any] = {}
+            output_dir = options.get("output_dir")
+            if isinstance(output_dir, str) and output_dir.strip():
+                kwargs["output_dir"] = output_dir
+            seed = _coerce_int(options.get("seed"))
+            if seed is not None:
+                kwargs["seed"] = seed
+            steps = _coerce_int(options.get("steps"))
+            if steps is not None and steps > 0:
+                kwargs["steps"] = steps
+            guidance = _coerce_float(options.get("guidance_scale"))
+            if guidance is not None and guidance >= 0:
+                kwargs["guidance_scale"] = guidance
+            try:
+                result = _sd_generate(prompt, **kwargs)
+            except Exception as exc:  # pragma: no cover - optional dependency
+                error = str(exc)
+                result = None
     elif name == "eleven_tts":
         text = getattr(msg, "arguments", "")
         try:
