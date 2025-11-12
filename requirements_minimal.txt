@@ -18,3 +18,4 @@ diskcache
 langchain-anthropic
 langchain-community
 langchain-openai
+nest_asyncio>=1.6.0

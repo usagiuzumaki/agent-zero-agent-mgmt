@@ -43,6 +43,7 @@ python-crontab
 markdown==3.7
 pillow>=10.3.0
 numpy
+nest_asyncio>=1.6.0
 
 # Development Tools
 pypdf==4.3.1
