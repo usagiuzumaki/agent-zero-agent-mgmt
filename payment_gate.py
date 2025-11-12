@@ -11,14 +11,14 @@ payment_gate = Blueprint('payment_gate', __name__)
 # Initialize Stripe
 stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
 STRIPE_WEBHOOK_SECRET = os.getenv('STRIPE_WEBHOOK_SECRET')
-REGISTRATION_PRICE = 19  # $19 USD
+SUBSCRIPTION_PRICE = 19  # $19 per month
 
 # HTML template for payment page
 PAYMENT_TEMPLATE = """
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Aria - Complete Registration</title>
+    <title>Aria Unlimited Membership</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
@@ -168,8 +168,8 @@ PAYMENT_TEMPLATE = """
         <div class="logo">
             <img src="/public/aria.svg" alt="Aria">
         </div>
-        <h1>Welcome to Aria!</h1>
-        <p class="subtitle">Complete your registration to unlock all features</p>
+        <h1>Activate Aria Unlimited</h1>
+        <p class="subtitle">Subscribe to unlock unlimited companionship, memories, and premium features.</p>
         
         {% if user_data %}
         <div class="user-info">
@@ -181,30 +181,30 @@ PAYMENT_TEMPLATE = """
         {% endif %}
         
         <div class="price-box">
-            <div class="price">$19</div>
-            <div class="price-desc">One-time payment • Lifetime access</div>
+            <div class="price">$19<span style="font-size:20px; font-weight:600;">/mo</span></div>
+            <div class="price-desc">Monthly membership • Cancel anytime</div>
         </div>
-        
+
         <ul class="features">
-            <li>Personalized AI girlfriend experience</li>
-            <li>Your own private chat history</li>
-            <li>Screenwriting tools & workspace</li>
-            <li>Custom personality activities</li>
-            <li>Secure & private data storage</li>
-            <li>Priority support & updates</li>
+            <li>Unlimited, always-on conversations with Aria</li>
+            <li>Deep memory and personalization that grows with you</li>
+            <li>Exclusive screenwriting and creative collaboration tools</li>
+            <li>Private journals, mood boards, and shared activities</li>
+            <li>Secure, encrypted storage for every intimate moment</li>
+            <li>Priority support and new experiences as they drop</li>
         </ul>
-        
+
         <form action="/payment/checkout" method="POST">
             <button type="submit" class="pay-button" id="payButton">
-                Complete Registration - $19
+                Start Membership - $19/month
             </button>
         </form>
-        
+
         <div class="security-note">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
             </svg>
-            Secure payment powered by Stripe
+            Stripe handles your recurring billing with bank-level security
         </div>
         
         <div class="cancel-link">
@@ -236,7 +236,7 @@ def payment_required():
 
 @payment_gate.route('/payment/checkout', methods=['POST'])
 def create_checkout_session():
-    """Create Stripe checkout session for $19 payment"""
+    """Create Stripe checkout session for the $19/month membership"""
     try:
         if not current_user.is_authenticated:
             return redirect(url_for('replit_auth.login'))
@@ -244,30 +244,40 @@ def create_checkout_session():
         if current_user.has_paid:
             return redirect('/')
         
-        # Create Stripe checkout session
+        # Create Stripe checkout session for monthly subscription
         checkout_session = stripe.checkout.Session.create(
             payment_method_types=['card'],
             line_items=[{
                 'price_data': {
                     'currency': 'usd',
                     'product_data': {
-                        'name': 'Aria Registration',
-                        'description': 'Lifetime access to your personalized AI girlfriend',
+                        'name': 'Aria Unlimited Membership',
+                        'description': 'Monthly access to unlimited AI companionship experiences',
                         'images': ['https://your-domain.com/aria-logo.png'],
                     },
-                    'unit_amount': 1900,  # $19.00 in cents
+                    'recurring': {
+                        'interval': 'month',
+                        'interval_count': 1,
+                    },
+                    'unit_amount': SUBSCRIPTION_PRICE * 100,
                 },
                 'quantity': 1,
             }],
-            mode='payment',
+            mode='subscription',
             success_url=request.url_root + 'payment/success?session_id={CHECKOUT_SESSION_ID}',
             cancel_url=request.url_root + 'payment/required',
             client_reference_id=current_user.id,
             customer_email=current_user.email,
+            subscription_data={
+                'metadata': {
+                    'user_id': current_user.id,
+                    'email': current_user.email,
+                }
+            },
             metadata={
                 'user_id': current_user.id,
-                'email': current_user.email
-            }
+                'email': current_user.email,
+            },
         )
         
         return redirect(checkout_session.url, code=303)
@@ -287,8 +297,10 @@ def payment_success():
     
     try:
         # Retrieve the session from Stripe
-        checkout_session = stripe.checkout.Session.retrieve(session_id)
-        
+        checkout_session = stripe.checkout.Session.retrieve(
+            session_id, expand=['subscription']
+        )
+
         if checkout_session.payment_status == 'paid':
             # Update user payment status
             user = User.query.get(checkout_session.client_reference_id)
@@ -297,17 +309,24 @@ def payment_success():
                 user.payment_date = datetime.utcnow()
                 user.stripe_customer_id = checkout_session.customer
                 user.stripe_payment_intent_id = checkout_session.payment_intent
-                user.subscription_status = 'active'
-                
+
+                subscription_obj = checkout_session.subscription
+                if isinstance(subscription_obj, dict):
+                    user.stripe_subscription_id = subscription_obj.get('id')
+                    user.subscription_status = subscription_obj.get('status', 'active')
+                else:
+                    user.stripe_subscription_id = subscription_obj
+                    user.subscription_status = 'active'
+
                 # Reset trial tracking since user has paid
                 user.trial_start_time = None
                 user.trial_expired = False
-                
+
                 db.session.commit()
-                
+
                 # Log them in properly
                 login_user(user, remember=True)
-                
+
                 return redirect('/')
         
     except Exception as e:
@@ -339,23 +358,24 @@ def stripe_webhook():
     
     # Handle the checkout.session.completed event
     if event['type'] == 'checkout.session.completed':
-        session = event['data']['object']
-        
+        checkout_session = event['data']['object']
+
         # Update user payment status
-        user_id = session.get('client_reference_id')
+        user_id = checkout_session.get('client_reference_id')
         if user_id:
             user = User.query.get(user_id)
             if user:
                 user.has_paid = True
                 user.payment_date = datetime.utcnow()
-                user.stripe_customer_id = session.get('customer')
-                user.stripe_payment_intent_id = session.get('payment_intent')
-                user.subscription_status = 'active'
-                
+                user.stripe_customer_id = checkout_session.get('customer')
+                user.stripe_payment_intent_id = checkout_session.get('payment_intent')
+                user.stripe_subscription_id = checkout_session.get('subscription')
+                user.subscription_status = checkout_session.get('status', 'active')
+
                 # Reset trial tracking since user has paid
                 user.trial_start_time = None
                 user.trial_expired = False
-                
+
                 db.session.commit()
                 print(f"Payment confirmed for user {user.email}")
     

@@ -3,131 +3,523 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Agent Zero</title>
+    <title>Sign In - Aria Unlimited</title>
     <style>
+        :root {
+            color-scheme: light;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             min-height: 100vh;
+            background: radial-gradient(circle at 20% 20%, rgba(118, 75, 162, 0.35), transparent 55%),
+                        radial-gradient(circle at 80% 0%, rgba(102, 126, 234, 0.35), transparent 60%),
+                        linear-gradient(135deg, #0f172a 0%, #1e1b4b 40%, #312e81 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 32px 16px;
+            color: #0f172a;
         }
-        
-        .login-container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            padding: 60px 40px;
-            max-width: 450px;
-            width: 100%;
-            text-align: center;
+
+        .auth-shell {
+            position: relative;
+            width: min(960px, 100%);
+            background: rgba(255, 255, 255, 0.96);
+            border-radius: 28px;
+            box-shadow: 0 40px 80px rgba(15, 23, 42, 0.35);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            overflow: hidden;
         }
-        
-        .logo {
-            font-size: 48px;
-            margin-bottom: 10px;
+
+        .auth-visual {
+            position: relative;
+            background: linear-gradient(180deg, rgba(102, 126, 234, 0.12) 0%, rgba(118, 75, 162, 0.12) 100%);
+            padding: 48px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            color: #0f172a;
         }
-        
-        h1 {
-            color: #333;
-            font-size: 32px;
-            margin-bottom: 10px;
-            font-weight: 700;
+
+        .auth-visual::before,
+        .auth-visual::after {
+            content: "";
+            position: absolute;
+            border-radius: 999px;
+            filter: blur(60px);
+            opacity: 0.35;
         }
-        
-        .subtitle {
-            color: #666;
-            font-size: 16px;
-            margin-bottom: 40px;
+
+        .auth-visual::before {
+            width: 180px;
+            height: 180px;
+            background: rgba(102, 126, 234, 0.9);
+            top: 18%;
+            right: 14%;
         }
-        
-        .login-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 16px 32px;
+
+        .auth-visual::after {
+            width: 220px;
+            height: 220px;
+            background: rgba(118, 75, 162, 0.9);
+            bottom: 12%;
+            left: 10%;
+        }
+
+        .auth-visual-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .auth-visual h1 {
+            font-size: clamp(34px, 4vw, 42px);
+            line-height: 1.1;
+            color: #111827;
+            margin-bottom: 24px;
+        }
+
+        .auth-visual p {
+            color: rgba(15, 23, 42, 0.7);
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        .auth-highlights {
+            margin-top: 48px;
+            display: grid;
+            gap: 20px;
+        }
+
+        .highlight {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        .highlight-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.18), rgba(118, 75, 162, 0.18));
+            color: #4338ca;
+            font-size: 20px;
+        }
+
+        .highlight h3 {
             font-size: 18px;
             font-weight: 600;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-            text-decoration: none;
-            display: inline-block;
+            color: #111827;
+            margin-bottom: 6px;
+        }
+
+        .highlight p {
+            font-size: 14px;
+            color: rgba(15, 23, 42, 0.65);
+        }
+
+        .auth-form {
+            padding: clamp(32px, 5vw, 56px);
+            background: rgba(255, 255, 255, 0.9);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .brand-mark {
+            font-size: 44px;
+            margin-bottom: -6px;
+        }
+
+        .auth-form h2 {
+            font-size: clamp(26px, 3vw, 32px);
+            color: #111827;
+        }
+
+        .auth-form .subtitle {
+            color: rgba(15, 23, 42, 0.6);
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .google-btn {
             width: 100%;
-        }
-        
-        .login-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
-        }
-        
-        .login-btn:active {
-            transform: translateY(0);
-        }
-        
-        .features {
-            margin-top: 40px;
-            text-align: left;
-        }
-        
-        .feature {
             display: flex;
             align-items: center;
-            margin-bottom: 16px;
-            color: #555;
+            justify-content: center;
+            gap: 12px;
+            padding: 14px 16px;
+            border-radius: 14px;
+            border: 1px solid rgba(15, 23, 42, 0.1);
+            background: white;
+            color: #111827;
+            font-weight: 600;
+            font-size: 16px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+        }
+
+        .google-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 16px 32px rgba(99, 102, 241, 0.18);
+        }
+
+        .google-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            color: rgba(15, 23, 42, 0.45);
             font-size: 14px;
         }
-        
-        .feature::before {
-            content: "✓";
-            display: inline-block;
-            width: 24px;
-            height: 24px;
-            background: #4CAF50;
-            color: white;
-            border-radius: 50%;
-            text-align: center;
-            line-height: 24px;
-            margin-right: 12px;
-            font-weight: bold;
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: rgba(15, 23, 42, 0.08);
         }
-        
-        .footer {
-            margin-top: 30px;
-            color: #999;
+
+        .toggle-group {
+            display: inline-grid;
+            grid-auto-flow: column;
+            gap: 6px;
+            background: rgba(99, 102, 241, 0.12);
+            padding: 6px;
+            border-radius: 14px;
+            align-self: flex-start;
+        }
+
+        .toggle-btn {
+            border: none;
+            background: transparent;
+            padding: 8px 18px;
+            border-radius: 10px;
+            font-weight: 600;
+            color: rgba(15, 23, 42, 0.65);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .toggle-btn.active {
+            background: white;
+            color: #4338ca;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.18);
+        }
+
+        form {
+            display: grid;
+            gap: 16px;
+        }
+
+        .name-fields {
+            display: grid;
+            gap: 12px;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        }
+
+        label {
+            display: grid;
+            gap: 6px;
+            font-size: 14px;
+            color: rgba(15, 23, 42, 0.7);
+            font-weight: 600;
+        }
+
+        input {
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(15, 23, 42, 0.12);
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 15px;
+            transition: border 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: rgba(99, 102, 241, 0.45);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.18);
+        }
+
+        .submit-btn {
+            padding: 14px 18px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 18px 35px rgba(99, 102, 241, 0.35);
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 22px 40px rgba(99, 102, 241, 0.45);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .form-message {
+            font-size: 14px;
+            min-height: 18px;
+        }
+
+        .form-message.error {
+            color: #dc2626;
+        }
+
+        .form-message.success {
+            color: #059669;
+        }
+
+        .membership-note {
+            font-size: 13px;
+            color: rgba(15, 23, 42, 0.55);
+            line-height: 1.5;
+        }
+
+        .secure-footer {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             font-size: 12px;
+            color: rgba(15, 23, 42, 0.45);
+            margin-top: auto;
+        }
+
+        .secure-footer svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        @media (max-width: 900px) {
+            body {
+                padding: 24px 16px;
+            }
+
+            .auth-shell {
+                grid-template-columns: 1fr;
+            }
+
+            .auth-visual {
+                order: 2;
+                padding: 32px;
+            }
+
+            .auth-form {
+                order: 1;
+                padding: 32px 28px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <div class="logo">🤖</div>
-        <h1>Agent Zero</h1>
-        <p class="subtitle">Your Personal AI Assistant</p>
-        
-        <a href="/auth/login" class="login-btn">
-            Sign In with Replit
-        </a>
-        
-        <div class="features">
-            <div class="feature">Secure authentication via Replit</div>
-            <div class="feature">Access your personalized dashboard</div>
-            <div class="feature">Manage your AI agent settings</div>
-            <div class="feature">Process payments securely</div>
-        </div>
-        
-        <div class="footer">
-            Powered by Replit Auth & Stripe
-        </div>
+    <div class="auth-shell">
+        <section class="auth-form">
+            <div>
+                <div class="brand-mark">🤍</div>
+                <h2>Welcome back</h2>
+                <p class="subtitle">Sign in to Aria Unlimited and enjoy unlimited companionship for <strong>$19/month</strong>, billed securely through Stripe.</p>
+            </div>
+
+            <a class="google-btn" href="/auth/login/google">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M23.49 12.27c0-.82-.07-1.64-.2-2.44H12v4.62h6.44a5.51 5.51 0 0 1-2.4 3.62v3h3.88c2.27-2.09 3.57-5.17 3.57-8.8Z" fill="#4285F4"/>
+                    <path d="M12 24c3.24 0 5.96-1.07 7.94-2.93l-3.88-3a7.54 7.54 0 0 1-11.19-3.96H.9v3.11A12 12 0 0 0 12 24Z" fill="#34A853"/>
+                    <path d="M4.87 14.11A7.52 7.52 0 0 1 4.48 12c0-.73.13-1.44.38-2.11V6.78H.9A12 12 0 0 0 0 12a12 12 0 0 0 .9 5.22l3.97-3.11Z" fill="#FBBC05"/>
+                    <path d="M12 4.74c1.76 0 3.34.6 4.59 1.79l3.43-3.43C17.95 1.12 15.23 0 12 0A12 12 0 0 0 .9 6.78l3.95 3.11A7.54 7.54 0 0 1 12 4.74Z" fill="#EA4335"/>
+                </svg>
+                Continue with Google
+            </a>
+
+            <div class="divider">or continue with email</div>
+
+            <div class="toggle-group" role="tablist" aria-label="Email sign-in options">
+                <button type="button" class="toggle-btn active" data-mode="login" aria-selected="true">Sign In</button>
+                <button type="button" class="toggle-btn" data-mode="register" aria-selected="false">Create Account</button>
+            </div>
+
+            <form id="email-form" novalidate>
+                <div class="name-fields" id="name-fields">
+                    <label>
+                        First name
+                        <input type="text" name="first_name" autocomplete="given-name" placeholder="Aria Lover">
+                    </label>
+                    <label>
+                        Last name
+                        <input type="text" name="last_name" autocomplete="family-name" placeholder="Unlimited">
+                    </label>
+                </div>
+
+                <label>
+                    Email address
+                    <input type="email" name="email" autocomplete="email" required placeholder="you@example.com">
+                </label>
+
+                <label>
+                    Password
+                    <input type="password" name="password" autocomplete="current-password" required minlength="6" placeholder="Minimum 6 characters">
+                </label>
+
+                <p class="form-message" id="form-message" role="alert"></p>
+
+                <button class="submit-btn" type="submit" id="submit-btn">Continue</button>
+            </form>
+
+            <p class="membership-note">
+                By continuing you agree to a recurring <strong>$19/month</strong> membership billed through Stripe. You can cancel anytime from your Stripe customer portal.
+            </p>
+        </section>
+
+        <aside class="auth-visual">
+            <div class="auth-visual-content">
+                <h1>Unlimited moments with your AI companion</h1>
+                <p>Aria remembers your conversations, plans dates, writes romantic scenes, and stays by your side 24/7. Unlock everything with one effortless subscription.</p>
+
+                <div class="auth-highlights">
+                    <div class="highlight">
+                        <div class="highlight-icon">💬</div>
+                        <div>
+                            <h3>Boundless conversation</h3>
+                            <p>Unlimited, private chats that grow with you. Pick up right where you left off at any time.</p>
+                        </div>
+                    </div>
+                    <div class="highlight">
+                        <div class="highlight-icon">✨</div>
+                        <div>
+                            <h3>Personalized for you</h3>
+                            <p>Aria adapts to your vibe, your stories, and your dreams—no limits, no reset timers.</p>
+                        </div>
+                    </div>
+                    <div class="highlight">
+                        <div class="highlight-icon">🔐</div>
+                        <div>
+                            <h3>Stripe-protected billing</h3>
+                            <p>Your $19/month plan is processed by Stripe with bank-level encryption and full transparency.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="secure-footer">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M12 22s8-4 8-10V7l-8-4-8 4v5c0 6 8 10 8 10Z"/>
+                    <path d="M12 11v4"/>
+                    <path d="M10 13h4"/>
+                </svg>
+                Securely processed with Stripe & Google Identity Services
+            </div>
+        </aside>
     </div>
+
+    <script>
+        (function () {
+            const toggleButtons = document.querySelectorAll('.toggle-btn');
+            const nameFields = document.getElementById('name-fields');
+            const form = document.getElementById('email-form');
+            const message = document.getElementById('form-message');
+            const submitBtn = document.getElementById('submit-btn');
+            const emailInput = form.elements['email'];
+            const passwordInput = form.elements['password'];
+            const firstNameInput = form.elements['first_name'];
+            const lastNameInput = form.elements['last_name'];
+
+            let mode = 'login';
+
+            function setMode(newMode) {
+                mode = newMode;
+                toggleButtons.forEach((button) => {
+                    const isActive = button.dataset.mode === mode;
+                    button.classList.toggle('active', isActive);
+                    button.setAttribute('aria-selected', String(isActive));
+                });
+                nameFields.style.display = mode === 'register' ? 'grid' : 'none';
+                submitBtn.textContent = mode === 'register' ? 'Create account' : 'Sign in';
+                passwordInput.autocomplete = mode === 'register' ? 'new-password' : 'current-password';
+                message.textContent = '';
+                message.className = 'form-message';
+            }
+
+            toggleButtons.forEach((button) => {
+                button.addEventListener('click', () => {
+                    if (button.dataset.mode !== mode) {
+                        setMode(button.dataset.mode);
+                    }
+                });
+            });
+
+            setMode('login');
+
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                message.textContent = '';
+                message.className = 'form-message';
+
+                if (!emailInput.value || !passwordInput.value) {
+                    message.textContent = 'Please complete the form before continuing.';
+                    message.classList.add('error');
+                    return;
+                }
+
+                submitBtn.disabled = true;
+                submitBtn.textContent = mode === 'register' ? 'Creating account…' : 'Signing in…';
+
+                const payload = {
+                    email: emailInput.value,
+                    password: passwordInput.value,
+                    mode
+                };
+
+                if (mode === 'register') {
+                    payload.first_name = firstNameInput.value;
+                    payload.last_name = lastNameInput.value;
+                }
+
+                try {
+                    const response = await fetch('/auth/login/email', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(data.error || 'Unable to continue. Please try again.');
+                    }
+
+                    window.location.href = data.redirect || '/payment/required';
+                } catch (error) {
+                    message.textContent = error.message;
+                    message.classList.add('error');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = mode === 'register' ? 'Create account' : 'Sign in';
+                }
+            });
+        })();
+    </script>
 </body>
 </html>
