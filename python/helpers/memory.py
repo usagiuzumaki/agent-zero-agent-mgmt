@@ -145,14 +145,29 @@ class Memory:
 
         # if db folder exists and is not empty:
         if os.path.exists(db_dir) and files.exists(db_dir, "index.faiss"):
-            db = MyFaiss.load_local(
-                folder_path=db_dir,
-                embeddings=embedder,
-                allow_dangerous_deserialization=True,
-                distance_strategy=DistanceStrategy.COSINE,
-                # normalize_L2=True,
-                relevance_score_fn=Memory._cosine_normalizer,
-            )  # type: ignore
+            try:
+                db = MyFaiss.load_local(
+                    folder_path=db_dir,
+                    embeddings=embedder,
+                    allow_dangerous_deserialization=True,
+                    distance_strategy=DistanceStrategy.COSINE,
+                    # normalize_L2=True,
+                    relevance_score_fn=Memory._cosine_normalizer,
+                )  # type: ignore
+            except (RuntimeError, OSError) as err:
+                # The FAISS index file might be corrupted or incomplete. Remove the
+                # persisted files so we can rebuild a fresh index instead of
+                # crashing during startup.
+                PrintStyle.warning(
+                    "Failed to load existing VectorDB index. Recreating it."
+                )
+                PrintStyle.debug(f"FAISS load error: {err}")
+                if log_item:
+                    log_item.stream(
+                        progress="\nVectorDB index corrupted. Rebuilding it."
+                    )
+                Memory._clear_db_files(db_dir)
+                db = None
 
             # if there is a mismatch in embeddings used, re-index the whole DB
             emb_ok = False
@@ -393,6 +408,20 @@ class Memory:
     def _save_db_file(db: MyFaiss, memory_subdir: str):
         abs_dir = Memory._abs_db_dir(memory_subdir)
         db.save_local(folder_path=abs_dir)
+
+    @staticmethod
+    def _clear_db_files(db_dir: str):
+        for file_name in ("index.faiss", "index.pkl"):
+            file_path = os.path.join(db_dir, file_name)
+            if os.path.exists(file_path):
+                try:
+                    os.remove(file_path)
+                except OSError:
+                    # If the file cannot be removed, we leave it so an exception is
+                    # raised later when saving the new index.
+                    PrintStyle.warning(
+                        f"Unable to delete '{file_path}'. Please remove it manually."
+                    )
 
     @staticmethod
     def _get_comparator(condition: str):
