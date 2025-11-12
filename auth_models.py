@@ -2,6 +2,7 @@ import os
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
 
 db = SQLAlchemy()
 
@@ -14,12 +15,14 @@ class User(UserMixin, db.Model):
     first_name = db.Column(db.String(255))
     last_name = db.Column(db.String(255))
     profile_image_url = db.Column(db.String(512))
+    password_hash = db.Column(db.String(255), nullable=True)
     
     # Payment and subscription status
     has_paid = db.Column(db.Boolean, default=False, nullable=False)
     payment_date = db.Column(db.DateTime, nullable=True)
     stripe_customer_id = db.Column(db.String(255), unique=True, nullable=True)
     stripe_payment_intent_id = db.Column(db.String(255), nullable=True)
+    stripe_subscription_id = db.Column(db.String(255), nullable=True)
     subscription_status = db.Column(db.String(50), default='trial', nullable=False)  # trial, active, expired
     
     # Trial tracking
@@ -35,6 +38,16 @@ class User(UserMixin, db.Model):
     
     def __repr__(self):
         return f'<User {self.email}>'
+
+    def set_password(self, password: str):
+        if not password:
+            raise ValueError("Password must not be empty")
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password: str) -> bool:
+        if not self.password_hash or not password:
+            return False
+        return check_password_hash(self.password_hash, password)
 
 
 class OAuth(db.Model):
@@ -135,6 +148,9 @@ def init_db(app):
                     
                     # Create tables if they don't exist
                     db.create_all()
+
+                    # Ensure existing deployments receive new columns
+                    _apply_user_schema_updates()
                     print("Database tables created successfully")
                     return True
             except Exception as e:
@@ -159,3 +175,27 @@ def init_db(app):
         print(f"Warning: Database initialization failed: {e}")
         print("Authentication features will be temporarily disabled")
         return False
+
+
+def _apply_user_schema_updates():
+    """Perform lightweight migrations required for the auth system."""
+    from sqlalchemy import inspect, text
+
+    try:
+        inspector = inspect(db.engine)
+        columns = {column["name"] for column in inspector.get_columns('users')}
+
+        statements = []
+        if 'password_hash' not in columns:
+            statements.append(text("ALTER TABLE users ADD COLUMN password_hash VARCHAR(255)"))
+        if 'stripe_subscription_id' not in columns:
+            statements.append(text("ALTER TABLE users ADD COLUMN stripe_subscription_id VARCHAR(255)"))
+
+        for statement in statements:
+            db.session.execute(statement)
+
+        if statements:
+            db.session.commit()
+    except Exception as exc:
+        db.session.rollback()
+        print(f"Warning: Failed to apply user schema updates: {exc}")
