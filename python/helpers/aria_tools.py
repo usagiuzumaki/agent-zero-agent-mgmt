@@ -160,8 +160,91 @@ def handle_tool_call(msg: Any) -> Tuple[Any, str | None]:
     result: str | None = None
     error: str | None = None
     if name == "sd_image":
-        prompt = getattr(msg, "arguments", "")
-        result = _sd_generate(prompt)
+        raw_args = getattr(msg, "arguments", "")
+        prompt: str | None = None
+        output_dir: str | None = None
+        negative_prompt: str | None = None
+        seed: int | None = None
+        steps: int | None = None
+        guidance_scale: float | None = None
+        width: int | None = None
+        height: int | None = None
+
+        parsed: Dict[str, Any] | None = None
+
+        if isinstance(raw_args, str):
+            stripped = raw_args.strip()
+            if stripped.startswith("{"):
+                try:
+                    parsed = json.loads(stripped)
+                except json.JSONDecodeError:
+                    prompt = stripped
+            elif stripped:
+                prompt = stripped
+        elif isinstance(raw_args, dict):
+            parsed = raw_args
+
+        if parsed:
+            prompt_val = parsed.get("prompt")
+            if isinstance(prompt_val, str):
+                prompt = prompt_val
+            elif prompt_val is not None:
+                prompt = str(prompt_val)
+
+            negative = parsed.get("negative_prompt")
+            if isinstance(negative, str):
+                negative_prompt = negative
+
+            output_dir_val = parsed.get("output_dir") or parsed.get("output_path")
+            if isinstance(output_dir_val, str) and output_dir_val.strip():
+                output_dir = output_dir_val.strip()
+
+            def _maybe_int(value: Any) -> int | None:
+                if value in (None, ""):
+                    return None
+                try:
+                    return int(value)
+                except (TypeError, ValueError):
+                    return None
+
+            def _maybe_float(value: Any) -> float | None:
+                if value in (None, ""):
+                    return None
+                try:
+                    return float(value)
+                except (TypeError, ValueError):
+                    return None
+
+            seed = _maybe_int(parsed.get("seed"))
+            steps = _maybe_int(parsed.get("steps") or parsed.get("num_inference_steps"))
+            width = _maybe_int(parsed.get("width"))
+            height = _maybe_int(parsed.get("height"))
+            guidance_scale = _maybe_float(parsed.get("guidance_scale") or parsed.get("cfg") or parsed.get("cfg_scale"))
+
+        if not prompt:
+            error = "Stable Diffusion tool requires a prompt string"
+        else:
+            sd_kwargs: Dict[str, Any] = {}
+            if output_dir:
+                sd_kwargs["output_dir"] = output_dir
+            if negative_prompt:
+                sd_kwargs["negative_prompt"] = negative_prompt
+            if seed is not None:
+                sd_kwargs["seed"] = seed
+            if steps is not None:
+                sd_kwargs["steps"] = steps
+            if guidance_scale is not None:
+                sd_kwargs["guidance_scale"] = guidance_scale
+            if width is not None:
+                sd_kwargs["width"] = width
+            if height is not None:
+                sd_kwargs["height"] = height
+
+            try:
+                result = _sd_generate(prompt, **sd_kwargs)
+            except Exception as exc:  # pragma: no cover - depends on external services
+                error = str(exc)
+                result = None
     elif name == "eleven_tts":
         text = getattr(msg, "arguments", "")
         try:

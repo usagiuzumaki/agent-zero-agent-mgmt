@@ -36,6 +36,9 @@ def _generate_image_via_replicate(
     seed: int | None = None,
     steps: int = 30,
     guidance_scale: float = 7.5,
+    negative_prompt: str | None = None,
+    width: int | None = None,
+    height: int | None = None,
 ) -> str:
     """Generate image using Replicate API."""
     if replicate is None:
@@ -58,7 +61,14 @@ def _generate_image_via_replicate(
         "num_inference_steps": steps,
         "guidance_scale": guidance_scale,
     }
-    
+
+    if negative_prompt:
+        input_params["negative_prompt"] = negative_prompt
+    if width:
+        input_params["width"] = width
+    if height:
+        input_params["height"] = height
+
     if seed is not None:
         input_params["seed"] = seed
     
@@ -137,10 +147,13 @@ def _load_pipeline() -> "StableDiffusionPipeline":
 def generate_image(
     prompt: str,
     *,
-    output_dir: str = "outputs", 
+    output_dir: str = "outputs",
     seed: int | None = None,
     steps: int = 30,
     guidance_scale: float = 7.5,
+    negative_prompt: str | None = None,
+    width: int | None = None,
+    height: int | None = None,
 ) -> str:
     """Generate an image from ``prompt`` using Stable Diffusion.
     
@@ -172,11 +185,22 @@ def generate_image(
         try:
             # Use the simple subprocess method that avoids import hangs
             from python.helpers.stable_diffusion_simple import generate_image as generate_simple
-            return generate_simple(prompt, output_dir=output_dir, steps=steps, guidance_scale=guidance_scale)
+
+            return generate_simple(
+                prompt,
+                output_dir=output_dir,
+                steps=steps,
+                guidance_scale=guidance_scale,
+                negative_prompt=negative_prompt,
+                width=width,
+                height=height,
+                seed=seed,
+                model_version=_REPLICATE_MODEL,
+            )
         except Exception as e:
             # Fall back to the original method if simple method fails
             pass
-    
+
     # Prioritize Replicate API if available
     if current_replicate_token and replicate is not None:
         # Update the module-level variable
@@ -188,14 +212,28 @@ def generate_image(
             seed=seed,
             steps=steps,
             guidance_scale=guidance_scale,
+            negative_prompt=negative_prompt,
+            width=width,
+            height=height,
         )
-    
+
     # Fall back to local generation
     pipe = _load_pipeline()
     generator = None
     if seed is not None and torch is not None:
         generator = torch.Generator(device=pipe.device).manual_seed(seed)
-    result = pipe(prompt, num_inference_steps=steps, guidance_scale=guidance_scale, generator=generator)
+    run_kwargs = {
+        "num_inference_steps": steps,
+        "guidance_scale": guidance_scale,
+        "generator": generator,
+    }
+    if negative_prompt:
+        run_kwargs["negative_prompt"] = negative_prompt
+    if width:
+        run_kwargs["width"] = width
+    if height:
+        run_kwargs["height"] = height
+    result = pipe(prompt, **run_kwargs)
     image = result.images[0]
     os.makedirs(output_dir, exist_ok=True)
     filename = os.path.join(output_dir, f"sd_image_{uuid.uuid4().hex}.png")
