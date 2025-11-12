@@ -7,10 +7,26 @@ from werkzeug.utils import secure_filename
 from python.helpers.defer import DeferredTask
 from python.helpers.print_style import PrintStyle
 
+# Import trial management
+try:
+    from flask_login import current_user
+    from trial_manager import TrialManager
+    from flask import jsonify
+    _trial_management_available = True
+except ImportError:
+    _trial_management_available = False
+    PrintStyle().print("Warning: Trial management not available")
+
 
 class Message(ApiHandler):
     async def process(self, input: dict, request: Request) -> dict | Response:
-        task, context = await self.communicate(input=input, request=request)
+        result = await self.communicate(input=input, request=request)
+        
+        # Check if this is a trial error response
+        if isinstance(result, tuple) and result[0] is None:
+            return result[1]  # Return the error response directly
+        
+        task, context = result
         return await self.respond(task, context)
 
     async def respond(self, task: DeferredTask, context: AgentContext):
@@ -21,6 +37,28 @@ class Message(ApiHandler):
         }
 
     async def communicate(self, input: dict, request: Request):
+        # Check trial status if trial management is available
+        if _trial_management_available:
+            try:
+                # In Flask, current_user is a proxy that needs to be accessed in request context
+                from flask import has_request_context
+                if has_request_context() and current_user.is_authenticated:
+                    # Check trial status
+                    is_allowed, remaining_seconds, message = TrialManager.check_trial_status(current_user)
+                    
+                    if not is_allowed:
+                        # Trial expired, return error response
+                        return None, {
+                            "error": "Trial expired",
+                            "message": "Your 3-minute free trial has expired. Please complete payment to continue chatting with Aria.",
+                            "redirect": "/payment/required",
+                            "trial_expired": True,
+                            "remaining_seconds": 0
+                        }
+            except Exception as e:
+                PrintStyle().print(f"Trial check error: {e}")
+                # Continue without trial check if there's an error
+        
         # Handle both JSON and multipart/form-data
         if request.content_type.startswith("multipart/form-data"):
             text = request.form.get("text", "")
