@@ -22,6 +22,10 @@ class User(UserMixin, db.Model):
     stripe_payment_intent_id = db.Column(db.String(255), nullable=True)
     subscription_status = db.Column(db.String(50), default='trial', nullable=False)  # trial, active, expired
     
+    # Trial tracking
+    trial_start_time = db.Column(db.DateTime, nullable=True)  # When user first sends a message
+    trial_expired = db.Column(db.Boolean, default=False, nullable=False)  # Whether 3-minute trial has expired
+    
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
     
