@@ -145,14 +145,29 @@ class Memory:
 
         # if db folder exists and is not empty:
         if os.path.exists(db_dir) and files.exists(db_dir, "index.faiss"):
-            db = MyFaiss.load_local(
-                folder_path=db_dir,
-                embeddings=embedder,
-                allow_dangerous_deserialization=True,
-                distance_strategy=DistanceStrategy.COSINE,
-                # normalize_L2=True,
-                relevance_score_fn=Memory._cosine_normalizer,
-            )  # type: ignore
+            try:
+                db = MyFaiss.load_local(
+                    folder_path=db_dir,
+                    embeddings=embedder,
+                    allow_dangerous_deserialization=True,
+                    distance_strategy=DistanceStrategy.COSINE,
+                    # normalize_L2=True,
+                    relevance_score_fn=Memory._cosine_normalizer,
+                )  # type: ignore
+            except (RuntimeError, OSError, ValueError) as exc:
+                warn_text = (
+                    "Corrupted FAISS index detected. Rebuilding the vector store from scratch."
+                )
+                PrintStyle.warning(warn_text)
+                if log_item:
+                    log_item.log.log(
+                        type="warning",
+                        heading=warn_text,
+                        content=str(exc),
+                        temp=False,
+                    )
+                Memory._cleanup_corrupted_index(db_dir)
+                db = None
 
             # if there is a mismatch in embeddings used, re-index the whole DB
             emb_ok = False
@@ -393,6 +408,18 @@ class Memory:
     def _save_db_file(db: MyFaiss, memory_subdir: str):
         abs_dir = Memory._abs_db_dir(memory_subdir)
         db.save_local(folder_path=abs_dir)
+
+    @staticmethod
+    def _cleanup_corrupted_index(db_dir: str):
+        for file_name in ("index.faiss", "index.pkl"):
+            file_path = os.path.join(db_dir, file_name)
+            try:
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+            except OSError as exc:
+                PrintStyle.warning(
+                    f"Failed to remove corrupted FAISS artifact '{file_path}': {exc}"
+                )
 
     @staticmethod
     def _get_comparator(condition: str):
