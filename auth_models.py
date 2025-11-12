@@ -148,6 +148,9 @@ def init_db(app):
                     
                     # Create tables if they don't exist
                     db.create_all()
+
+                    # Ensure existing deployments receive new columns
+                    _apply_user_schema_updates()
                     print("Database tables created successfully")
                     return True
             except Exception as e:
@@ -172,3 +175,27 @@ def init_db(app):
         print(f"Warning: Database initialization failed: {e}")
         print("Authentication features will be temporarily disabled")
         return False
+
+
+def _apply_user_schema_updates():
+    """Perform lightweight migrations required for the auth system."""
+    from sqlalchemy import inspect, text
+
+    try:
+        inspector = inspect(db.engine)
+        columns = {column["name"] for column in inspector.get_columns('users')}
+
+        statements = []
+        if 'password_hash' not in columns:
+            statements.append(text("ALTER TABLE users ADD COLUMN password_hash VARCHAR(255)"))
+        if 'stripe_subscription_id' not in columns:
+            statements.append(text("ALTER TABLE users ADD COLUMN stripe_subscription_id VARCHAR(255)"))
+
+        for statement in statements:
+            db.session.execute(statement)
+
+        if statements:
+            db.session.commit()
+    except Exception as exc:
+        db.session.rollback()
+        print(f"Warning: Failed to apply user schema updates: {exc}")
