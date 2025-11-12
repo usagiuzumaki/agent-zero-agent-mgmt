@@ -89,6 +89,7 @@ def init_db(app):
     database_url = os.getenv('DATABASE_URL')
     if not database_url:
         print("Warning: DATABASE_URL not found, authentication features will be disabled")
+        print("Please provision a database using the Replit database pane")
         return False
     
     # Handle both postgres:// and postgresql:// formats for pg8000
@@ -98,33 +99,63 @@ def init_db(app):
         database_url = database_url.replace('postgres://', 'postgresql+pg8000://', 1)
     
     # Remove sslmode parameter if present as pg8000 handles SSL differently
-    if 'sslmode=' in database_url:
+    if '?sslmode=' in database_url:
         database_url = database_url.split('?')[0]
+    elif '&sslmode=' in database_url:
+        # Remove sslmode parameter from middle of query string
+        import re
+        database_url = re.sub(r'[&?]sslmode=[^&]*', '', database_url)
     
     app.config['SQLALCHEMY_DATABASE_URI'] = database_url
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
         'pool_pre_ping': True,
         'pool_recycle': 300,
-        'pool_size': 10,
-        'max_overflow': 20,
+        'pool_size': 5,  # Reduced pool size for Neon
+        'max_overflow': 10,  # Reduced overflow
+        'pool_timeout': 30,  # Add timeout
         'connect_args': {
             'ssl_context': True
+            # pg8000 doesn't accept connect_timeout as a parameter
         }
     }
     
     try:
         db.init_app(app)
         
-        with app.app_context():
-            # Create tables if they don't exist
-            db.create_all()
-            print("Database tables created successfully")
-            # Test connection
-            db.engine.execute("SELECT 1")
-            return True
+        # Try to initialize database with retries
+        max_retries = 3
+        for retry in range(max_retries):
+            try:
+                with app.app_context():
+                    # Try a simple query first to wake up the database
+                    from sqlalchemy import text
+                    db.session.execute(text("SELECT 1"))
+                    db.session.commit()
+                    
+                    # Create tables if they don't exist
+                    db.create_all()
+                    print("Database tables created successfully")
+                    return True
+            except Exception as e:
+                if "endpoint has been disabled" in str(e).lower():
+                    print(f"Database endpoint is disabled. Retry {retry + 1}/{max_retries}...")
+                    if retry < max_retries - 1:
+                        import time
+                        time.sleep(2)  # Wait before retry
+                        continue
+                    else:
+                        print("IMPORTANT: The Neon database endpoint is disabled.")
+                        print("Please enable it through the Replit database pane:")
+                        print("1. Go to the Database pane in Replit")
+                        print("2. Click on your PostgreSQL database")
+                        print("3. The database will automatically wake up")
+                        print("4. Restart this application")
+                        print("Authentication features will work once the database is enabled.")
+                        return False
+                else:
+                    raise e
     except Exception as e:
         print(f"Warning: Database initialization failed: {e}")
         print("Authentication features will be temporarily disabled")
-        print("The database may be sleeping - it will auto-wake on the next request")
         return False

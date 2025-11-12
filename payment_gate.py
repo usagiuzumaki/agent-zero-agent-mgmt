@@ -298,6 +298,11 @@ def payment_success():
                 user.stripe_customer_id = checkout_session.customer
                 user.stripe_payment_intent_id = checkout_session.payment_intent
                 user.subscription_status = 'active'
+                
+                # Reset trial tracking since user has paid
+                user.trial_start_time = None
+                user.trial_expired = False
+                
                 db.session.commit()
                 
                 # Log them in properly
@@ -346,6 +351,11 @@ def stripe_webhook():
                 user.stripe_customer_id = session.get('customer')
                 user.stripe_payment_intent_id = session.get('payment_intent')
                 user.subscription_status = 'active'
+                
+                # Reset trial tracking since user has paid
+                user.trial_start_time = None
+                user.trial_expired = False
+                
                 db.session.commit()
                 print(f"Payment confirmed for user {user.email}")
     
