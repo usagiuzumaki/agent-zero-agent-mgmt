@@ -42,11 +42,16 @@ class OAuth(db.Model):
 def init_db(app):
     database_url = os.getenv('DATABASE_URL')
     if not database_url:
-        raise ValueError("DATABASE_URL environment variable is required")
+        print("Warning: DATABASE_URL not found, authentication features will be disabled")
+        return False
     
+    # Handle both postgres:// and postgresql:// formats for pg8000
     if database_url.startswith('postgresql://'):
         database_url = database_url.replace('postgresql://', 'postgresql+pg8000://', 1)
+    elif database_url.startswith('postgres://'):
+        database_url = database_url.replace('postgres://', 'postgresql+pg8000://', 1)
     
+    # Remove sslmode parameter if present as pg8000 handles SSL differently
     if 'sslmode=' in database_url:
         database_url = database_url.split('?')[0]
     
@@ -55,13 +60,25 @@ def init_db(app):
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
         'pool_pre_ping': True,
         'pool_recycle': 300,
+        'pool_size': 10,
+        'max_overflow': 20,
         'connect_args': {
             'ssl_context': True
         }
     }
     
-    db.init_app(app)
-    
-    with app.app_context():
-        db.create_all()
-        print("Database tables created successfully")
+    try:
+        db.init_app(app)
+        
+        with app.app_context():
+            # Create tables if they don't exist
+            db.create_all()
+            print("Database tables created successfully")
+            # Test connection
+            db.engine.execute("SELECT 1")
+            return True
+    except Exception as e:
+        print(f"Warning: Database initialization failed: {e}")
+        print("Authentication features will be temporarily disabled")
+        print("The database may be sleeping - it will auto-wake on the next request")
+        return False

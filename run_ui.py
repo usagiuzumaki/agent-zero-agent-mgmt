@@ -298,10 +298,14 @@ def run():
     if _auth_available:
         try:
             PrintStyle().print("Initializing database and authentication...")
-            init_db(webapp)
-            init_replit_auth(webapp)
-            init_stripe_routes(webapp)
-            register_image_routes(webapp)
+            db_initialized = init_db(webapp)
+            if db_initialized:
+                init_replit_auth(webapp)
+                init_stripe_routes(webapp)
+                register_image_routes(webapp)
+                PrintStyle().print("✅ Replit Auth is ready! Users can login at /auth/login")
+            else:
+                PrintStyle().print("⚠️ Database is sleeping, auth features temporarily disabled")
             PrintStyle().print("Authentication and payment routes configured successfully")
         except Exception as e:
             PrintStyle().print(f"Warning: Failed to initialize auth/payment: {e}")
