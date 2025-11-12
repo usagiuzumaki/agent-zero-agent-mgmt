@@ -1,6 +1,6 @@
 import os
 from flask import Blueprint, request, jsonify, current_app
-from flask_login import login_required
+from flask_login import login_required, current_user
 
 stripe_payments = Blueprint('stripe_payments', __name__)
 
@@ -54,27 +54,55 @@ def create_checkout_session():
         import stripe
         
         data = request.get_json() or {}
-        price_id = data.get('price_id', os.getenv('STRIPE_PRICE_ID', 'price_example'))
-        
+        price_id = data.get('price_id') or os.getenv('STRIPE_PRICE_ID')
+
         dev_domain = os.getenv('REPLIT_DEV_DOMAIN', '')
         domains = os.getenv('REPLIT_DOMAINS', '')
-        base_domain = dev_domain or domains.split(',')[0] if domains else ''
-        
-        if not base_domain:
-            return jsonify({'error': 'Unable to determine domain for redirect URLs'}), 500
-        
-        success_url = f"https://{base_domain}/payment-success?session_id={{CHECKOUT_SESSION_ID}}"
-        cancel_url = f"https://{base_domain}/payment"
-        
+        base_domain = dev_domain or (domains.split(',')[0] if domains else '')
+
+        if base_domain:
+            base_url = f"https://{base_domain}"
+        else:
+            base_url = request.host_url.rstrip('/')
+
+        success_url = f"{base_url}/payment-success?session_id={{CHECKOUT_SESSION_ID}}"
+        cancel_url = f"{base_url}/payment"
+
+        line_item = {'quantity': 1}
+        if price_id:
+            line_item['price'] = price_id
+        else:
+            line_item['price_data'] = {
+                'currency': 'usd',
+                'product_data': {
+                    'name': 'Aria Unlimited Membership',
+                    'description': 'Monthly subscription for unlimited AI companionship',
+                },
+                'recurring': {
+                    'interval': 'month',
+                    'interval_count': 1,
+                },
+                'unit_amount': 1900,
+            }
+
         checkout_session = stripe.checkout.Session.create(
             payment_method_types=['card'],
-            line_items=[{
-                'price': price_id,
-                'quantity': 1,
-            }],
-            mode='payment',
+            line_items=[line_item],
+            mode='subscription',
             success_url=success_url,
             cancel_url=cancel_url,
+            client_reference_id=getattr(current_user, 'id', None),
+            customer_email=getattr(current_user, 'email', None),
+            subscription_data={
+                'metadata': {
+                    'user_id': getattr(current_user, 'id', ''),
+                    'email': getattr(current_user, 'email', ''),
+                }
+            },
+            metadata={
+                'user_id': getattr(current_user, 'id', ''),
+                'email': getattr(current_user, 'email', ''),
+            },
         )
         
         return jsonify({'checkout_url': checkout_session.url})

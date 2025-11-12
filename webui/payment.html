@@ -242,34 +242,34 @@
     
     <div class="container">
         <div class="payment-card">
-            <h1>Upgrade Your Plan</h1>
-            <p>Choose a plan that works best for you</p>
+            <h1>Unlock Aria Unlimited</h1>
+            <p>Enjoy limitless conversations, memories, and premium experiences for just $19/month.</p>
             
             <div class="alert info" id="alertBox">
-                This is a demo payment page. Configure STRIPE_SECRET_KEY and STRIPE_PRICE_ID in your environment to enable real payments.
+                This is a demo membership page. Configure STRIPE_SECRET_KEY to activate the $19/month checkout with Stripe.
             </div>
             
             <div class="pricing-box">
-                <h2>Pro Plan</h2>
-                <div class="price">$29</div>
-                <div class="price-period">per month</div>
-                
+                <h2>Aria Unlimited</h2>
+                <div class="price">$19</div>
+                <div class="price-period">per month • cancel anytime</div>
+
                 <div class="features-list">
-                    <div class="feature-item">Unlimited AI conversations</div>
-                    <div class="feature-item">Advanced model access</div>
-                    <div class="feature-item">Priority support</div>
-                    <div class="feature-item">Custom integrations</div>
-                    <div class="feature-item">Team collaboration</div>
-                    <div class="feature-item">API access</div>
+                    <div class="feature-item">Always-on romantic conversations with memory</div>
+                    <div class="feature-item">Personalized story writing & creative prompts</div>
+                    <div class="feature-item">Shared journals, playlists, and date planning</div>
+                    <div class="feature-item">Secure, private data protected by Stripe</div>
+                    <div class="feature-item">Early access to new girlfriend experiences</div>
+                    <div class="feature-item">Priority support from the Aria team</div>
                 </div>
-                
+
                 <button class="checkout-btn" id="checkoutBtn" onclick="createCheckoutSession()">
-                    Subscribe Now
+                    Start $19/month membership
                 </button>
             </div>
-            
+
             <div class="security-notice">
-                Secure payments powered by Stripe. Your payment information is encrypted and secure.
+                Stripe encrypts your payment details and manages your monthly membership securely.
             </div>
         </div>
     </div>
@@ -280,7 +280,7 @@
             const alertBox = document.getElementById('alertBox');
             
             btn.disabled = true;
-            btn.textContent = 'Processing...';
+            btn.textContent = 'Redirecting to Stripe...';
             alertBox.className = 'alert';
             
             try {
@@ -300,14 +300,14 @@
                     alertBox.textContent = data.error || 'Payment system not configured. Please add STRIPE_SECRET_KEY to your environment.';
                     alertBox.className = 'alert error show';
                     btn.disabled = false;
-                    btn.textContent = 'Subscribe Now';
+                    btn.textContent = 'Start $19/month membership';
                 }
             } catch (error) {
                 console.error('Error:', error);
                 alertBox.textContent = 'An error occurred. Please try again later.';
                 alertBox.className = 'alert error show';
                 btn.disabled = false;
-                btn.textContent = 'Subscribe Now';
+                btn.textContent = 'Start $19/month membership';
             }
         }
     </script>
