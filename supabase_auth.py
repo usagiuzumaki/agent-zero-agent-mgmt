@@ -12,7 +12,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from auth_models import db, User, OAuth
 
 
-replit_auth = Blueprint('replit_auth', __name__, url_prefix='/auth')
+supabase_auth = Blueprint('supabase_auth', __name__, url_prefix='/auth')
 login_manager = LoginManager()
 
 
@@ -104,18 +104,12 @@ def _get_base_url():
     if explicit:
         return explicit.rstrip('/')
 
-    dev_domain = os.getenv('REPLIT_DEV_DOMAIN', '')
-    domains = os.getenv('REPLIT_DOMAINS', '')
-    base_domain = dev_domain or (domains.split(',')[0] if domains else '')
-    if base_domain:
-        return f"https://{base_domain}"
-
     app_url = os.getenv('PUBLIC_URL') or os.getenv('APP_URL')
     if app_url:
         return app_url.rstrip('/')
 
     raise ValueError(
-        "AUTH_BASE_URL, PUBLIC_URL, or Replit domain environment variables are required"
+        "AUTH_BASE_URL or PUBLIC_URL environment variables are required"
     )
 
 
@@ -147,12 +141,12 @@ def _normalize_email(value: str) -> str:
     return (value or '').strip().lower()
 
 
-@replit_auth.route('/login')
+@supabase_auth.route('/login')
 def login():
     return redirect(url_for('login_page'))
 
 
-@replit_auth.route('/login/google')
+@supabase_auth.route('/login/google')
 def login_with_google():
     try:
         config = get_google_oauth_config()
@@ -181,7 +175,7 @@ def login_with_google():
     return redirect(auth_url)
 
 
-@replit_auth.route('/callback')
+@supabase_auth.route('/callback')
 def callback():
     try:
         code = request.args.get('code')
@@ -254,7 +248,7 @@ def callback():
         return f"Authentication error: {exc}", 500
 
 
-@replit_auth.route('/login/email', methods=['POST'])
+@supabase_auth.route('/login/email', methods=['POST'])
 def login_with_email():
     try:
         data = request.get_json() or {}
@@ -325,7 +319,7 @@ def login_with_email():
         return jsonify({'error': 'Unable to sign in right now. Please try again later.'}), 500
 
 
-@replit_auth.route('/logout')
+@supabase_auth.route('/logout')
 @login_required
 def logout():
     UserSessionStorage.clear_user_session()
@@ -333,7 +327,7 @@ def logout():
     return redirect(url_for('login_page'))
 
 
-@replit_auth.route('/user')
+@supabase_auth.route('/user')
 @login_required
 def user_info():
     return jsonify(
@@ -349,7 +343,7 @@ def user_info():
     )
 
 
-def init_replit_auth(app):
+def init_supabase_auth(app):
     session_secret = os.getenv('SESSION_SECRET')
     if not session_secret:
         raise ValueError('SESSION_SECRET environment variable is required')
@@ -360,8 +354,8 @@ def init_replit_auth(app):
     app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
     login_manager.init_app(app)
-    login_manager.login_view = 'replit_auth.login'
+    login_manager.login_view = 'supabase_auth.login'
 
-    app.register_blueprint(replit_auth)
+    app.register_blueprint(supabase_auth)
 
     print('Authentication routes initialized successfully')

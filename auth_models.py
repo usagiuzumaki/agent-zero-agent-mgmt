@@ -56,7 +56,7 @@ class OAuth(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.String(255), db.ForeignKey('users.id'), nullable=False, index=True)
     browser_session_key = db.Column(db.String(255), unique=True, nullable=False, index=True)
-    provider = db.Column(db.String(50), nullable=False, default='replit')
+    provider = db.Column(db.String(50), nullable=False, default='supabase')
     token = db.Column(db.Text)
     token_secret = db.Column(db.Text)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
@@ -99,10 +99,10 @@ class UserScreenwriting(db.Model):
 
 
 def init_db(app):
-    database_url = os.getenv('DATABASE_URL')
+    database_url = os.getenv('SUPABASE_DB_URL') or os.getenv('DATABASE_URL')
     if not database_url:
-        print("Warning: DATABASE_URL not found, authentication features will be disabled")
-        print("Please provision a database using the Replit database pane")
+        print("Warning: SUPABASE_DB_URL not found, authentication features will be disabled")
+        print("Please provision a database connection string in SUPABASE_DB_URL")
         return False
     
     # Handle both postgres:// and postgresql:// formats for pg8000
@@ -124,7 +124,7 @@ def init_db(app):
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
         'pool_pre_ping': True,
         'pool_recycle': 300,
-        'pool_size': 5,  # Reduced pool size for Neon
+        'pool_size': 5,  # Conservative pool size for hosted Postgres
         'max_overflow': 10,  # Reduced overflow
         'pool_timeout': 30,  # Add timeout
         'connect_args': {
@@ -161,13 +161,8 @@ def init_db(app):
                         time.sleep(2)  # Wait before retry
                         continue
                     else:
-                        print("IMPORTANT: The Neon database endpoint is disabled.")
-                        print("Please enable it through the Replit database pane:")
-                        print("1. Go to the Database pane in Replit")
-                        print("2. Click on your PostgreSQL database")
-                        print("3. The database will automatically wake up")
-                        print("4. Restart this application")
-                        print("Authentication features will work once the database is enabled.")
+                        print("IMPORTANT: The database endpoint is disabled.")
+                        print("Ensure your Supabase instance is active and restart this application.")
                         return False
                 else:
                     raise e

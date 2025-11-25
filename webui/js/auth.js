@@ -1,4 +1,4 @@
-// Replit Auth JavaScript Integration
+// Supabase-backed Auth JavaScript Integration
 
 (function() {
     'use strict';
@@ -45,7 +45,7 @@
         const authContainer = document.getElementById('auth-container');
         authContainer.innerHTML = `
             <a href="/auth/login" class="auth-btn">
-                <i class="fas fa-sign-in-alt"></i> Sign In with Replit
+                <i class="fas fa-sign-in-alt"></i> Sign In
             </a>
         `;
     }

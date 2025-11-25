@@ -22,7 +22,7 @@ from python.helpers.print_style import PrintStyle
 
 try:
     from auth_models import init_db
-    from replit_auth import init_replit_auth, require_login
+    from supabase_auth import init_supabase_auth, require_login
     from stripe_payments import init_stripe_routes
     from python.api.image_generation_endpoint import register_image_routes
     from flask_login import current_user
@@ -308,7 +308,7 @@ def run():
             PrintStyle().print("Initializing database and authentication...")
             db_initialized = init_db(webapp)
             if db_initialized:
-                init_replit_auth(webapp)
+                init_supabase_auth(webapp)
                 init_stripe_routes(webapp)
                 register_image_routes(webapp)
                 
@@ -320,7 +320,7 @@ def run():
                 from python.api.user_data import init_user_data_api
                 init_user_data_api(webapp)
                 
-                PrintStyle().print("✅ Replit Auth with $19 payment gate is ready!")
+                PrintStyle().print("✅ Supabase-backed auth with $19 payment gate is ready!")
             else:
                 PrintStyle().print("⚠️ Database is sleeping, auth features temporarily disabled")
             PrintStyle().print("Authentication and payment routes configured successfully")

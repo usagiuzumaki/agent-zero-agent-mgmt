@@ -239,7 +239,7 @@ def create_checkout_session():
     """Create Stripe checkout session for the $19/month membership"""
     try:
         if not current_user.is_authenticated:
-            return redirect(url_for('replit_auth.login'))
+            return redirect(url_for('supabase_auth.login'))
         
         if current_user.has_paid:
             return redirect('/')
