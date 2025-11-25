@@ -2,7 +2,7 @@
 # Production startup script for Agent Zero (Aria)
 
 echo "[STARTUP] Agent Zero (Aria) Production Deployment"
-echo "[STARTUP] Environment: ${REPLIT_DEPLOYMENT_ID:-development}"
+echo "[STARTUP] Environment: ${DEPLOYMENT_ID:-development}"
 echo "[STARTUP] Port: ${PORT:-5000}"
 
 # Run database migrations

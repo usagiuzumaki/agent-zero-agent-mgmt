@@ -95,7 +95,7 @@ def initialize_agent():
         # additional = {},
     )
 
-    # Force local code execution on Replit/cheap hosts
+    # Force local code execution on constrained hosts
     config.code_exec_ssh_enabled = False
 
     # update SSH and docker settings

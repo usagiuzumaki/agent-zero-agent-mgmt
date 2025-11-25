@@ -21,7 +21,7 @@ def init_stripe():
         print(
             "STRIPE_SECRET_KEY not found in environment. "
             "Payment features will be disabled. "
-            "Add STRIPE_SECRET_KEY to your Replit Secrets to enable payments."
+            "Set STRIPE_SECRET_KEY in your environment to enable payments."
         )
         _stripe_available = False
         return False
@@ -56,14 +56,11 @@ def create_checkout_session():
         data = request.get_json() or {}
         price_id = data.get('price_id') or os.getenv('STRIPE_PRICE_ID')
 
-        dev_domain = os.getenv('REPLIT_DEV_DOMAIN', '')
-        domains = os.getenv('REPLIT_DOMAINS', '')
-        base_domain = dev_domain or (domains.split(',')[0] if domains else '')
-
-        if base_domain:
-            base_url = f"https://{base_domain}"
-        else:
-            base_url = request.host_url.rstrip('/')
+        base_url = (
+            os.getenv('PUBLIC_URL')
+            or os.getenv('APP_URL')
+            or request.host_url.rstrip('/')
+        )
 
         success_url = f"{base_url}/payment-success?session_id={{CHECKOUT_SESSION_ID}}"
         cancel_url = f"{base_url}/payment"
@@ -128,7 +125,7 @@ def stripe_webhook():
         if not webhook_secret:
             current_app.logger.error(
                 "STRIPE_WEBHOOK_SECRET is required for webhook security. "
-                "Add it to your Replit Secrets to enable webhook processing."
+                "Set it in your environment to enable webhook processing."
             )
             return jsonify({
                 'error': 'Webhook secret not configured. Cannot process webhooks securely.'
