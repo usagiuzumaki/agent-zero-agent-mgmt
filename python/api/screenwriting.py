@@ -12,6 +12,7 @@ screenwriting_bp = Blueprint('screenwriting', __name__)
 # Initialize the screenwriting manager
 manager = ScreenwritingManager()
 
+
 @screenwriting_bp.route('/api/screenwriting/<data_type>', methods=['GET'])
 def get_screenwriting_data(data_type):
     """Get screenwriting data by type"""
@@ -19,10 +20,10 @@ def get_screenwriting_data(data_type):
         data = manager.load_data(data_type)
         if data:
             return jsonify(data), 200
-        else:
-            return jsonify({'error': 'Invalid data type'}), 400
+        return jsonify({'error': 'Invalid data type'}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 @screenwriting_bp.route('/api/screenwriting/<data_type>', methods=['POST'])
 def save_screenwriting_data(data_type):
@@ -31,10 +32,10 @@ def save_screenwriting_data(data_type):
         data = request.get_json()
         if manager.save_data(data_type, data):
             return jsonify({'message': f'{data_type} saved successfully'}), 200
-        else:
-            return jsonify({'error': 'Failed to save data'}), 400
+        return jsonify({'error': 'Failed to save data'}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 @screenwriting_bp.route('/api/screenwriting/character/add', methods=['POST'])
 def add_character():
@@ -43,10 +44,10 @@ def add_character():
         character_data = request.get_json()
         if manager.add_character(character_data):
             return jsonify({'message': 'Character added successfully'}), 200
-        else:
-            return jsonify({'error': 'Failed to add character'}), 400
+        return jsonify({'error': 'Failed to add character'}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 @screenwriting_bp.route('/api/screenwriting/quote/add', methods=['POST'])
 def add_quote():
@@ -57,13 +58,13 @@ def add_quote():
         character = data.get('character')
         context = data.get('context')
         category = data.get('category')
-        
+
         if manager.add_quote(quote, character, context, category):
             return jsonify({'message': 'Quote added successfully'}), 200
-        else:
-            return jsonify({'error': 'Failed to add quote'}), 400
+        return jsonify({'error': 'Failed to add quote'}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 @screenwriting_bp.route('/api/screenwriting/scene/add', methods=['POST'])
 def add_scene():
@@ -72,10 +73,10 @@ def add_scene():
         scene_data = request.get_json()
         if manager.add_scene(scene_data):
             return jsonify({'message': 'Scene added successfully'}), 200
-        else:
-            return jsonify({'error': 'Failed to add scene'}), 400
+        return jsonify({'error': 'Failed to add scene'}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 @screenwriting_bp.route('/api/screenwriting/sketch/add', methods=['POST'])
 def add_sketch():
@@ -84,10 +85,10 @@ def add_sketch():
         sketch_data = request.get_json()
         if manager.add_sketch(sketch_data):
             return jsonify({'message': 'Sketch added successfully'}), 200
-        else:
-            return jsonify({'error': 'Failed to add sketch'}), 400
+        return jsonify({'error': 'Failed to add sketch'}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 @screenwriting_bp.route('/api/screenwriting/project/create', methods=['POST'])
 def create_project():
@@ -97,13 +98,13 @@ def create_project():
         project_name = data.get('name')
         genre = data.get('genre')
         logline = data.get('logline')
-        
+
         if manager.create_project(project_name, genre, logline):
             return jsonify({'message': 'Project created successfully'}), 200
-        else:
-            return jsonify({'error': 'Failed to create project'}), 400
+        return jsonify({'error': 'Failed to create project'}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 @screenwriting_bp.route('/api/screenwriting/all', methods=['GET'])
 def get_all_data():
@@ -113,6 +114,7 @@ def get_all_data():
         return jsonify(all_data), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 @screenwriting_bp.route('/api/screenwriting/quotes/search', methods=['POST'])
 def search_quotes():
@@ -125,6 +127,7 @@ def search_quotes():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+
 @screenwriting_bp.route('/api/screenwriting/character/find', methods=['POST'])
 def find_character():
     """Find a character by name"""
@@ -134,10 +137,10 @@ def find_character():
         character = manager.get_character_by_name(name)
         if character:
             return jsonify(character), 200
-        else:
-            return jsonify({'error': 'Character not found'}), 404
+        return jsonify({'error': 'Character not found'}), 404
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 @screenwriting_bp.route('/api/screenwriting/outline/update', methods=['POST'])
 def update_outline():
@@ -146,7 +149,26 @@ def update_outline():
         outline_data = request.get_json()
         if manager.update_outline(outline_data):
             return jsonify({'message': 'Outline updated successfully'}), 200
-        else:
-            return jsonify({'error': 'Failed to update outline'}), 400
+        return jsonify({'error': 'Failed to update outline'}), 400
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@screenwriting_bp.route('/api/screenwriting/storybook/upload', methods=['POST'])
+def upload_storybook():
+    """Convert an uploaded document into a clickable storybook."""
+    try:
+        payload = request.get_json(force=True)
+        name = payload.get('name', 'Untitled Document')
+        content = payload.get('content', '')
+        description = payload.get('description')
+        tags = payload.get('tags', [])
+
+        document = manager.ingest_story_document(name, content, description, tags)
+
+        if document:
+            return jsonify(document), 200
+
+        return jsonify({'error': 'Failed to ingest document'}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500

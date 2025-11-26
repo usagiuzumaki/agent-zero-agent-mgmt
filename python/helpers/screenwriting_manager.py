@@ -4,9 +4,10 @@ Manages book outlines, story bibles, character profiles, quotes, and sketches
 """
 import json
 import os
+import re
+import hashlib
 from datetime import datetime
 from typing import Dict, List, Optional, Any
-import hashlib
 
 class ScreenwritingManager:
     """Manager for screenwriting data persistence"""
@@ -23,7 +24,8 @@ class ScreenwritingManager:
             'character_profiles': os.path.join(storage_dir, 'character_profiles.json'),
             'sick_quotes': os.path.join(storage_dir, 'sick_quotes.json'),
             'sketches_imagery': os.path.join(storage_dir, 'sketches_imagery.json'),
-            'projects': os.path.join(storage_dir, 'projects.json')
+            'projects': os.path.join(storage_dir, 'projects.json'),
+            'storybook': os.path.join(storage_dir, 'storybook.json')
         }
     
     def ensure_storage_exists(self):
@@ -117,6 +119,11 @@ class ScreenwritingManager:
             'projects': {
                 'active_project': None,
                 'projects': [],
+                'created': datetime.now().isoformat(),
+                'last_updated': datetime.now().isoformat()
+            },
+            'storybook': {
+                'documents': [],
                 'created': datetime.now().isoformat(),
                 'last_updated': datetime.now().isoformat()
             }
@@ -264,7 +271,7 @@ class ScreenwritingManager:
                 if character.get('name', '').lower() == name.lower():
                     return character
         return None
-    
+
     def update_outline(self, outline_data: Dict) -> bool:
         """Update the book outline"""
         current_outline = self.load_data('book_outline')
@@ -273,3 +280,95 @@ class ScreenwritingManager:
             current_outline.update(outline_data)
             return self.save_data('book_outline', current_outline)
         return False
+
+    def ingest_story_document(
+        self,
+        name: str,
+        content: str,
+        description: Optional[str] = None,
+        tags: Optional[List[str]] = None,
+    ) -> Optional[Dict[str, Any]]:
+        """Convert uploaded text into a storybook entry with chapters and beats."""
+        if not content:
+            return None
+
+        storybook = self.load_data('storybook') or self._get_default_structure('storybook')
+        doc_id = hashlib.md5(f"{name}_{datetime.now().isoformat()}".encode()).hexdigest()[:8]
+
+        chapters = self._build_chapters_from_text(content)
+        suggestions = self._build_global_suggestions(chapters)
+
+        document_entry = {
+            'id': doc_id,
+            'name': name,
+            'description': description or '',
+            'tags': tags or [],
+            'chapters': chapters,
+            'suggestions': suggestions,
+            'uploaded_at': datetime.now().isoformat(),
+        }
+
+        storybook['documents'].append(document_entry)
+        saved = self.save_data('storybook', storybook)
+
+        if saved:
+            return document_entry
+        return None
+
+    def _build_chapters_from_text(self, content: str) -> List[Dict[str, Any]]:
+        """Derive clickable chapters and beats from raw text."""
+        raw_sections = [chunk.strip() for chunk in re.split(r"\n{2,}", content) if chunk.strip()]
+        chapters: List[Dict[str, Any]] = []
+
+        for index, section in enumerate(raw_sections):
+            sentences = [s.strip() for s in re.split(r"(?<=[.!?])\s+", section) if s.strip()]
+            title = sentences[0][:80] if sentences else f"Section {index + 1}"
+
+            beats = []
+            for beat_index, sentence in enumerate(sentences[:4]):
+                beats.append(
+                    {
+                        'id': f"{index + 1}-{beat_index + 1}",
+                        'label': f"Beat {beat_index + 1}",
+                        'summary': sentence,
+                        'visual_prompt': f"Illustrate the mood of: {sentence[:120]}",
+                    }
+                )
+
+            chapters.append(
+                {
+                    'id': f"chapter-{index + 1}",
+                    'title': title,
+                    'summary': ' '.join(sentences[:2]) if sentences else section[:120],
+                    'beats': beats,
+                    'notes': [
+                        f"Track emotional shift near beat {beat['label']}" for beat in beats
+                    ],
+                }
+            )
+
+        return chapters
+
+    def _build_global_suggestions(self, chapters: List[Dict[str, Any]]) -> List[str]:
+        """Create high-level suggestions for the storybook."""
+        suggestions: List[str] = []
+
+        if not chapters:
+            return suggestions
+
+        if len(chapters) >= 2:
+            suggestions.append(
+                "Bridge early world-building with later conflicts using a recurring motif or image."
+            )
+        if any(len(chapter.get('beats', [])) >= 3 for chapter in chapters):
+            suggestions.append(
+                "Promote your strongest beat into a mini-set piece with a dedicated visual spread."
+            )
+        suggestions.append(
+            "Add clickable references between chapters for character callbacks and thematic echoes."
+        )
+        suggestions.append(
+            "Bundle art prompts per chapter so illustrators can batch-render concept frames."
+        )
+
+        return suggestions
