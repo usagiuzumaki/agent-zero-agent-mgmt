@@ -38,6 +38,8 @@ class Screenwriting(Tool):
                 return await self._update_outline(args)
             elif operation == 'search_quotes':
                 return await self._search_quotes(args)
+            elif operation == 'ingest_storybook':
+                return await self._ingest_storybook(args)
             else:
                 return Response(False, f"Unknown operation: {operation}")
         except Exception as e:
@@ -145,20 +147,34 @@ class Screenwriting(Tool):
             'chapters': args.get('chapters', []),
             'plot_points': args.get('plot_points', [])
         }
-        
+
         # Remove None values
         outline_data = {k: v for k, v in outline_data.items() if v is not None}
-        
+
         if self.manager.update_outline(outline_data):
             return Response(True, "📚 Book outline updated successfully!")
         else:
             return Response(False, "Failed to update outline")
+
+    async def _ingest_storybook(self, args):
+        """Create a storybook entry from uploaded text."""
+        name = args.get('name', 'Uploaded Document')
+        content = args.get('content', '')
+        description = args.get('description')
+        tags = args.get('tags', [])
+
+        document = self.manager.ingest_story_document(name, content, description, tags)
+        if document:
+            formatted = self._format_storybook({'documents': [document]})
+            return Response(True, formatted)
+
+        return Response(False, "Failed to ingest storybook document")
     
     async def _search_quotes(self, args):
         """Search for quotes"""
         search_term = args.get('search', '')
         results = self.manager.search_quotes(search_term)
-        
+
         if results:
             formatted = "📝 **Found Quotes:**\n\n"
             for quote in results:
@@ -184,6 +200,8 @@ class Screenwriting(Tool):
             return self._format_quotes(data)
         elif data_type == 'sketches_imagery':
             return self._format_sketches(data)
+        elif data_type == 'storybook':
+            return self._format_storybook(data)
         else:
             return json.dumps(data, indent=2)
     
@@ -296,21 +314,46 @@ class Screenwriting(Tool):
     def _format_sketches(self, data):
         """Format sketches and imagery"""
         formatted = "🎨 **SKETCHES & IMAGERY**\n\n"
-        
+
         if data.get('sketches'):
             formatted += "**Sketches:**\n"
             for sketch in data['sketches']:
                 formatted += f"- {sketch.get('title', 'Untitled')}: {sketch.get('description', '')}\n"
             formatted += "\n"
-        
+
         if data.get('mood_boards'):
             formatted += "**Mood Boards:**\n"
             for board in data['mood_boards']:
                 formatted += f"- {board.get('title', 'Untitled')}\n"
-        
+
         if data.get('concept_art'):
             formatted += "**Concept Art:**\n"
             for art in data['concept_art']:
                 formatted += f"- {art.get('title', 'Untitled')}\n"
-        
+
+        return formatted
+
+    def _format_storybook(self, data):
+        """Format storybook documents with chapters and beats."""
+        documents = data.get('documents', []) if isinstance(data, dict) else []
+        if not documents:
+            return "📘 No storybook documents available yet."
+
+        formatted = "📘 **STORYBOOK**\n\n"
+        for document in documents:
+            formatted += f"### {document.get('name', 'Untitled')}\n"
+            if document.get('description'):
+                formatted += f"_{document['description']}_\n"
+
+            for chapter in document.get('chapters', []):
+                formatted += f"- **{chapter.get('title', 'Chapter')}**: {chapter.get('summary', '')}\n"
+                for beat in chapter.get('beats', []):
+                    formatted += f"    - {beat.get('label')}: {beat.get('summary')}\n"
+            if document.get('suggestions'):
+                formatted += "\n**Suggestions:**\n"
+                for idea in document['suggestions']:
+                    formatted += f"- {idea}\n"
+
+            formatted += "\n"
+
         return formatted
