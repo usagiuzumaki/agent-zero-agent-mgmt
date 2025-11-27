@@ -1,0 +1,316 @@
+:root {
+  --aria-pink: #ff73c7;
+  --aria-teal: #5eead4;
+  --aria-night: #0a0b15;
+  --aria-panel: rgba(255, 255, 255, 0.03);
+  --aria-border: rgba(255, 255, 255, 0.12);
+  --aria-text: #f5f7fb;
+  --aria-muted: #c2c8d6;
+  --aria-shadow: 0 20px 80px rgba(0, 0, 0, 0.35);
+  --aria-glow: 0 0 0.8rem rgba(255, 115, 199, 0.55), 0 0 1.2rem rgba(94, 234, 212, 0.4);
+}
+
+body.aria-aurora {
+  background: radial-gradient(circle at 10% 20%, rgba(255, 115, 199, 0.12), transparent 35%),
+    radial-gradient(circle at 90% 10%, rgba(94, 234, 212, 0.12), transparent 30%),
+    radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.04), transparent 30%),
+    linear-gradient(135deg, #0b1020 0%, #0c0f1a 50%, #0a0b15 100%);
+  color: var(--aria-text);
+  min-height: 100vh;
+  background-attachment: fixed;
+}
+
+.aria-aurora .container {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+  border: 1px solid var(--aria-border);
+  box-shadow: var(--aria-shadow);
+  border-radius: 28px;
+  padding: 18px;
+  backdrop-filter: blur(16px);
+  gap: 14px;
+}
+
+.aria-aurora .panel {
+  border: 1px solid var(--aria-border);
+  border-radius: 22px;
+  background: linear-gradient(145deg, rgba(12, 16, 30, 0.75), rgba(14, 18, 32, 0.85));
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
+}
+
+.aria-hero {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 18px;
+  margin-bottom: 16px;
+  padding: 18px;
+  border-radius: 20px;
+  background: radial-gradient(circle at 10% 10%, rgba(255, 115, 199, 0.18), transparent 35%),
+    radial-gradient(circle at 80% 30%, rgba(94, 234, 212, 0.18), transparent 32%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+  border: 1px solid var(--aria-border);
+  position: relative;
+  overflow: hidden;
+}
+
+.aria-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.08), transparent 30%);
+  filter: blur(40px);
+  pointer-events: none;
+}
+
+.aria-hero-left {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+.aria-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 20px;
+  background: linear-gradient(145deg, #ff73c7, #5eead4);
+  display: grid;
+  place-items: center;
+  box-shadow: var(--aria-glow);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.aria-avatar img {
+  width: 46px;
+  height: 46px;
+}
+
+.aria-meta .eyebrow {
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--aria-muted);
+  margin: 0 0 6px 0;
+}
+
+.aria-meta h1 {
+  font-size: 22px;
+  margin: 0 0 8px 0;
+  color: var(--aria-text);
+}
+
+.aria-meta p {
+  margin: 0 0 10px 0;
+  color: var(--aria-muted);
+}
+
+.aria-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.aria-pill {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--aria-text);
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.aria-hero-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+.aria-card {
+  background: var(--aria-panel);
+  border: 1px solid var(--aria-border);
+  border-radius: 16px;
+  padding: 14px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.aria-card:hover,
+.aria-card:focus-visible {
+  transform: translateY(-2px);
+  border-color: rgba(255, 115, 199, 0.4);
+  box-shadow: var(--aria-shadow);
+  outline: none;
+}
+
+.aria-card small {
+  display: inline-block;
+  color: var(--aria-muted);
+  margin-bottom: 6px;
+}
+
+.aria-card h3 {
+  margin: 0 0 6px 0;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.aria-card p {
+  margin: 0;
+  color: var(--aria-muted);
+  line-height: 1.4;
+}
+
+.aria-progress-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.aria-progress {
+  flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.aria-progress span {
+  display: block;
+  height: 100%;
+  width: var(--value, 50%);
+  background: linear-gradient(90deg, #ff73c7, #5eead4);
+  border-radius: 999px;
+  box-shadow: var(--aria-glow);
+}
+
+.aria-quick-prompts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.aria-chip {
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 8px 14px;
+  color: var(--aria-text);
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+  font-size: 13px;
+}
+
+.aria-chip:hover,
+.aria-chip:focus-visible {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.aria-chip .icon {
+  margin-right: 6px;
+  color: #ffb3e6;
+}
+
+.aria-intents {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.intent-card {
+  position: relative;
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid var(--aria-border);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.intent-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 80% 0%, rgba(255, 255, 255, 0.08), transparent 35%);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.intent-card:hover,
+.intent-card:focus-visible {
+  transform: translateY(-2px);
+  border-color: rgba(94, 234, 212, 0.5);
+  outline: none;
+}
+
+.intent-card:hover::after,
+.intent-card:focus-visible::after {
+  opacity: 1;
+}
+
+.intent-card h4 {
+  margin: 0 0 6px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.intent-card p {
+  margin: 0 0 10px 0;
+  color: var(--aria-muted);
+}
+
+.intent-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: var(--aria-muted);
+}
+
+.intent-badge {
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+@media (max-width: 1024px) {
+  .aria-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .aria-hero-left {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .aria-aurora .container {
+    padding: 12px;
+  }
+
+  .aria-quick-prompts {
+    gap: 6px;
+  }
+
+  .aria-chip {
+    font-size: 12px;
+    padding: 7px 12px;
+  }
+}

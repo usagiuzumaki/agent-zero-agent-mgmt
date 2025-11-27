@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="css/activities.css">
     <link rel="stylesheet" href="css/screenwriting.css">
     <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="css/aurora-theme.css">
 
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="vendor/font-awesome/all.min.css">
@@ -105,6 +106,7 @@
     <script type="module" src="js/scheduler.js"></script>
     <script type="module" src="js/history.js"></script>
     <script type="module" src="index.js"></script>
+    <script type="module" src="js/aurora-theme.js"></script>
 
     <!-- Then load Alpine.js -->
     <script defer src="vendor/alpine/alpine.collapse.min.js"></script>
@@ -135,7 +137,7 @@
     <script type="text/javascript" src="js/auth.js"></script>
 </head>
 
-<body class="dark-mode device-pointer">
+<body class="dark-mode device-pointer aria-aurora">
     <div class="container">
         <div id="sidebar-overlay" class="sidebar-overlay hidden"></div>
         <div class="icons-section" id="hide-button" x-data="{ connected: true }">
@@ -345,6 +347,96 @@
             </div>
         </div>
         <div id="right-panel" class="panel">
+            <section class="aria-hero" aria-label="ARIA live session overview">
+                <div class="aria-hero-left">
+                    <div class="aria-avatar" aria-hidden="true">
+                        <img src="./public/aria.svg" alt="ARIA crest">
+                    </div>
+                    <div class="aria-meta">
+                        <p class="eyebrow">Aria • always-on companion</p>
+                        <h1>Design days with playful flow, strategy, and care.</h1>
+                        <p>A kawaii-forward guide that sketches ideas, keeps tabs on your habits, and nudges you toward smart wins without losing the fun.</p>
+                        <div class="aria-badges">
+                            <span class="aria-pill">● Live sync</span>
+                            <span class="aria-pill">✨ Memory on</span>
+                            <span class="aria-pill">🌙 Calm focus</span>
+                        </div>
+                        <div class="aria-quick-prompts" aria-label="Quick conversation starters">
+                            <button class="aria-chip" data-aria-prompt="Let's storyboard a dreamy scene we could write together. Give me three vibes to choose from and open with a playful greeting." data-aria-send="true">
+                                <span class="icon">✦</span> Creative spark
+                            </button>
+                            <button class="aria-chip" data-aria-prompt="Do a 5-minute money check: ask about goals, review any saved positions you recall, and suggest one smart next action." data-aria-send="true">
+                                <span class="icon">⚡</span> Money micro-loop
+                            </button>
+                            <button class="aria-chip" data-aria-prompt="Start with a lighthearted check-in and a fun icebreaker question about my current mood or favorite media." data-aria-send="true">
+                                <span class="icon">♡</span> Cozy check-in
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="aria-hero-grid" aria-label="Session stats">
+                    <div class="aria-card">
+                        <small>Session vibe</small>
+                        <h3>Creative flow</h3>
+                        <p>Balancing strategy, imagination, and gentle prompts.</p>
+                        <div class="aria-progress-row">
+                            <div class="aria-progress" aria-label="Flow meter">
+                                <span style="--value: 72%"></span>
+                            </div>
+                            <span class="aria-pill">+ steady</span>
+                        </div>
+                    </div>
+                    <div class="aria-card">
+                        <small>Memory streak</small>
+                        <h3>Linked notes</h3>
+                        <p>Pulls recent likes, dislikes, and ongoing threads.</p>
+                        <div class="aria-progress-row">
+                            <div class="aria-progress" aria-label="Memory confidence">
+                                <span style="--value: 64%"></span>
+                            </div>
+                            <span class="aria-pill">Recall ready</span>
+                        </div>
+                    </div>
+                    <div class="aria-card">
+                        <small>Next move</small>
+                        <h3>Play + plan</h3>
+                        <p>Ready to draft scenes, brainstorm trades, or vibe-check goals.</p>
+                        <div class="aria-progress-row">
+                            <div class="aria-progress" aria-label="Momentum">
+                                <span style="--value: 58%"></span>
+                            </div>
+                            <span class="aria-pill">Open canvas</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="aria-intents" aria-label="ARIA starter intents">
+                <article class="intent-card" role="button" tabindex="0" data-aria-prompt="Let's craft a screenplay beat sheet for a charming adventure. Ask me for genre and hero traits, then outline five beats and propose two aesthetic image prompts." data-aria-send="false">
+                    <h4>🎬 Creative Studio</h4>
+                    <p>Storyboards, dialogue riffs, and visual prompts to keep imagination glowing.</p>
+                    <div class="intent-meta">
+                        <span class="intent-badge">fresh draft</span>
+                        <span>~8 min</span>
+                    </div>
+                </article>
+                <article class="intent-card" role="button" tabindex="0" data-aria-prompt="Help me design a 3-step routine to boost my skills and money habits this week. Include one optional stretch goal and a reflection question." data-aria-send="false">
+                    <h4>📈 Strategy Lab</h4>
+                    <p>Micro-plans for study, trading practice, and habit stacking.</p>
+                    <div class="intent-meta">
+                        <span class="intent-badge">actionable</span>
+                        <span>~5 min</span>
+                    </div>
+                </article>
+                <article class="intent-card" role="button" tabindex="0" data-aria-prompt="Guide me through a quick vibes check using what you remember about my MBTI style. Ask two questions, mirror back what you hear, and propose one mood-lifting activity." data-aria-send="false">
+                    <h4>💗 Wellness Check</h4>
+                    <p>Gentle coaching that blends personality insights with grounded encouragement.</p>
+                    <div class="intent-meta">
+                        <span class="intent-badge">supportive</span>
+                        <span>~4 min</span>
+                    </div>
+                </article>
+            </section>
             <!--Chat-->
             <div id="time-date-container">
                 <div id="time-date"></div>
