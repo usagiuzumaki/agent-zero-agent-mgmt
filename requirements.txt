@@ -6,6 +6,15 @@ flask-sqlalchemy==3.1.1
 flask-dance==7.0.1
 gunicorn==21.2.0
 a2wsgi==1.10.0
+webcolors
+whisper
+faiss-cpu
+pytz
+flaredantic
+paramiko
+aiohttp
+treys
+
 
 # Database
 psycopg2-binary==2.9.9
@@ -33,6 +42,7 @@ langchain-openai==0.1.15
 langchain-community==0.2.7
 tiktoken==0.8.0
 replicate==0.32.0
+pytz
 
 # Utilities
 python-dotenv>=1.0.1
@@ -44,6 +54,8 @@ markdown==3.7
 pillow>=10.3.0
 numpy
 nest_asyncio>=1.6.0
+soundfile
+flaredantic
 
 # Development Tools
 pypdf==4.3.1
@@ -51,3 +63,6 @@ jsonmerge
 pathspec
 simpleeval
 inflection
+websockets
+openai-whisper
+playwright

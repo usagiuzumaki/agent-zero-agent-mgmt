@@ -69,6 +69,13 @@
             label: 'Storybook Builder',
             prompt: '',
             description: 'Upload drafts and generate clickable chapters & beats'
+        },
+        {
+            id: 'mythic_agents',
+            icon: '🌙',
+            label: 'Mythic Agents',
+            prompt: '',
+            description: 'Summon the arcane screenwriter crew'
         }
     ];
 
@@ -135,9 +142,16 @@
                 toggleDropdown();
                 return;
             }
+            if (tool.id === 'mythic_agents') {
+                openMythicOverlay();
+                toggleDropdown();
+                return;
+            }
             // Fill the input with the tool's prompt
-            const input = document.getElementById('user-input');
-            if (input) {
+            const input = document.getElementById('chat-input');
+            if (window.updateChatInput) {
+                window.updateChatInput(tool.prompt);
+            } else if (input) {
                 input.value = tool.prompt;
                 input.focus();
                 
@@ -159,9 +173,12 @@
 
     // Create new project
     function newProject() {
-        const input = document.getElementById('user-input');
-        if (input) {
-            input.value = 'Let\'s start a new screenwriting project! What genre are we working with? What\'s the basic premise or logline?';
+        const input = document.getElementById('chat-input');
+        const prompt = 'Let\'s start a new screenwriting project! What genre are we working with? What\'s the basic premise or logline?';
+        if (window.updateChatInput) {
+            window.updateChatInput(prompt);
+        } else if (input) {
+            input.value = prompt;
             input.focus();
             
             // Trigger input event
@@ -398,8 +415,10 @@
 
         const prompt = quickActions[action];
         if (prompt) {
-            const input = document.getElementById('user-input');
-            if (input) {
+            const input = document.getElementById('chat-input');
+            if (window.updateChatInput) {
+                window.updateChatInput(prompt);
+            } else if (input) {
                 input.value = prompt;
                 input.focus();
                 const event = new Event('input', { bubbles: true });
@@ -436,4 +455,67 @@
         quickAction: quickAction,
         tools: screenwritingTools
     };
+
+    // Mythic sub-agents (from aria_screenwriter_suite)
+    const mythicAgents = [
+        { id: "story_architect", title: "Story Architect", desc: "Structural spines, beat sheets.", payload: { tool_name: "story_architect", tool_args: { premise: "", genre: "", format: "feature", target_runtime_minutes: 110, structure_model: "three_act" } } },
+        { id: "character_alchemist", title: "Character Alchemist", desc: "Deep character bibles and arcs.", payload: { tool_name: "character_alchemist", tool_args: { name: "", story_role: "", initial_concept: "", relationships: [], theme: "" } } },
+        { id: "dialogue_demon", title: "Dialogue Demon", desc: "Sharp, subtext-heavy dialogue.", payload: { tool_name: "dialogue_demon", tool_args: { scene_purpose: "", characters: [], setting: "", emotional_context: "", existing_beats: [] } } },
+        { id: "emotion_cartographer", title: "Emotion Cartographer", desc: "Emotional arcs and pacing.", payload: { tool_name: "emotion_cartographer", tool_args: { scene_list: [], protagonist: "", key_relationships: [], tone: "" } } },
+        { id: "cinematic_oracle", title: "Cinematic Oracle", desc: "Shots, blocking, visual beats.", payload: { tool_name: "cinematic_oracle", tool_args: { scene_summary: "", tone: "", setting_details: "", key_characters: [], style_influences: [] } } },
+        { id: "theme_weaver", title: "Theme Weaver", desc: "Thread theme through story.", payload: { tool_name: "theme_weaver", tool_args: { draft_theme: "", logline: "", character_list: [], key_events: [] } } },
+        { id: "continuity_warden", title: "Continuity Warden", desc: "Timeline + logic guardrails.", payload: { tool_name: "continuity_warden", tool_args: { scenes: [], world_rules: "", character_bibles: [] } } },
+        { id: "conflict_provoker", title: "Conflict Provoker", desc: "Raise stakes & friction.", payload: { tool_name: "conflict_provoker", tool_args: { scene_or_sequence: "", character_goals: {}, current_stakes: "", tone: "" } } },
+        { id: "romance_crafter", title: "Romance Crafter", desc: "Romantic arc + micro-tension.", payload: { tool_name: "romance_crafter", tool_args: { character_a: "", character_b: "", relationship_status: "", desired_arc: "", key_story_beats: [] } } },
+        { id: "lore_forger", title: "Lore Forger", desc: "Worldbuilding + magic systems.", payload: { tool_name: "lore_forger", tool_args: { genre: "", premise: "", focus_area: "", constraints: "" } } },
+        { id: "scene_surgeon", title: "Scene Surgeon", desc: "Diagnose + repair scenes.", payload: { tool_name: "scene_surgeon", tool_args: { scene_text: "", intended_purpose: "", key_characters: [], constraints: "" } } },
+        { id: "narrative_stylist", title: "Narrative Stylist", desc: "Line-level voice + rhythm.", payload: { tool_name: "narrative_stylist", tool_args: { sample_pages: "", style_goal: "", constraints: "" } } },
+        { id: "final_cut_editor", title: "Final Cut Editor", desc: "Polish + compliance pass.", payload: { tool_name: "final_cut_editor", tool_args: { full_script: "", format_preference: "Fountain", notes: "" } } }
+    ];
+
+    function openMythicOverlay() {
+        const overlay = document.getElementById("mythic-overlay");
+        const grid = document.getElementById("mythic-grid");
+        const close = document.getElementById("mythic-close");
+        if (!overlay || !grid || !close) return;
+
+        grid.innerHTML = mythicAgents.map((agent) => `
+            <div class="mythic-card">
+                <div class="mythic-card-head">
+                    <div>
+                        <div class="mythic-card-title">${agent.title}</div>
+                        <div class="mythic-card-hint">${agent.desc}</div>
+                    </div>
+                    <button class="pill-button mythic-summon" data-agent="${agent.id}">Summon</button>
+                </div>
+                <pre class="mythic-payload">${JSON.stringify(agent.payload, null, 2)}</pre>
+            </div>
+        `).join("");
+
+        grid.querySelectorAll(".mythic-summon").forEach((btn) => {
+            btn.addEventListener("click", () => {
+                const id = btn.getAttribute("data-agent");
+                const agent = mythicAgents.find((a) => a.id === id);
+                if (!agent) return;
+                const payloadText = JSON.stringify(agent.payload, null, 2);
+                if (window.updateChatInput) {
+                    window.updateChatInput(payloadText);
+                } else {
+                    const input = document.getElementById("chat-input");
+                    if (input) {
+                        input.value = payloadText;
+                        input.focus();
+                        input.dispatchEvent(new Event("input", { bubbles: true }));
+                    }
+                }
+                overlay.classList.add("hidden");
+            });
+        });
+
+        close.onclick = () => overlay.classList.add("hidden");
+        overlay.onclick = (e) => {
+            if (e.target === overlay) overlay.classList.add("hidden");
+        };
+        overlay.classList.remove("hidden");
+    }
 })();

@@ -205,6 +205,97 @@
     animation: glowRotate 3s linear infinite;
 }
 
+.mythic-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(6, 4, 10, 0.8);
+    backdrop-filter: blur(8px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    padding: 18px;
+    z-index: 1400;
+}
+
+.mythic-overlay.hidden {
+    display: none;
+}
+
+.mythic-overlay:not(.hidden) {
+    display: flex;
+}
+
+.mythic-modal {
+    width: min(1080px, 96vw);
+    max-height: 90vh;
+    overflow: auto;
+    background: linear-gradient(180deg, rgba(18, 10, 28, 0.95), rgba(12, 8, 18, 0.95));
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    padding: 14px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+}
+
+.mythic-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.mythic-title {
+    font-weight: 700;
+    color: #f5e9ff;
+    font-size: 16px;
+}
+
+.mythic-hint {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 12px;
+}
+
+.mythic-grid {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.mythic-card {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.mythic-card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+    gap: 8px;
+}
+
+.mythic-card-title {
+    font-weight: 700;
+    color: #f5e9ff;
+}
+
+.mythic-card-hint {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.mythic-payload {
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 8px;
+    color: #dfe7ff;
+    font-size: 12px;
+    white-space: pre-wrap;
+    max-height: 220px;
+    overflow: auto;
+}
 @keyframes glowRotate {
     0% {
         background: linear-gradient(45deg, #9333ea, #c084fc, #9333ea);

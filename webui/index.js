@@ -13,6 +13,8 @@ const container = document.querySelector(".container");
 const chatInput = document.getElementById("chat-input");
 const chatHistory = document.getElementById("chat-history");
 const sendButton = document.getElementById("send-button");
+const heroSection = document.querySelector(".aria-hero");
+const homeButton = document.getElementById("home-button");
 const inputSection = document.getElementById("input-section");
 const statusSection = document.getElementById("status-section");
 const chatsSection = document.getElementById("chats-section");
@@ -26,6 +28,14 @@ let context = "";
 let resetCounter = 0;
 let skipOneSpeech = false;
 let connectionStatus = false;
+let homeVisible = true;
+
+function setHomeVisible(flag) {
+  homeVisible = !!flag;
+  if (heroSection) {
+    heroSection.classList.toggle("hidden", !homeVisible);
+  }
+}
 
 // Initialize the toggle button
 setupSidebarToggle();
@@ -79,6 +89,9 @@ document.addEventListener("DOMContentLoaded", () => {
       toggleSidebar(false);
     }
   });
+  if (chatHistory && chatHistory.children.length > 0) {
+    setHomeVisible(false);
+  }
 });
 
 function setupSidebarToggle() {
@@ -101,6 +114,7 @@ export async function sendMessage() {
     const hasAttachments = attachmentsWithUrls.length > 0;
 
     if (message || hasAttachments) {
+      setHomeVisible(false);
       let response;
       const messageId = generateGUID();
 
@@ -187,6 +201,10 @@ chatInput.addEventListener("keydown", (e) => {
 });
 
 sendButton.addEventListener("click", sendMessage);
+homeButton?.addEventListener("click", () => {
+  setHomeVisible(true);
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
 
 export function updateChatInput(text) {
   console.log("updateChatInput called with:", text);

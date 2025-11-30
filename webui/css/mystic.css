@@ -1,0 +1,167 @@
+.mystic-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 12px;
+}
+
+.mystic-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 12px;
+    min-height: 140px;
+}
+
+.mystic-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.mystic-title {
+    font-weight: 700;
+    color: #f5e9ff;
+}
+
+.mystic-hint {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.mystic-result {
+    font-size: 13px;
+    color: #e6dcff;
+    line-height: 1.45;
+}
+
+.mystic-result.empty-state {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.mystic-inline {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.mystic-input {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #f5e9ff;
+    padding: 6px 8px;
+}
+
+.creative-modal.small {
+    max-width: 520px;
+}
+
+.consent-copy {
+    color: #e6dcff;
+    margin-bottom: 10px;
+}
+
+.consent-check {
+    display: block;
+    margin: 6px 0;
+    color: #f5e9ff;
+    font-size: 13px;
+}
+
+.consent-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 10px;
+}
+
+.focus-overlay {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(255, 182, 255, 0.25), rgba(5, 2, 10, 0.9));
+    z-index: 1300;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.focus-overlay.active {
+    display: flex;
+}
+
+.focus-scene {
+    position: relative;
+    width: 90vw;
+    max-width: 960px;
+    height: 70vh;
+    background: linear-gradient(135deg, #0c0618, #1b0f2c);
+    overflow: hidden;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+}
+
+.focus-shimmer, .focus-swirl, .focus-particles {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.focus-swirl {
+    background: conic-gradient(from 90deg, rgba(255, 127, 212, 0.15), rgba(120, 97, 255, 0.18), rgba(255, 255, 255, 0.05), rgba(255, 127, 212, 0.15));
+    filter: blur(30px);
+    animation: swirlRotate 12s linear infinite;
+}
+
+.focus-shimmer {
+    background: radial-gradient(circle at 50% 40%, rgba(255, 255, 255, 0.25), transparent 45%);
+    mix-blend-mode: screen;
+    animation: pulse 3.5s ease-in-out infinite;
+}
+
+.focus-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #fefefe;
+    text-align: center;
+    z-index: 2;
+}
+
+.focus-center h2 {
+    font-size: 28px;
+    margin-bottom: 6px;
+}
+
+.focus-center p {
+    opacity: 0.85;
+    margin-bottom: 12px;
+}
+
+.focus-cta {
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 999px;
+    padding: 8px 14px;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.focus-exit {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 3;
+}
+
+@keyframes swirlRotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+    0% { opacity: 0.5; }
+    50% { opacity: 1; }
+    100% { opacity: 0.5; }
+}

@@ -19,6 +19,8 @@
     <link rel="stylesheet" href="css/tunnel.css">
     <link rel="stylesheet" href="css/activities.css">
     <link rel="stylesheet" href="css/screenwriting.css">
+    <link rel="stylesheet" href="css/creative.css">
+    <link rel="stylesheet" href="css/mystic.css">
     <link rel="stylesheet" href="css/auth.css">
     <link rel="stylesheet" href="css/aurora-theme.css">
 
@@ -134,6 +136,8 @@
     <script type="module" src="js/tunnel.js"></script>
     <script type="text/javascript" src="js/activities.js"></script>
     <script type="text/javascript" src="js/screenwriting.js"></script>
+    <script type="text/javascript" src="js/creative.js"></script>
+    <script type="text/javascript" src="js/mystic.js"></script>
     <script type="text/javascript" src="js/auth.js"></script>
 </head>
 
@@ -353,9 +357,9 @@
                         <img src="./public/aria.svg" alt="ARIA crest">
                     </div>
                     <div class="aria-meta">
-                        <p class="eyebrow">Aria • always-on companion</p>
+                        <p class="eyebrow">Aria • Always-ON </p>
                         <h1>Design days with playful flow, strategy, and care.</h1>
-                        <p>A kawaii-forward guide that sketches ideas, keeps tabs on your habits, and nudges you toward smart wins without losing the fun.</p>
+                        <p>Display your creative flow with me.</p>
                         <div class="aria-badges">
                             <span class="aria-pill">● Live sync</span>
                             <span class="aria-pill">✨ Memory on</span>
@@ -450,6 +454,146 @@
                         <circle class="disconnected-circle" cx="15" cy="15" r="12" fill="none" stroke="#ff1493"
                             stroke-width="3" x-bind:opacity="connected ? 0 : 1" />
                     </svg>
+                </div>
+                <button id="home-button" class="ghost-button small" aria-label="Show home cards">Home</button>
+            </div>
+            <div id="creative-ribbon" class="creative-ribbon">
+                <button class="creative-tab active" data-target="creative-inspo">Inspo</button>
+                <button class="creative-tab" data-target="creative-storyboard">Storyboard</button>
+                <button class="creative-tab" data-target="mystic-studio">Mystic</button>
+            </div>
+            <div id="creative-overlay" class="creative-overlay hidden">
+                <div class="creative-modal">
+                    <div class="creative-modal-bar">
+                        <div class="creative-modal-title">Creative Studio</div>
+                        <button id="creative-close" class="ghost-button small" aria-label="Close creative view">Close</button>
+                    </div>
+                    <div id="creative-panels">
+                        <div id="creative-inspo" class="creative-panel">
+                            <div class="inspo-card">
+                                <div class="inspo-title">D is for Death — A Scanner Darkly</div>
+                                <div class="inspo-body">
+                                    <p>D is for death, for Donna drifting out of reach.</p>
+                                    <p>D is for the dope that dulls and divides.</p>
+                                    <p>D is for the door that closes with a whisper.</p>
+                                    <p>D is for the dark we scan through, grain by grain.</p>
+                                </div>
+                                <div class="inspo-actions">
+                                    <button id="inspo-insert" class="pill-button">Drop into chat</button>
+                                    <button id="inspo-copy" class="ghost-button">Copy</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="creative-storyboard" class="creative-panel hidden">
+                            <div class="storyboard-grid">
+                                <div class="storyboard-card">
+                                    <div class="storyboard-head">
+                                        <div>
+                                            <div class="storyboard-title">Beats</div>
+                                            <div class="storyboard-hint">Quick logline for each beat</div>
+                                        </div>
+        <button id="storyboard-clear-beats" class="ghost-button small">Clear</button>
+                                    </div>
+                                    <form id="beat-form" class="storyboard-form">
+                                        <input type="text" id="beat-label" placeholder="Beat title" required>
+                                        <input type="text" id="beat-notes" placeholder="What happens?">
+                                        <button type="submit" class="pill-button">Add beat</button>
+                                    </form>
+                                    <div id="beat-list" class="storyboard-list empty-state">No beats yet</div>
+                                </div>
+                                <div class="storyboard-card">
+                                    <div class="storyboard-head">
+                                        <div>
+                                            <div class="storyboard-title">Characters</div>
+                                            <div class="storyboard-hint">Names + role or vibe</div>
+                                        </div>
+                                        <button id="storyboard-clear-characters" class="ghost-button small">Clear</button>
+                                    </div>
+                                    <form id="character-form" class="storyboard-form">
+                                        <input type="text" id="character-name" placeholder="Name" required>
+                                        <input type="text" id="character-role" placeholder="Role, goal, or quirk">
+                                        <button type="submit" class="pill-button">Add character</button>
+                                    </form>
+                                    <div id="character-list" class="storyboard-list empty-state">No characters yet</div>
+                                </div>
+                                <div class="storyboard-card">
+                                    <div class="storyboard-head">
+                                        <div>
+                                            <div class="storyboard-title">Ideas</div>
+                                            <div class="storyboard-hint">Images, motifs, loose sparks</div>
+                                        </div>
+                                        <button id="storyboard-clear-ideas" class="ghost-button small">Clear</button>
+                                    </div>
+                                    <form id="idea-form" class="storyboard-form">
+                                        <textarea id="idea-notes" rows="2" placeholder="Fragments, visuals, scene seeds"></textarea>
+                                        <button type="submit" class="pill-button">Add idea</button>
+                                    </form>
+                                    <div id="idea-list" class="storyboard-list empty-state">No ideas yet</div>
+                                </div>
+                            </div>
+                            <div class="storyboard-actions">
+                                <button id="storyboard-send" class="pill-button">Send storyboard to chat</button>
+                                <button id="storyboard-clear-all" class="ghost-button">Reset storyboard</button>
+                            </div>
+                        </div>
+                        <div id="mystic-studio" class="creative-panel hidden">
+                            <div class="mystic-grid">
+                                <div class="mystic-card">
+                                    <div class="mystic-head">
+                                        <div>
+                                            <div class="mystic-title">Mood Sight</div>
+                                            <div class="mystic-hint">1-second glance, mood read</div>
+                                        </div>
+                                        <button class="pill-button" id="mystic-mood-start">Read</button>
+                                    </div>
+                                    <div id="mystic-mood-result" class="mystic-result empty-state">Ready when you are.</div>
+                                </div>
+                                <div class="mystic-card">
+                                    <div class="mystic-head">
+                                        <div>
+                                            <div class="mystic-title">Mind-Read Object</div>
+                                            <div class="mystic-hint">Think of one object nearby</div>
+                                        </div>
+                                        <button class="pill-button" id="mystic-object-start">Reveal</button>
+                                    </div>
+                                    <div id="mystic-object-result" class="mystic-result empty-state">Tap reveal to begin.</div>
+                                </div>
+                                <div class="mystic-card">
+                                    <div class="mystic-head">
+                                        <div>
+                                            <div class="mystic-title">Time Traveler</div>
+                                            <div class="mystic-hint">Give any date in history</div>
+                                        </div>
+                                        <div class="mystic-inline">
+                                            <input type="date" id="mystic-date" class="mystic-input">
+                                            <button class="pill-button" id="mystic-date-go">Go</button>
+                                        </div>
+                                    </div>
+                                    <div id="mystic-date-result" class="mystic-result empty-state">Pick a date to peer through.</div>
+                                </div>
+                                <div class="mystic-card">
+                                    <div class="mystic-head">
+                                        <div>
+                                            <div class="mystic-title">Digital Séance</div>
+                                            <div class="mystic-hint">Whisper or hum for 3s</div>
+                                        </div>
+                                        <button class="pill-button" id="mystic-seance-start">Listen</button>
+                                    </div>
+                                    <div id="mystic-seance-result" class="mystic-result empty-state">Waiting for a whisper.</div>
+                                </div>
+                                <div class="mystic-card">
+                                    <div class="mystic-head">
+                                        <div>
+                                            <div class="mystic-title">Don’t Blink</div>
+                                            <div class="mystic-hint">Immersive trance reveal</div>
+                                        </div>
+                                        <button class="pill-button" id="mystic-focus-start">Begin</button>
+                                    </div>
+                                    <div class="mystic-result">Stare at her eyes when the veil drops.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div id="chat-history">
@@ -1784,6 +1928,33 @@
 
     <!-- Drag and Drop Overlay Component -->
     <x-component path="chat/attachments/dragDropOverlay.html"></x-component>
+    <div id="mythic-overlay" class="mythic-overlay hidden">
+        <div class="mythic-modal">
+            <div class="mythic-bar">
+                <div>
+                    <div class="mythic-title">Mythic Screenwriters</div>
+                    <div class="mythic-hint">13 arcane specialists woven into Aria</div>
+                </div>
+                <button id="mythic-close" class="ghost-button small">Close</button>
+            </div>
+            <div id="mythic-grid" class="mythic-grid"></div>
+        </div>
+    </div>
+    <div id="mystic-consent" class="creative-overlay hidden">
+        <div class="creative-modal small">
+            <div class="creative-modal-bar">
+                <div class="creative-modal-title">Permission needed</div>
+                <button id="mystic-consent-close" class="ghost-button small" aria-label="Close consent">Close</button>
+            </div>
+            <p class="consent-copy">Aria uses camera and mic locally for mood sight, object vision, and séance. Nothing is stored or sent until you tap a trick.</p>
+            <label class="consent-check"><input type="checkbox" id="consent-camera"> I agree to allow camera for visual tricks.</label>
+            <label class="consent-check"><input type="checkbox" id="consent-mic"> I agree to allow microphone for audio tricks.</label>
+            <div class="consent-actions">
+                <button id="consent-accept" class="pill-button">Okay</button>
+                <button id="consent-decline" class="ghost-button">Not now</button>
+            </div>
+        </div>
+    </div>
     
     <!-- Trial Timer Script -->
     <script src="/js/trial-timer.js"></script>

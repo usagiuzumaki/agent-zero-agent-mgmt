@@ -1,8 +1,13 @@
 services:
   agent-zero:
     container_name: agent-zero
-    image: agent0ai/agent-zero:latest
+    build:
+      context: ../..
+      dockerfile: DockerfileLocal
+      args:
+        CACHE_DATE: ${CACHE_DATE:-dev}
+    image: agent-zero-local
     volumes:
-      - ./agent-zero:/a0
+      - ../..:/a0
     ports:
       - "50080:80"
