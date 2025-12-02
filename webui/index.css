@@ -1988,6 +1988,159 @@ a:active {
   background-color: var(--color-panel);
 }
 
+.images-panel {
+  background: var(--color-panel);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.images-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.images-panel-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.images-panel-subtitle,
+.images-panel-hint {
+  margin: 4px 0 0;
+  color: var(--color-text-secondary);
+}
+
+.images-panel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.image-preview-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+}
+
+.image-preview-card {
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.image-preview-card img {
+  width: 100%;
+  height: 90px;
+  object-fit: cover;
+}
+
+.image-preview-meta {
+  padding: 6px;
+}
+
+.image-card-title {
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+}
+
+.image-card-timestamp {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}
+
+.modal-container.image-modal {
+  max-width: 900px;
+  width: 90%;
+  background: var(--color-panel);
+}
+
+.image-modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.image-drop-zone {
+  border: 2px dashed var(--color-border);
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.02);
+  position: relative;
+}
+
+.image-drop-zone input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.image-drop-zone .drop-zone-title {
+  font-size: 1.1rem;
+  margin-bottom: 6px;
+}
+
+.image-drop-zone .drop-zone-hint {
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.image-drop-zone.dragging {
+  border-color: var(--highlight-pink);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.image-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.image-card {
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.image-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+.image-card-meta {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.image-modal-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.image-modal-note {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
 .light-mode .tab.active {
   box-shadow: 0 -4px 8px -2px var(--color-border),
     4px 0 8px -2px var(--color-border), -4px 0 8px -2px var(--color-border);
