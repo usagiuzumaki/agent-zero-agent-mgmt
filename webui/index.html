@@ -196,6 +196,7 @@
                     <div class="tabs">
                         <div class="tab active" id="chats-tab">Chats</div>
                         <div class="tab" id="tasks-tab">Tasks</div>
+                        <div class="tab" id="images-tab">Images</div>
                     </div>
                 </div>
 
@@ -274,6 +275,25 @@
                         </ul>
                         <div class="empty-list-message" x-show="tasks.length === 0">
                             <p><i>No tasks to list.</i></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Images Tab -->
+                <div class="config-section" id="images-section" style="display: none;">
+                    <div class="images-panel">
+                        <div class="images-panel-header">
+                            <div>
+                                <h3>Stable Diffusion Gallery</h3>
+                                <p class="images-panel-subtitle">Keep the pictures she generates in one cozy spot.</p>
+                            </div>
+                            <button class="config-button" id="open-image-modal" type="button">Open Gallery</button>
+                        </div>
+                        <div class="images-panel-body">
+                            <p class="images-panel-hint">Tap the gallery to stash new images or review the latest creations.</p>
+                            <div class="image-preview-row" id="image-preview-row">
+                                <p class="empty-list-message"><i>No images yet. Add the first one from the gallery.</i></p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1955,7 +1975,36 @@
             </div>
         </div>
     </div>
-    
+
+    <!-- Image gallery modal -->
+    <div id="image-modal-overlay" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="image-modal-title">
+        <div class="modal-container image-modal">
+            <div class="modal-header">
+                <div>
+                    <h2 id="image-modal-title">Stable Diffusion Gallery</h2>
+                    <p class="modal-subheader">Drop her creations here so they're easy to find later.</p>
+                </div>
+                <button class="modal-close" id="image-modal-close" aria-label="Close image gallery">✕</button>
+            </div>
+            <div class="modal-content image-modal-content">
+                <div class="image-drop-zone" id="image-drop-zone">
+                    <input type="file" id="image-upload-input" accept="image/*" multiple aria-label="Upload images">
+                    <p class="drop-zone-title">Add images</p>
+                    <p class="drop-zone-hint">Upload the shots she makes with Stable Diffusion. Drag and drop or tap to browse.</p>
+                </div>
+                <div class="image-gallery" id="image-gallery">
+                    <p class="empty-list-message"><i>No images added yet.</i></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="image-modal-footer">
+                    <p class="image-modal-note">Images stay in your browser so you can curate without leaving the chat.</p>
+                    <button class="btn btn-ok" id="image-modal-done">Done</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Trial Timer Script -->
     <script src="/js/trial-timer.js"></script>
 

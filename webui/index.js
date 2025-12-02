@@ -19,9 +19,18 @@ const inputSection = document.getElementById("input-section");
 const statusSection = document.getElementById("status-section");
 const chatsSection = document.getElementById("chats-section");
 const tasksSection = document.getElementById("tasks-section");
+const imagesSection = document.getElementById("images-section");
 const progressBar = document.getElementById("progress-bar");
 const autoScrollSwitch = document.getElementById("auto-scroll-switch");
 const timeDate = document.getElementById("time-date-container");
+const imageModalOverlay = document.getElementById("image-modal-overlay");
+const imageModalClose = document.getElementById("image-modal-close");
+const imageModalDone = document.getElementById("image-modal-done");
+const imageDropZone = document.getElementById("image-drop-zone");
+const imageUploadInput = document.getElementById("image-upload-input");
+const imageGallery = document.getElementById("image-gallery");
+const imagePreviewRow = document.getElementById("image-preview-row");
+const openImageModalButton = document.getElementById("open-image-modal");
 
 let autoScroll = true;
 let context = "";
@@ -29,6 +38,7 @@ let resetCounter = 0;
 let skipOneSpeech = false;
 let connectionStatus = false;
 let homeVisible = true;
+let imageLibrary = [];
 
 function setHomeVisible(flag) {
   homeVisible = !!flag;
@@ -92,6 +102,8 @@ document.addEventListener("DOMContentLoaded", () => {
   if (chatHistory && chatHistory.children.length > 0) {
     setHomeVisible(false);
   }
+
+  setupImageModal();
 });
 
 function setupSidebarToggle() {
@@ -1149,14 +1161,19 @@ document.addEventListener("DOMContentLoaded", function () {
 function setupTabs() {
   const chatsTab = document.getElementById("chats-tab");
   const tasksTab = document.getElementById("tasks-tab");
+  const imagesTab = document.getElementById("images-tab");
 
-  if (chatsTab && tasksTab) {
+  if (chatsTab && tasksTab && imagesTab) {
     chatsTab.addEventListener("click", function () {
       activateTab("chats");
     });
 
     tasksTab.addEventListener("click", function () {
       activateTab("tasks");
+    });
+
+    imagesTab.addEventListener("click", function () {
+      activateTab("images");
     });
   } else {
     console.error("Tab elements not found");
@@ -1167,8 +1184,10 @@ function setupTabs() {
 function activateTab(tabName) {
   const chatsTab = document.getElementById("chats-tab");
   const tasksTab = document.getElementById("tasks-tab");
+  const imagesTab = document.getElementById("images-tab");
   const chatsSection = document.getElementById("chats-section");
   const tasksSection = document.getElementById("tasks-section");
+  const imagesSection = document.getElementById("images-section");
 
   // Get current context to preserve before switching
   const currentContext = context;
@@ -1184,8 +1203,10 @@ function activateTab(tabName) {
   // Reset all tabs and sections
   chatsTab.classList.remove("active");
   tasksTab.classList.remove("active");
+  imagesTab.classList.remove("active");
   chatsSection.style.display = "none";
   tasksSection.style.display = "none";
+  imagesSection.style.display = "none";
 
   // Remember the last active tab in localStorage
   localStorage.setItem("activeTab", tabName);
@@ -1237,6 +1258,9 @@ function activateTab(tabName) {
     ) {
       setContext(lastSelectedTask);
     }
+  } else if (tabName === "images") {
+    imagesTab.classList.add("active");
+    imagesSection.style.display = "block";
   }
 
   // Request a poll update
@@ -1255,6 +1279,131 @@ function initializeActiveTab() {
 
   const activeTab = localStorage.getItem("activeTab") || "chats";
   activateTab(activeTab);
+}
+
+function setupImageModal() {
+  if (!imageModalOverlay || !openImageModalButton) {
+    return;
+  }
+
+  const closeModal = () => toggleImageModal(false);
+
+  openImageModalButton.addEventListener("click", () => toggleImageModal(true));
+  imageModalClose?.addEventListener("click", closeModal);
+  imageModalDone?.addEventListener("click", closeModal);
+  imageModalOverlay.addEventListener("click", (event) => {
+    if (event.target === imageModalOverlay) {
+      closeModal();
+    }
+  });
+
+  if (imageDropZone && imageUploadInput) {
+    imageDropZone.addEventListener("click", () => imageUploadInput.click());
+    imageDropZone.addEventListener("dragover", (event) => {
+      event.preventDefault();
+      imageDropZone.classList.add("dragging");
+    });
+    imageDropZone.addEventListener("dragleave", () => {
+      imageDropZone.classList.remove("dragging");
+    });
+    imageDropZone.addEventListener("drop", (event) => {
+      event.preventDefault();
+      imageDropZone.classList.remove("dragging");
+      handleImageFiles(event.dataTransfer.files);
+    });
+    imageUploadInput.addEventListener("change", (event) => {
+      handleImageFiles(event.target.files);
+      event.target.value = "";
+    });
+  }
+
+  renderImageGallery();
+}
+
+function toggleImageModal(show) {
+  if (!imageModalOverlay) {
+    return;
+  }
+  imageModalOverlay.classList.toggle("hidden", !show);
+}
+
+function handleImageFiles(fileList) {
+  if (!fileList || fileList.length === 0) {
+    return;
+  }
+
+  const files = Array.from(fileList).filter((file) => file.type.startsWith("image/"));
+
+  if (files.length === 0) {
+    if (typeof toast === "function") {
+      toast("Only image files can be added to the gallery.", "warning");
+    }
+    return;
+  }
+
+  files.forEach((file) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      imageLibrary = [
+        {
+          name: file.name,
+          src: event.target.result,
+          addedAt: new Date().toISOString(),
+        },
+        ...imageLibrary,
+      ];
+      renderImageGallery();
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function renderImageGallery() {
+  if (!imageGallery || !imagePreviewRow) {
+    return;
+  }
+
+  const renderCards = (container, images, preview = false) => {
+    container.innerHTML = "";
+
+    if (!images.length) {
+      const empty = document.createElement("p");
+      empty.className = "empty-list-message";
+      empty.innerHTML = "<i>No images added yet.</i>";
+      container.appendChild(empty);
+      return;
+    }
+
+    images.forEach((image) => {
+      const card = document.createElement("div");
+      card.className = preview ? "image-preview-card" : "image-card";
+
+      const img = document.createElement("img");
+      img.src = image.src;
+      img.alt = image.name;
+
+      const meta = document.createElement("div");
+      meta.className = preview ? "image-preview-meta" : "image-card-meta";
+
+      const title = document.createElement("div");
+      title.className = "image-card-title";
+      title.textContent = image.name || "Saved image";
+
+      const timestamp = document.createElement("div");
+      timestamp.className = "image-card-timestamp";
+      timestamp.textContent = new Date(image.addedAt).toLocaleString();
+
+      meta.appendChild(title);
+      meta.appendChild(timestamp);
+
+      card.appendChild(img);
+      card.appendChild(meta);
+      container.appendChild(card);
+    });
+  };
+
+  renderCards(imageGallery, imageLibrary);
+  renderCards(imagePreviewRow, imageLibrary.slice(0, 4), true);
 }
 
 /*
