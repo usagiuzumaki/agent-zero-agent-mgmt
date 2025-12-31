@@ -1092,7 +1092,7 @@ def get_settings() -> Settings:
 async def set_settings(settings: Settings, apply: bool = True):
     global _settings
     previous = _settings
-    _settings = normalize_settings(settings)
+    _settings = normalize_settings(settings, use_env_auth=False)
     _write_settings_file(_settings)
     if apply:
         await _apply_settings(previous)
@@ -1104,7 +1104,7 @@ async def set_settings_delta(delta: dict, apply: bool = True):
     await set_settings(new, apply)  # type: ignore
 
 
-def normalize_settings(settings: Settings) -> Settings:
+def normalize_settings(settings: Settings, use_env_auth: bool = True) -> Settings:
     copy = settings.copy()
     default = get_default_settings()
 
@@ -1131,7 +1131,13 @@ def normalize_settings(settings: Settings) -> Settings:
                 copy[key] = value  # make default instead
 
     # mcp server token is set automatically
-    copy["mcp_server_token"] = create_auth_token()
+    if use_env_auth:
+        copy["mcp_server_token"] = create_auth_token()
+    else:
+        copy["mcp_server_token"] = create_auth_token(
+            username=str(copy.get("auth_login", "")),
+            password=str(copy.get("auth_password", "")),
+        )
 
     return copy
 
@@ -1192,20 +1198,27 @@ def _read_settings_file() -> Settings | None:
 
 def _write_settings_file(settings: Settings):
     _write_sensitive_settings(settings)
-    _remove_sensitive_settings(settings)
+
+    # prepare settings for file write - fully stripped
+    file_copy = settings.copy()
+    _remove_sensitive_settings(file_copy, keep_token=False)
 
     # write settings
-    content = json.dumps(settings, indent=4)
+    content = json.dumps(file_copy, indent=4)
     files.write_file(SETTINGS_FILE, content)
 
+    # strip sensitive settings from memory but keep token
+    _remove_sensitive_settings(settings, keep_token=True)
 
-def _remove_sensitive_settings(settings: Settings):
+
+def _remove_sensitive_settings(settings: Settings, keep_token: bool = False):
     settings["api_keys"] = {}
     settings["auth_login"] = ""
     settings["auth_password"] = ""
     settings["rfc_password"] = ""
     settings["root_password"] = ""
-    settings["mcp_server_token"] = ""
+    if not keep_token:
+        settings["mcp_server_token"] = ""
 
 
 def _write_sensitive_settings(settings: Settings):
@@ -1450,10 +1463,12 @@ def get_runtime_config(set: Settings):
         }
 
 
-def create_auth_token() -> str:
+def create_auth_token(username: str | None = None, password: str | None = None) -> str:
     runtime_id = runtime.get_persistent_id()
-    username = dotenv.get_dotenv_value(dotenv.KEY_AUTH_LOGIN) or ""
-    password = dotenv.get_dotenv_value(dotenv.KEY_AUTH_PASSWORD) or ""
+    if username is None:
+        username = dotenv.get_dotenv_value(dotenv.KEY_AUTH_LOGIN) or ""
+    if password is None:
+        password = dotenv.get_dotenv_value(dotenv.KEY_AUTH_PASSWORD) or ""
     # use base64 encoding for a more compact token with alphanumeric chars
     hash_bytes = hashlib.sha256(f"{runtime_id}:{username}:{password}".encode()).digest()
     # encode as base64 and remove any non-alphanumeric chars (like +, /, =)
