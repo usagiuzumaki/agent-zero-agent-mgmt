@@ -8,6 +8,7 @@ import asyncio
 from typing import Any, Literal, TypedDict, cast
 
 import models
+import asyncio
 from python.helpers import runtime, whisper, defer, git
 from . import files, dotenv
 from python.helpers.print_style import PrintStyle
@@ -1088,19 +1089,19 @@ def get_settings() -> Settings:
     return _apply_env_overrides(norm)
 
 
-def set_settings(settings: Settings, apply: bool = True):
+async def set_settings(settings: Settings, apply: bool = True):
     global _settings
     previous = _settings
     _settings = normalize_settings(settings)
     _write_settings_file(_settings)
     if apply:
-        _apply_settings(previous)
+        await _apply_settings(previous)
 
 
-def set_settings_delta(delta: dict, apply: bool = True):
+async def set_settings_delta(delta: dict, apply: bool = True):
     current = get_settings()
     new = {**current, **delta}
-    set_settings(new, apply)  # type: ignore
+    await set_settings(new, apply)  # type: ignore
 
 
 def normalize_settings(settings: Settings) -> Settings:
@@ -1295,7 +1296,7 @@ def get_default_settings() -> Settings:
     )
 
 
-def _apply_settings(previous: Settings | None):
+async def _apply_settings(previous: Settings | None):
     global _settings
     if _settings:
         from agents import AgentContext
@@ -1312,6 +1313,9 @@ def _apply_settings(previous: Settings | None):
 
         # reload whisper model if necessary
         if not previous or _settings["stt_model_size"] != previous["stt_model_size"]:
+            asyncio.get_running_loop().run_in_executor(
+                None, whisper.preload, _settings["stt_model_size"]
+            )
             _run_background(whisper.preload(_settings["stt_model_size"]))
 
         # force memory reload on embedding model change
@@ -1368,6 +1372,7 @@ def _apply_settings(previous: Settings | None):
                     type="info", content="Finished updating MCP settings.", temp=True
                 )
 
+            asyncio.create_task(update_mcp_settings(config.mcp_servers))
             _run_background(update_mcp_settings(config.mcp_servers))
 
         # update token in mcp server
@@ -1381,6 +1386,7 @@ def _apply_settings(previous: Settings | None):
 
                 DynamicMcpProxy.get_instance().reconfigure(token=token)
 
+            asyncio.create_task(update_mcp_token(current_token))
             _run_background(update_mcp_token(current_token))
 
 

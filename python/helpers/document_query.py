@@ -32,7 +32,7 @@ except (ModuleNotFoundError, AttributeError):  # pragma: no cover
     TesseractBlobParser = None  # type: ignore[assignment]
 
 from langchain_core.documents import Document
-from langchain.schema import SystemMessage, HumanMessage
+from langchain_core.messages import SystemMessage, HumanMessage
 
 from python.helpers.print_style import PrintStyle
 from python.helpers import files, errors
