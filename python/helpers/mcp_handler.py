@@ -23,6 +23,7 @@ from datetime import timedelta
 import json
 from python.helpers import errors
 from python.helpers import settings
+from python.helpers import files
 
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
@@ -708,6 +709,7 @@ class MCPConfig(BaseModel):
             raise ValueError(f"Server {server_name} not found")
 
         usage_template = read_file("prompts/agent.system.mcp_tool_usage.md")
+        usage_template = files.read_file("prompts/agent.system.mcp_tool_usage.md")
 
         for server in self.servers:
             if server.name in server_names:
@@ -738,6 +740,13 @@ class MCPConfig(BaseModel):
                         usage_template, tool_name=f"{server_name}.{tool['name']}"
                     )
                     prompt += f"#### Usage:\n{usage_str}\n"
+                    tool_usage = files.replace_placeholders_text(
+                        usage_template,
+                        tool_name=f"{server_name}.{tool['name']}",
+                        observations="",
+                        reflection="",
+                    )
+                    prompt += tool_usage + "\n"
 
         return prompt
 
