@@ -40,6 +40,16 @@ def load_model(name: str = "base"):
     return _whisper.load_model(name)
 
 
+def preload(name: str = "base"):
+    """
+    Preload the Whisper model into memory.
+    """
+    try:
+        load_model(name)
+    except WhisperTranscriptionError:
+        pass  # ignore if not installed
+
+
 def transcribe(model, audio_path: str, **kwargs: Dict[str, Any]) -> Any:
     """
     Wrapper around model.transcribe(audio_path, **kwargs).
