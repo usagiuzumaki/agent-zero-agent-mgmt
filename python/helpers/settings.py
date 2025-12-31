@@ -4,6 +4,7 @@ import json
 import os
 import re
 import subprocess
+import asyncio
 from typing import Any, Literal, TypedDict, cast
 
 import models
@@ -138,6 +139,21 @@ SETTINGS_FILE = files.get_abs_path("tmp/settings.json")
 _settings: Settings | None = None
 
 
+def _run_background(coro):
+    """
+    Run a coroutine in the background on the current event loop.
+    If no loop is running, this function currently does nothing (or could block).
+    Since set_settings is typically called from an async context (API), this works.
+    """
+    try:
+        loop = asyncio.get_running_loop()
+        loop.create_task(coro)
+    except RuntimeError:
+        # No running loop. If we are in a sync script, background tasks
+        # cannot be spawned without a loop. We fallback to DeferredTask if absolutely needed,
+        # but here we follow the instruction to use background task (asyncio).
+        PrintStyle().error("No event loop for background task. Falling back to blocking call.")
+        asyncio.run(coro)
 
 def convert_out(settings: Settings) -> SettingsOutput:
     default_settings = get_default_settings()
@@ -1296,9 +1312,7 @@ def _apply_settings(previous: Settings | None):
 
         # reload whisper model if necessary
         if not previous or _settings["stt_model_size"] != previous["stt_model_size"]:
-            task = defer.DeferredTask().start_task(
-                whisper.preload, _settings["stt_model_size"]
-            )  # TODO overkill, replace with background task
+            _run_background(whisper.preload(_settings["stt_model_size"]))
 
         # force memory reload on embedding model change
         if not previous or (
@@ -1324,7 +1338,7 @@ def _apply_settings(previous: Settings | None):
 
                 mcp_config = MCPConfig.get_instance()
                 try:
-                    MCPConfig.update(mcp_servers)
+                    await MCPConfig.update(mcp_servers)
                 except Exception as e:
                     AgentContext.log_to_all(
                         type="error",
@@ -1354,9 +1368,7 @@ def _apply_settings(previous: Settings | None):
                     type="info", content="Finished updating MCP settings.", temp=True
                 )
 
-            task2 = defer.DeferredTask().start_task(
-                update_mcp_settings, config.mcp_servers
-            )  # TODO overkill, replace with background task
+            _run_background(update_mcp_settings(config.mcp_servers))
 
         # update token in mcp server
         current_token = (
@@ -1369,9 +1381,7 @@ def _apply_settings(previous: Settings | None):
 
                 DynamicMcpProxy.get_instance().reconfigure(token=token)
 
-            task3 = defer.DeferredTask().start_task(
-                update_mcp_token, current_token
-            )  # TODO overkill, replace with background task
+            _run_background(update_mcp_token(current_token))
 
 
 def _env_to_dict(data: str):

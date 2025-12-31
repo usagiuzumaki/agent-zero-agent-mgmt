@@ -7,6 +7,7 @@ Whisper will raise a clear RuntimeError instead of killing startup.
 """
 
 from typing import Any, Dict, Optional
+import asyncio
 
 # Define the custom error so other modules can import it
 class WhisperTranscriptionError(Exception):
@@ -50,3 +51,10 @@ def transcribe(model, audio_path: str, **kwargs: Dict[str, Any]) -> Any:
             "Install `openai-whisper` to enable transcription."
         )
     return model.transcribe(audio_path, **kwargs)
+
+async def preload(name: str):
+    try:
+        loop = asyncio.get_running_loop()
+        return await loop.run_in_executor(None, load_model, name)
+    except RuntimeError:
+        return load_model(name)
