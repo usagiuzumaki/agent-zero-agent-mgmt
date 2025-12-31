@@ -3,8 +3,13 @@ import AgentChat from './AgentChat';
 export default function EgirlUI({ onLog }) {
   return (
     <div className="egirl-ui">
-      <h2>E-Girl Companion</h2>
-      <AgentChat onLog={onLog} />
+      <div className="aria-container">
+        <div className="aria-header">
+          <h2>Aria - Your Creative Companion</h2>
+          <div className="status-indicator">Creative Mode Active</div>
+        </div>
+        <AgentChat onLog={onLog} />
+      </div>
     </div>
   );
 }

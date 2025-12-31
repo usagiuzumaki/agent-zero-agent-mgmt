@@ -38,7 +38,7 @@ export default function App() {
         >
           <option value="default">Default</option>
           <option value="screenwriting">Screenwriting</option>
-          <option value="egirl">E-Girl</option>
+          <option value="egirl">Aria</option>
         </select>
         {renderUI()}
         <AgentLogView logs={logs} />
