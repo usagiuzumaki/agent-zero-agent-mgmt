@@ -80,10 +80,10 @@ def _is_streaming_http_type(server_type: str) -> bool:
     return server_type.lower() in ["http-stream", "streaming-http", "streamable-http", "http-streaming"]
 
 
-def initialize_mcp(mcp_servers_config: str):
+async def initialize_mcp(mcp_servers_config: str):
     if not MCPConfig.get_instance().is_initialized():
         try:
-            MCPConfig.update(mcp_servers_config)
+            await MCPConfig.update(mcp_servers_config)
         except Exception as e:
             from agents import AgentContext
 
@@ -226,7 +226,28 @@ class MCPServerRemote(BaseModel):
     def __init__(self, config: dict[str, Any]):
         super().__init__()
         self.__client = MCPClientRemote(self)
-        self.update(config)
+        self._apply_config_sync(config)
+
+    def _apply_config_sync(self, config: dict[str, Any]):
+        with self.__lock:
+            for key, value in config.items():
+                if key in [
+                    "name",
+                    "description",
+                    "type",
+                    "url",
+                    "serverUrl",
+                    "headers",
+                    "init_timeout",
+                    "tool_timeout",
+                    "disabled",
+                ]:
+                    if key == "name":
+                        value = normalize_name(value)
+                    if key == "serverUrl":
+                        key = "url"  # remap serverUrl to url
+
+                    setattr(self, key, value)
 
     def get_error(self) -> str:
         with self.__lock:
@@ -254,28 +275,12 @@ class MCPServerRemote(BaseModel):
             # We already run in an event loop, dont believe Pylance
             return await self.__client.call_tool(tool_name, input_data)  # type: ignore
 
-    def update(self, config: dict[str, Any]) -> "MCPServerRemote":
-        with self.__lock:
-            for key, value in config.items():
-                if key in [
-                    "name",
-                    "description",
-                    "type",
-                    "url",
-                    "serverUrl",
-                    "headers",
-                    "init_timeout",
-                    "tool_timeout",
-                    "disabled",
-                ]:
-                    if key == "name":
-                        value = normalize_name(value)
-                    if key == "serverUrl":
-                        key = "url"  # remap serverUrl to url
+    async def update(self, config: dict[str, Any]) -> "MCPServerRemote":
+        self._apply_config_sync(config)
+        return await self.__on_update()
 
-                    setattr(self, key, value)
-            # We already run in an event loop, dont believe Pylance
-            return asyncio.run(self.__on_update())
+    async def initialize(self):
+        return await self.__on_update()
 
     async def __on_update(self) -> "MCPServerRemote":
         await self.__client.update_tools()  # type: ignore
@@ -303,7 +308,27 @@ class MCPServerLocal(BaseModel):
     def __init__(self, config: dict[str, Any]):
         super().__init__()
         self.__client = MCPClientLocal(self)
-        self.update(config)
+        self._apply_config_sync(config)
+
+    def _apply_config_sync(self, config: dict[str, Any]):
+         with self.__lock:
+            for key, value in config.items():
+                if key in [
+                    "name",
+                    "description",
+                    "type",
+                    "command",
+                    "args",
+                    "env",
+                    "encoding",
+                    "encoding_error_handler",
+                    "init_timeout",
+                    "tool_timeout",
+                    "disabled",
+                ]:
+                    if key == "name":
+                        value = normalize_name(value)
+                    setattr(self, key, value)
 
     def get_error(self) -> str:
         with self.__lock:
@@ -331,27 +356,12 @@ class MCPServerLocal(BaseModel):
             # We already run in an event loop, dont believe Pylance
             return await self.__client.call_tool(tool_name, input_data)  # type: ignore
 
-    def update(self, config: dict[str, Any]) -> "MCPServerLocal":
-        with self.__lock:
-            for key, value in config.items():
-                if key in [
-                    "name",
-                    "description",
-                    "type",
-                    "command",
-                    "args",
-                    "env",
-                    "encoding",
-                    "encoding_error_handler",
-                    "init_timeout",
-                    "tool_timeout",
-                    "disabled",
-                ]:
-                    if key == "name":
-                        value = normalize_name(value)
-                    setattr(self, key, value)
-            # We already run in an event loop, dont believe Pylance
-            return asyncio.run(self.__on_update())
+    async def update(self, config: dict[str, Any]) -> "MCPServerLocal":
+        self._apply_config_sync(config)
+        return await self.__on_update()
+
+    async def initialize(self):
+        return await self.__on_update()
 
     async def __on_update(self) -> "MCPServerLocal":
         await self.__client.update_tools()  # type: ignore
@@ -387,7 +397,7 @@ class MCPConfig(BaseModel):
             return
 
     @classmethod
-    def update(cls, config_str: str) -> Any:
+    async def update(cls, config_str: str) -> Any:
         with cls.__lock:
             servers_data: List[Dict[str, Any]] = []  # Default to empty list
 
@@ -427,59 +437,19 @@ class MCPConfig(BaseModel):
                         f"Error parsing MCP config string: {e_json}. Config string was: '{config_str}'"
                     )
 
-                    # # Fallback to DirtyJson or log error if standard json.loads fails
-                    # PrintStyle(background_color="orange", font_color="black", padding=True).print(
-                    #     f"Standard json.loads failed for MCP config: {e_json}. Attempting DirtyJson as fallback."
-                    # )
-                    # try:
-                    #     parsed_value = DirtyJson.parse_string(config_str)
-                    #     if isinstance(parsed_value, list):
-                    #         valid_servers = []
-                    #         for item in parsed_value:
-                    #             if isinstance(item, dict):
-                    #                 valid_servers.append(item)
-                    #             else:
-                    #                 PrintStyle(background_color="yellow", font_color="black", padding=True).print(
-                    #                     f"Warning: MCP config item (from DirtyJson) was not a dictionary and was ignored: {item}"
-                    #                 )
-                    #         servers_data = valid_servers
-                    #     else:
-                    #         PrintStyle(background_color="red", font_color="white", padding=True).print(
-                    #             f"Error: Parsed MCP config (from DirtyJson) top-level structure is not a list. Config string was: '{config_str}'"
-                    #         )
-                    #         # servers_data remains empty
-                    # except Exception as e_dirty:
-                    #     PrintStyle(background_color="red", font_color="white", padding=True).print(
-                    #         f"Error parsing MCP config string with DirtyJson as well: {e_dirty}. Config string was: '{config_str}'"
-                    #     )
-                    #     # servers_data remains empty, allowing graceful degradation
-
             # Initialize/update the singleton instance with the (potentially empty) list of server data
             instance = cls.get_instance()
-            # Directly update the servers attribute of the existing instance or re-initialize carefully
-            # For simplicity and to ensure __init__ logic runs if needed for setup:
-            new_instance_data = {
-                "servers": servers_data
-            }  # Prepare data for re-initialization or update
 
             # Option 1: Re-initialize the existing instance (if __init__ is idempotent for other fields)
+            # This is synchronous and creates the server objects
             instance.__init__(servers_list=servers_data)
 
-            # Option 2: Or, if __init__ has side effects we don't want to repeat,
-            # and 'servers' is the primary thing 'update' changes:
-            # instance.servers = [] # Clear existing servers first
-            # for server_item_data in servers_data:
-            #     try:
-            #         if server_item_data.get("url", None):
-            #             instance.servers.append(MCPServerRemote(server_item_data))
-            #         else:
-            #             instance.servers.append(MCPServerLocal(server_item_data))
-            #     except Exception as e_init:
-            #         PrintStyle(background_color="grey", font_color="red", padding=True).print(
-            #             f"MCPConfig.update: Failed to create MCPServer from item '{server_item_data.get('name', 'Unknown')}': {e_init}"
-            #         )
-
+            # Mark as initialized
             cls.__initialized = True
+
+            # Asynchronously initialize the servers (fetch tools)
+            await instance.initialize_servers()
+
             return instance
 
     @classmethod
@@ -611,6 +581,22 @@ class MCPConfig(BaseModel):
                 self.disconnected_servers.append(
                     {"config": server_item, "error": error_msg, "name": server_name}
                 )
+
+    async def initialize_servers(self):
+        """Initialize all servers (fetch tools) asynchronously."""
+        # Using gather to initialize in parallel
+        # We need to be careful with logging if multiple threads/tasks print at once
+        # but PrintStyle seems to handle it OK
+
+        # NOTE: If one server fails, we still want others to succeed.
+        # gather(return_exceptions=True) handles this.
+
+        tasks = []
+        for server in self.servers:
+            tasks.append(server.initialize())
+
+        if tasks:
+            await asyncio.gather(*tasks, return_exceptions=True)
 
     def get_server_log(self, server_name: str) -> str:
         with self.__lock:
