@@ -88,3 +88,139 @@ body {
 .egirl-ui h2 {
   color: #db2777;
 }
+
+/* Aria / Egirl UI Customization */
+.egirl-ui .aria-container {
+  background: linear-gradient(135deg, #fce7f3 0%, #e0e7ff 100%);
+  border-radius: var(--border-radius);
+  padding: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.egirl-ui .aria-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.egirl-ui h2 {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #831843; /* Pink-900 */
+  margin-bottom: 0.25rem;
+  font-weight: 700;
+}
+
+.egirl-ui .status-indicator {
+  font-size: 0.8rem;
+  color: #db2777; /* Pink-600 */
+  background: rgba(255, 255, 255, 0.5);
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.egirl-ui .agent-chat .messages {
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 8px;
+  padding: 0.5rem;
+}
+
+.egirl-ui .agent-chat .msg {
+  padding: 0.75rem 1rem;
+  border-radius: 1rem;
+  max-width: 80%;
+  animation: slideIn 0.3s ease-out forwards;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.egirl-ui .agent-chat .msg-user {
+  background-color: #ffffff;
+  color: #374151;
+  margin-left: auto;
+  border-bottom-right-radius: 0.25rem;
+}
+
+.egirl-ui .agent-chat .msg-agent {
+  background-color: #fbcfe8; /* Pink-200 */
+  color: #831843;
+  margin-right: auto;
+  border-bottom-left-radius: 0.25rem;
+}
+
+.egirl-ui .agent-chat .input-row {
+  background: white;
+  padding: 0.5rem;
+  border-radius: 2rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  display: flex;
+  gap: 0.5rem;
+}
+
+.egirl-ui .agent-chat .input-row input {
+  border: none;
+  background: transparent;
+  width: 100%;
+  outline: none;
+  padding: 0.5rem;
+}
+
+.egirl-ui .agent-chat .input-row button {
+  border-radius: 1.5rem;
+  padding: 0.5rem 1.25rem;
+  background: #db2777;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.egirl-ui .agent-chat .input-row button:hover {
+  background: #be185d;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .7;
+  }
+}
+
+
+.egirl-ui .agent-chat .tool-bar {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.egirl-ui .agent-chat .tool-bar button {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid #db2777;
+  color: #db2777;
+  border-radius: 1rem;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-right: 0;
+}
+
+.egirl-ui .agent-chat .tool-bar button:hover {
+  background: #db2777;
+  color: white;
+}
