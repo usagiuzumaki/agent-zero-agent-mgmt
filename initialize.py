@@ -141,7 +141,7 @@ def initialize_mcp():
     set = settings.get_settings()
     async def initialize_mcp_async():
         from python.helpers.mcp_handler import initialize_mcp as _initialize_mcp
-        return _initialize_mcp(set["mcp_servers"])
+        return await _initialize_mcp(set["mcp_servers"])
     return defer.DeferredTask().start_task(initialize_mcp_async)
 
 def initialize_job_loop():
