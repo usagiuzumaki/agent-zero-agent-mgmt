@@ -163,21 +163,31 @@ class Topic(Record):
             * CURRENT_TOPIC_RATIO
             * LARGE_MESSAGE_TO_TOPIC_RATIO
         )
-        large_msgs = []
-        for m in (m for m in self.messages if not m.summary):
-            # TODO refactor this
-            out = m.output()
-            text = output_text(out)
+        # Generator for candidates (messages without summary)
+        candidates = (m for m in self.messages if not m.summary)
+
+        # Find the message with the maximum tokens
+        largest_msg = None
+        max_tok = 0
+
+        for m in candidates:
             tok = m.get_tokens()
+            if tok > max_tok:
+                max_tok = tok
+                largest_msg = m
+
+        # If the largest message exceeds the limit, compress it
+        if largest_msg and max_tok > msg_max_size:
+            out = largest_msg.output()
+            # We need the text length for the ratio calculation
+            text = output_text(out)
             leng = len(text)
-            if tok > msg_max_size:
-                large_msgs.append((m, tok, leng, out))
-        large_msgs.sort(key=lambda x: x[1], reverse=True)
-        for msg, tok, leng, out in large_msgs:
-            trim_to_chars = leng * (msg_max_size / tok)
+
+            trim_to_chars = leng * (msg_max_size / max_tok)
+
             # raw messages will be replaced as a whole, they would become invalid when truncated
             if _is_raw_message(out[0]["content"]):
-                msg.set_summary(
+                largest_msg.set_summary(
                     "Message content replaced to save space in context window"
                 )
 
@@ -189,9 +199,10 @@ class Topic(Record):
                     trim_to_chars * 1.15,
                     trim_to_chars * 0.85,
                 )
-                msg.set_summary(_json_dumps(trunc))
+                largest_msg.set_summary(_json_dumps(trunc))
 
             return True
+
         return False
 
     async def compress(self) -> bool:
