@@ -7,7 +7,7 @@ from python.helpers import errors
 from python.helpers import runtime
 
 
-SLEEP_TIME = 60
+SLEEP_TIME = 5
 
 keep_running = True
 pause_time = 0
@@ -15,6 +15,10 @@ pause_time = 0
 
 async def run_loop():
     global pause_time, keep_running
+
+    # Initialize last_tick to trigger a check immediately with a 60s window
+    # This preserves original startup behavior (checking last minute for missed jobs)
+    last_tick = time.time() - 60
 
     while True:
         if runtime.is_development():
@@ -26,19 +30,24 @@ async def run_loop():
                 PrintStyle().error("Failed to pause job loop by development instance: " + errors.error_text(e))
         if not keep_running and (time.time() - pause_time) > (SLEEP_TIME * 2):
             resume_loop()
+
+        now = time.time()
+        elapsed = now - last_tick
+        last_tick = now
+
         if keep_running:
             try:
-                await scheduler_tick()
+                await scheduler_tick(interval=elapsed)
             except Exception as e:
                 PrintStyle().error(errors.format_error(e))
-        await asyncio.sleep(SLEEP_TIME)  # TODO! - if we lower it under 1min, it can run a 5min job multiple times in it's target minute
+        await asyncio.sleep(SLEEP_TIME)
 
 
-async def scheduler_tick():
+async def scheduler_tick(interval: float = 60.0):
     # Get the task scheduler instance and print detailed debug info
     scheduler = TaskScheduler.get()
     # Run the scheduler tick
-    await scheduler.tick()
+    await scheduler.tick(interval=interval)
 
 
 def pause_loop():

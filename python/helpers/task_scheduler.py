@@ -563,12 +563,12 @@ class SchedulerTaskList(BaseModel):
                 and (not only_running or task.state == TaskState.RUNNING)
             ]
 
-    async def get_due_tasks(self) -> list[Union[ScheduledTask, AdHocTask, PlannedTask]]:
+    async def get_due_tasks(self, interval: float = 60.0) -> list[Union[ScheduledTask, AdHocTask, PlannedTask]]:
         with self._lock:
             await self.reload()
             return [
                 task for task in self.tasks
-                if task.check_schedule() and task.state == TaskState.IDLE
+                if task.check_schedule(frequency_seconds=interval) and task.state == TaskState.IDLE
             ]
 
     def get_task_by_uuid(self, task_uuid: str) -> Union[ScheduledTask, AdHocTask, PlannedTask] | None:
@@ -646,8 +646,8 @@ class TaskScheduler:
     def find_task_by_name(self, name: str) -> list[Union[ScheduledTask, AdHocTask, PlannedTask]]:
         return self._tasks.find_task_by_name(name)
 
-    async def tick(self):
-        for task in await self._tasks.get_due_tasks():
+    async def tick(self, interval: float = 60.0):
+        for task in await self._tasks.get_due_tasks(interval=interval):
             await self._run_task(task)
 
     async def run_task_by_uuid(self, task_uuid: str, task_context: str | None = None):
