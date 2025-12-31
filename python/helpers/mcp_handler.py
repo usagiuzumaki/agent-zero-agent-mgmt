@@ -38,6 +38,7 @@ from anyio.streams.memory import (
 
 from pydantic import BaseModel, Field, Discriminator, Tag, PrivateAttr
 from python.helpers import dirty_json
+from python.helpers.files import read_file, replace_placeholders_text
 from python.helpers.print_style import PrintStyle
 from python.helpers.tool import Tool, Response
 
@@ -707,6 +708,7 @@ class MCPConfig(BaseModel):
         if server_name and server_name not in server_names:
             raise ValueError(f"Server {server_name} not found")
 
+        usage_template = read_file("prompts/agent.system.mcp_tool_usage.md")
         usage_template = files.read_file("prompts/agent.system.mcp_tool_usage.md")
 
         for server in self.servers:
@@ -734,6 +736,10 @@ class MCPConfig(BaseModel):
 
                     prompt += "\n"
 
+                    usage_str = replace_placeholders_text(
+                        usage_template, tool_name=f"{server_name}.{tool['name']}"
+                    )
+                    prompt += f"#### Usage:\n{usage_str}\n"
                     tool_usage = files.replace_placeholders_text(
                         usage_template,
                         tool_name=f"{server_name}.{tool['name']}",

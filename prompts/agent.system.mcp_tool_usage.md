@@ -1,3 +1,11 @@
+{
+    "thoughts": [
+        "..."
+    ],
+    "reflection": [
+        "..."
+    ],
+    "tool_name": "{{tool_name}}",
 #### Usage:
 {
 {{observations}}    "thoughts": ["..."],
