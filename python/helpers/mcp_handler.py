@@ -37,6 +37,7 @@ from anyio.streams.memory import (
 
 from pydantic import BaseModel, Field, Discriminator, Tag, PrivateAttr
 from python.helpers import dirty_json
+from python.helpers.files import read_file, replace_placeholders_text
 from python.helpers.print_style import PrintStyle
 from python.helpers.tool import Tool, Response
 
@@ -706,6 +707,8 @@ class MCPConfig(BaseModel):
         if server_name and server_name not in server_names:
             raise ValueError(f"Server {server_name} not found")
 
+        usage_template = read_file("prompts/agent.system.mcp_tool_usage.md")
+
         for server in self.servers:
             if server.name in server_names:
                 server_name = server.name
@@ -731,16 +734,10 @@ class MCPConfig(BaseModel):
 
                     prompt += "\n"
 
-                    prompt += (
-                        f"#### Usage:\n"
-                        f"{{\n"
-                        # f'    "observations": ["..."],\n' # TODO: this should be a prompt file with placeholders
-                        f'    "thoughts": ["..."],\n'
-                        # f'    "reflection": ["..."],\n' # TODO: this should be a prompt file with placeholders
-                        f"    \"tool_name\": \"{server_name}.{tool['name']}\",\n"
-                        f'    "tool_args": !follow schema above\n'
-                        f"}}\n"
+                    usage_str = replace_placeholders_text(
+                        usage_template, tool_name=f"{server_name}.{tool['name']}"
                     )
+                    prompt += f"#### Usage:\n{usage_str}\n"
 
         return prompt
 
