@@ -1326,10 +1326,7 @@ async def _apply_settings(previous: Settings | None):
 
         # reload whisper model if necessary
         if not previous or _settings["stt_model_size"] != previous["stt_model_size"]:
-            asyncio.get_running_loop().run_in_executor(
-                None, whisper.preload, _settings["stt_model_size"]
-            )
-            _run_background(whisper.preload(_settings["stt_model_size"]))
+            await whisper.preload(_settings["stt_model_size"])
 
         # force memory reload on embedding model change
         if not previous or (
@@ -1385,8 +1382,7 @@ async def _apply_settings(previous: Settings | None):
                     type="info", content="Finished updating MCP settings.", temp=True
                 )
 
-            asyncio.create_task(update_mcp_settings(config.mcp_servers))
-            _run_background(update_mcp_settings(config.mcp_servers))
+            await update_mcp_settings(config.mcp_servers)
 
         # update token in mcp server
         current_token = (
@@ -1399,8 +1395,7 @@ async def _apply_settings(previous: Settings | None):
 
                 DynamicMcpProxy.get_instance().reconfigure(token=token)
 
-            asyncio.create_task(update_mcp_token(current_token))
-            _run_background(update_mcp_token(current_token))
+            await update_mcp_token(current_token)
 
 
 def _env_to_dict(data: str):
