@@ -649,6 +649,11 @@ export function drawMessageError(
   );
 }
 
+const KEY_CLASS_MAP = {
+  thoughts: "msg-thoughts",
+  reasoning: "msg-thoughts",
+};
+
 function drawKvps(container, kvps, latex) {
   if (kvps) {
     const table = document.createElement("table");
@@ -656,9 +661,9 @@ function drawKvps(container, kvps, latex) {
     for (let [key, value] of Object.entries(kvps)) {
       const row = table.insertRow();
       row.classList.add("kvps-row");
-      if (key === "thoughts" || key === "reasoning")
-        // TODO: find a better way to determine special class assignment
-        row.classList.add("msg-thoughts");
+      if (KEY_CLASS_MAP[key]) {
+        row.classList.add(KEY_CLASS_MAP[key]);
+      }
 
       const th = row.insertCell();
       th.textContent = convertToTitleCase(key);
