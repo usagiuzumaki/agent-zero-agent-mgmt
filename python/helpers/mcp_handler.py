@@ -23,6 +23,7 @@ from datetime import timedelta
 import json
 from python.helpers import errors
 from python.helpers import settings
+from python.helpers import files
 
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
@@ -706,6 +707,8 @@ class MCPConfig(BaseModel):
         if server_name and server_name not in server_names:
             raise ValueError(f"Server {server_name} not found")
 
+        usage_template = files.read_file("prompts/agent.system.mcp_tool_usage.md")
+
         for server in self.servers:
             if server.name in server_names:
                 server_name = server.name
@@ -731,16 +734,13 @@ class MCPConfig(BaseModel):
 
                     prompt += "\n"
 
-                    prompt += (
-                        f"#### Usage:\n"
-                        f"{{\n"
-                        # f'    "observations": ["..."],\n' # TODO: this should be a prompt file with placeholders
-                        f'    "thoughts": ["..."],\n'
-                        # f'    "reflection": ["..."],\n' # TODO: this should be a prompt file with placeholders
-                        f"    \"tool_name\": \"{server_name}.{tool['name']}\",\n"
-                        f'    "tool_args": !follow schema above\n'
-                        f"}}\n"
+                    tool_usage = files.replace_placeholders_text(
+                        usage_template,
+                        tool_name=f"{server_name}.{tool['name']}",
+                        observations="",
+                        reflection="",
                     )
+                    prompt += tool_usage + "\n"
 
         return prompt
 
