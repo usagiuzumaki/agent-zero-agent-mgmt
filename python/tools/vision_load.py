@@ -4,6 +4,7 @@ from python.helpers.tool import Tool, Response
 from python.helpers import runtime, files, images
 from mimetypes import guess_type
 from python.helpers import history
+import os
 
 # image optimization and token estimation for context window
 MAX_PIXELS = 768_000
@@ -72,7 +73,20 @@ class VisionLoad(Tool):
                         }
                     )
             # append as raw message content for LLMs with vision tokens estimate
-            msg = history.RawMessage(raw_content=content, preview="<Base64 encoded image data>")
+
+            # create a descriptive preview for the raw message
+            loaded_files = [os.path.basename(p) for p, img in self.images_dict.items() if img]
+            failed_files = [os.path.basename(p) for p, img in self.images_dict.items() if not img]
+
+            preview_parts = []
+            if loaded_files:
+                preview_parts.append(f"User loaded images: {', '.join(loaded_files)}")
+            if failed_files:
+                preview_parts.append(f"Failed to load images: {', '.join(failed_files)}")
+
+            preview = " ".join(preview_parts) if preview_parts else "<Base64 encoded image data>"
+
+            msg = history.RawMessage(raw_content=content, preview=preview)
             self.agent.hist_add_message(
                 False, content=msg, tokens=TOKENS_ESTIMATE * len(content)
             )
