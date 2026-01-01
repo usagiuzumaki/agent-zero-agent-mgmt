@@ -842,6 +842,16 @@ class Agent:
                 )
             except Exception:
                 pass
+
+        # try screenwriting tools
+        if not classes:
+            try:
+                classes = extract_tools.load_classes_from_file(
+                    f"python/tools/screenwriting/{normalized_name}.py", Tool
+                )
+            except Exception:
+                pass
+
         tool_class = classes[0] if classes else Unknown
         return tool_class(
             agent=self, name=normalized_name, method=method, args=args, message=message, loop_data=loop_data, **kwargs

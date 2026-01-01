@@ -41,23 +41,23 @@ class Screenwriting(Tool):
             elif operation == 'ingest_storybook':
                 return await self._ingest_storybook(args)
             else:
-                return Response(False, f"Unknown operation: {operation}")
+                return Response(message=f"Unknown operation: {operation}", break_loop=False)
         except Exception as e:
-            return Response(False, f"Error in screenwriting tool: {str(e)}")
+            return Response(message=f"Error in screenwriting tool: {str(e)}", break_loop=False)
     
     async def _view_data(self, data_type):
         """View screenwriting data"""
         if data_type == 'all':
             all_data = self.manager.get_all_data()
             formatted = self._format_all_data(all_data)
-            return Response(True, formatted)
+            return Response(message=formatted, break_loop=True)
         else:
             data = self.manager.load_data(data_type)
             if data:
                 formatted = self._format_data(data_type, data)
-                return Response(True, formatted)
+                return Response(message=formatted, break_loop=True)
             else:
-                return Response(False, f"Invalid data type: {data_type}")
+                return Response(message=f"Invalid data type: {data_type}", break_loop=False)
     
     async def _add_character(self, args):
         """Add a new character"""
@@ -74,9 +74,9 @@ class Screenwriting(Tool):
         }
         
         if self.manager.add_character(character_data):
-            return Response(True, f"✨ Character '{character_data['name']}' added successfully!")
+            return Response(message=f"✨ Character '{character_data['name']}' added successfully!", break_loop=True)
         else:
-            return Response(False, "Failed to add character")
+            return Response(message="Failed to add character", break_loop=False)
     
     async def _add_quote(self, args):
         """Add a memorable quote"""
@@ -86,9 +86,9 @@ class Screenwriting(Tool):
         category = args.get('category')
         
         if self.manager.add_quote(quote, character, context, category):
-            return Response(True, f"✍️ Quote added successfully!")
+            return Response(message=f"✍️ Quote added successfully!", break_loop=True)
         else:
-            return Response(False, "Failed to add quote")
+            return Response(message="Failed to add quote", break_loop=False)
     
     async def _add_scene(self, args):
         """Add a new scene"""
@@ -104,9 +104,9 @@ class Screenwriting(Tool):
         }
         
         if self.manager.add_scene(scene_data):
-            return Response(True, f"🎬 Scene '{scene_data['title']}' added successfully!")
+            return Response(message=f"🎬 Scene '{scene_data['title']}' added successfully!", break_loop=True)
         else:
-            return Response(False, "Failed to add scene")
+            return Response(message="Failed to add scene", break_loop=False)
     
     async def _add_sketch(self, args):
         """Add a sketch or visual element"""
@@ -122,9 +122,9 @@ class Screenwriting(Tool):
         }
         
         if self.manager.add_sketch(sketch_data):
-            return Response(True, f"🎨 Sketch '{sketch_data['title']}' added successfully!")
+            return Response(message=f"🎨 Sketch '{sketch_data['title']}' added successfully!", break_loop=True)
         else:
-            return Response(False, "Failed to add sketch")
+            return Response(message="Failed to add sketch", break_loop=False)
     
     async def _create_project(self, args):
         """Create a new project"""
@@ -133,9 +133,9 @@ class Screenwriting(Tool):
         logline = args.get('logline')
         
         if self.manager.create_project(name, genre, logline):
-            return Response(True, f"✨ Project '{name}' created successfully!")
+            return Response(message=f"✨ Project '{name}' created successfully!", break_loop=True)
         else:
-            return Response(False, "Failed to create project")
+            return Response(message="Failed to create project", break_loop=False)
     
     async def _update_outline(self, args):
         """Update book outline"""
@@ -152,9 +152,9 @@ class Screenwriting(Tool):
         outline_data = {k: v for k, v in outline_data.items() if v is not None}
 
         if self.manager.update_outline(outline_data):
-            return Response(True, "📚 Book outline updated successfully!")
+            return Response(message="📚 Book outline updated successfully!", break_loop=True)
         else:
-            return Response(False, "Failed to update outline")
+            return Response(message="Failed to update outline", break_loop=False)
 
     async def _ingest_storybook(self, args):
         """Create a storybook entry from uploaded text."""
@@ -166,9 +166,9 @@ class Screenwriting(Tool):
         document = self.manager.ingest_story_document(name, content, description, tags)
         if document:
             formatted = self._format_storybook({'documents': [document]})
-            return Response(True, formatted)
+            return Response(message=formatted, break_loop=True)
 
-        return Response(False, "Failed to ingest storybook document")
+        return Response(message="Failed to ingest storybook document", break_loop=False)
     
     async def _search_quotes(self, args):
         """Search for quotes"""
@@ -184,9 +184,9 @@ class Screenwriting(Tool):
                 if quote.get('context'):
                     formatted += f"   - Context: {quote['context']}\n"
                 formatted += "\n"
-            return Response(True, formatted)
+            return Response(message=formatted, break_loop=True)
         else:
-            return Response(True, "No quotes found matching your search.")
+            return Response(message="No quotes found matching your search.", break_loop=True)
     
     def _format_data(self, data_type, data):
         """Format data for display"""
