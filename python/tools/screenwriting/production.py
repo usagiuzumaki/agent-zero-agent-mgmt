@@ -17,7 +17,7 @@ class ScreenwritingProduction(Tool):
             project_name (str): The name of the project.
         """
         if not task:
-            return Response(False, "Task description is required.")
+            return Response(message="Task description is required.", break_loop=False)
 
         # Define the production line stages
         # We will use the Agent class with specific profiles from agents/screenwriting/
@@ -53,7 +53,7 @@ class ScreenwritingProduction(Tool):
         results.append(await self._run_stage("Script Formatter", "screenwriting", "script_formatter", current_input))
 
         final_output = f"## Production Line Result\n\n{results[-1]}"
-        return Response(True, final_output)
+        return Response(message=final_output, break_loop=True)
 
     async def _run_stage(self, stage_name: str, profile_group: str, agent_file_name: str, input_text: str) -> str:
         """
