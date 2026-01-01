@@ -7,12 +7,18 @@ import faiss
 
 
 from langchain_core.documents import Document
-from langchain.storage import InMemoryByteStore
+try:
+    from langchain.storage import InMemoryByteStore
+except ImportError:
+    from langchain_core.stores import InMemoryByteStore
 from langchain_community.docstore.in_memory import InMemoryDocstore
 from langchain_community.vectorstores.utils import (
     DistanceStrategy,
 )
-from langchain.embeddings import CacheBackedEmbeddings
+try:
+    from langchain.embeddings import CacheBackedEmbeddings
+except ImportError:
+    from langchain.storage import CacheBackedEmbeddings
 
 from agents import Agent
 

@@ -42,7 +42,13 @@ if hasattr(time, 'tzset'):
     time.tzset()
 
 # initialize the internal Flask server
-webapp = Flask("app", static_folder=get_abs_path("./webui"), static_url_path="/")
+if os.getenv("USE_REACT_UI", "false").lower() == "true":
+    static_folder = get_abs_path("./ui-kit-react/dist")
+    PrintStyle().print(f"Serving React UI from: {static_folder}")
+else:
+    static_folder = get_abs_path("./webui")
+
+webapp = Flask("app", static_folder=static_folder, static_url_path="/")
 webapp.secret_key = os.getenv("FLASK_SECRET_KEY") or secrets.token_hex(32)
 webapp.config.update(
     JSON_SORT_KEYS=False,
@@ -204,8 +210,15 @@ async def serve_index():
             "version": "unknown",
             "commit_time": "unknown",
         }
+
+    # Determine which index file to serve based on the configured static folder
+    if os.getenv("USE_REACT_UI", "false").lower() == "true":
+        index_path = "./ui-kit-react/dist/index.html"
+    else:
+        index_path = "./webui/index.html"
+
     return files.read_file(
-        "./webui/index.html",
+        index_path,
         version_no=gitinfo["version"],
         version_time=gitinfo["commit_time"],
     )
