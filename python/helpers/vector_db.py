@@ -3,6 +3,8 @@ import uuid
 from python.helpers.faiss_loader import faiss
 from langchain_community.vectorstores import FAISS
 
+import faiss
+
 
 from langchain_core.documents import Document
 from langchain.storage import InMemoryByteStore

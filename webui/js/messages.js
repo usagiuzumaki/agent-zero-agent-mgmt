@@ -18,6 +18,13 @@ export function setMessage(id, type, heading, content, temp, kvps = null) {
     // if (type === "user") {
     //   return; // Skip re-rendering
     // }
+
+    // Capture scroll state of existing KVPs before clearing
+    const savedScrollState = captureScrollState(messageContainer);
+    if (savedScrollState) {
+      messageContainer._savedScrollState = savedScrollState;
+    }
+
     // For other types, update the message
     messageContainer.innerHTML = "";
   } else {
@@ -187,7 +194,14 @@ export function _drawMessage(
   bodyDiv.classList.add("message-body");
   messageDiv.appendChild(bodyDiv);
 
-  drawKvps(bodyDiv, kvps, false);
+  // Retrieve saved scroll state if available
+  const savedScrollState = messageContainer._savedScrollState || null;
+  drawKvps(bodyDiv, kvps, false, savedScrollState);
+
+  // Clear the saved state after use to avoid applying it to future updates inappropriately
+  if (messageContainer._savedScrollState) {
+    delete messageContainer._savedScrollState;
+  }
 
   if (content && content.trim().length > 0) {
     if (markdown) {
@@ -654,7 +668,25 @@ const KEY_CLASS_MAP = {
   reasoning: "msg-thoughts",
 };
 
-function drawKvps(container, kvps, latex) {
+function captureScrollState(container) {
+  const state = {};
+  const rows = container.querySelectorAll(".kvps-row");
+  rows.forEach(row => {
+    const keyCell = row.querySelector(".kvps-key");
+    const valDiv = row.querySelector(".kvps-val");
+    if (keyCell && valDiv) {
+      const key = keyCell.textContent;
+      const isAtBottom = (valDiv.scrollHeight - valDiv.scrollTop - valDiv.clientHeight) < 20; // tolerance
+      state[key] = {
+        scrollTop: valDiv.scrollTop,
+        isAtBottom: isAtBottom
+      };
+    }
+  });
+  return Object.keys(state).length > 0 ? state : null;
+}
+
+function drawKvps(container, kvps, latex, savedScrollState = null) {
   if (kvps) {
     const table = document.createElement("table");
     table.classList.add("msg-kvps");
@@ -665,8 +697,9 @@ function drawKvps(container, kvps, latex) {
         row.classList.add(KEY_CLASS_MAP[key]);
       }
 
+      const titleKey = convertToTitleCase(key);
       const th = row.insertCell();
-      th.textContent = convertToTitleCase(key);
+      th.textContent = titleKey;
       th.classList.add("kvps-key");
 
       const td = row.insertCell();
@@ -683,9 +716,21 @@ function drawKvps(container, kvps, latex) {
       }
 
       // autoscroll the KVP value if needed
-      // if (getAutoScroll()) #TODO needs a better redraw system
       setTimeout(() => {
-        tdiv.scrollTop = tdiv.scrollHeight;
+        const savedState = savedScrollState ? savedScrollState[titleKey] : null;
+
+        if (savedState) {
+          if (savedState.isAtBottom) {
+             tdiv.scrollTop = tdiv.scrollHeight;
+          } else {
+             tdiv.scrollTop = savedState.scrollTop;
+          }
+        } else {
+          // New KVP or no saved state: follow global autoscroll preference
+          if (getAutoScroll()) {
+            tdiv.scrollTop = tdiv.scrollHeight;
+          }
+        }
       }, 0);
 
       function addValue(value) {

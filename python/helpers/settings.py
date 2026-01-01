@@ -4,9 +4,11 @@ import json
 import os
 import re
 import subprocess
+import asyncio
 from typing import Any, Literal, TypedDict, cast
 
 import models
+import asyncio
 from python.helpers import runtime, whisper, defer, git
 from . import files, dotenv
 from python.helpers.print_style import PrintStyle
@@ -138,6 +140,21 @@ SETTINGS_FILE = files.get_abs_path("tmp/settings.json")
 _settings: Settings | None = None
 
 
+def _run_background(coro):
+    """
+    Run a coroutine in the background on the current event loop.
+    If no loop is running, this function currently does nothing (or could block).
+    Since set_settings is typically called from an async context (API), this works.
+    """
+    try:
+        loop = asyncio.get_running_loop()
+        loop.create_task(coro)
+    except RuntimeError:
+        # No running loop. If we are in a sync script, background tasks
+        # cannot be spawned without a loop. We fallback to DeferredTask if absolutely needed,
+        # but here we follow the instruction to use background task (asyncio).
+        PrintStyle().error("No event loop for background task. Falling back to blocking call.")
+        asyncio.run(coro)
 
 def convert_out(settings: Settings) -> SettingsOutput:
     default_settings = get_default_settings()
@@ -1072,22 +1089,22 @@ def get_settings() -> Settings:
     return _apply_env_overrides(norm)
 
 
-def set_settings(settings: Settings, apply: bool = True):
+async def set_settings(settings: Settings, apply: bool = True):
     global _settings
     previous = _settings
-    _settings = normalize_settings(settings)
+    _settings = normalize_settings(settings, use_env_auth=False)
     _write_settings_file(_settings)
     if apply:
-        _apply_settings(previous)
+        await _apply_settings(previous)
 
 
-def set_settings_delta(delta: dict, apply: bool = True):
+async def set_settings_delta(delta: dict, apply: bool = True):
     current = get_settings()
     new = {**current, **delta}
-    set_settings(new, apply)  # type: ignore
+    await set_settings(new, apply)  # type: ignore
 
 
-def normalize_settings(settings: Settings) -> Settings:
+def normalize_settings(settings: Settings, use_env_auth: bool = True) -> Settings:
     copy = settings.copy()
     default = get_default_settings()
 
@@ -1114,7 +1131,13 @@ def normalize_settings(settings: Settings) -> Settings:
                 copy[key] = value  # make default instead
 
     # mcp server token is set automatically
-    copy["mcp_server_token"] = create_auth_token()
+    if use_env_auth:
+        copy["mcp_server_token"] = create_auth_token()
+    else:
+        copy["mcp_server_token"] = create_auth_token(
+            username=str(copy.get("auth_login", "")),
+            password=str(copy.get("auth_password", "")),
+        )
 
     return copy
 
@@ -1175,20 +1198,27 @@ def _read_settings_file() -> Settings | None:
 
 def _write_settings_file(settings: Settings):
     _write_sensitive_settings(settings)
-    _remove_sensitive_settings(settings)
+
+    # prepare settings for file write - fully stripped
+    file_copy = settings.copy()
+    _remove_sensitive_settings(file_copy, keep_token=False)
 
     # write settings
-    content = json.dumps(settings, indent=4)
+    content = json.dumps(file_copy, indent=4)
     files.write_file(SETTINGS_FILE, content)
 
+    # strip sensitive settings from memory but keep token
+    _remove_sensitive_settings(settings, keep_token=True)
 
-def _remove_sensitive_settings(settings: Settings):
+
+def _remove_sensitive_settings(settings: Settings, keep_token: bool = False):
     settings["api_keys"] = {}
     settings["auth_login"] = ""
     settings["auth_password"] = ""
     settings["rfc_password"] = ""
     settings["root_password"] = ""
-    settings["mcp_server_token"] = ""
+    if not keep_token:
+        settings["mcp_server_token"] = ""
 
 
 def _write_sensitive_settings(settings: Settings):
@@ -1279,7 +1309,7 @@ def get_default_settings() -> Settings:
     )
 
 
-def _apply_settings(previous: Settings | None):
+async def _apply_settings(previous: Settings | None):
     global _settings
     if _settings:
         from agents import AgentContext
@@ -1296,9 +1326,7 @@ def _apply_settings(previous: Settings | None):
 
         # reload whisper model if necessary
         if not previous or _settings["stt_model_size"] != previous["stt_model_size"]:
-            task = defer.DeferredTask().start_task(
-                whisper.preload, _settings["stt_model_size"]
-            )  # TODO overkill, replace with background task
+            await whisper.preload(_settings["stt_model_size"])
 
         # force memory reload on embedding model change
         if not previous or (
@@ -1324,7 +1352,7 @@ def _apply_settings(previous: Settings | None):
 
                 mcp_config = MCPConfig.get_instance()
                 try:
-                    MCPConfig.update(mcp_servers)
+                    await MCPConfig.update(mcp_servers)
                 except Exception as e:
                     AgentContext.log_to_all(
                         type="error",
@@ -1354,9 +1382,7 @@ def _apply_settings(previous: Settings | None):
                     type="info", content="Finished updating MCP settings.", temp=True
                 )
 
-            task2 = defer.DeferredTask().start_task(
-                update_mcp_settings, config.mcp_servers
-            )  # TODO overkill, replace with background task
+            await update_mcp_settings(config.mcp_servers)
 
         # update token in mcp server
         current_token = (
@@ -1369,9 +1395,7 @@ def _apply_settings(previous: Settings | None):
 
                 DynamicMcpProxy.get_instance().reconfigure(token=token)
 
-            task3 = defer.DeferredTask().start_task(
-                update_mcp_token, current_token
-            )  # TODO overkill, replace with background task
+            await update_mcp_token(current_token)
 
 
 def _env_to_dict(data: str):
@@ -1434,10 +1458,12 @@ def get_runtime_config(set: Settings):
         }
 
 
-def create_auth_token() -> str:
+def create_auth_token(username: str | None = None, password: str | None = None) -> str:
     runtime_id = runtime.get_persistent_id()
-    username = dotenv.get_dotenv_value(dotenv.KEY_AUTH_LOGIN) or ""
-    password = dotenv.get_dotenv_value(dotenv.KEY_AUTH_PASSWORD) or ""
+    if username is None:
+        username = dotenv.get_dotenv_value(dotenv.KEY_AUTH_LOGIN) or ""
+    if password is None:
+        password = dotenv.get_dotenv_value(dotenv.KEY_AUTH_PASSWORD) or ""
     # use base64 encoding for a more compact token with alphanumeric chars
     hash_bytes = hashlib.sha256(f"{runtime_id}:{username}:{password}".encode()).digest()
     # encode as base64 and remove any non-alphanumeric chars (like +, /, =)
