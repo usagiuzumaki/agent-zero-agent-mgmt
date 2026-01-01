@@ -4,9 +4,8 @@ from langchain.storage import InMemoryByteStore, LocalFileStore
 from langchain.embeddings import CacheBackedEmbeddings
 
 # from langchain_chroma import Chroma
+from python.helpers.faiss_loader import faiss
 from langchain_community.vectorstores import FAISS
-
-import faiss
 
 
 from langchain_community.docstore.in_memory import InMemoryDocstore

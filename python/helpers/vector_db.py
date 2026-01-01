@@ -1,5 +1,6 @@
 from typing import Any, List, Sequence
 import uuid
+from python.helpers.faiss_loader import faiss
 from langchain_community.vectorstores import FAISS
 
 import faiss
