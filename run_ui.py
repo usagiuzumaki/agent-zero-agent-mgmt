@@ -366,6 +366,13 @@ def run():
     for handler in handlers:
         register_api_handler(webapp, handler)
 
+    # Register Screenwriting Blueprint
+    try:
+        from python.api.screenwriting import screenwriting_bp
+        webapp.register_blueprint(screenwriting_bp)
+    except Exception as e:
+        PrintStyle().print(f"Warning: Failed to register screenwriting blueprint: {e}")
+
     # add the webapp and mcp to the app
     app = DispatcherMiddleware(
         webapp,

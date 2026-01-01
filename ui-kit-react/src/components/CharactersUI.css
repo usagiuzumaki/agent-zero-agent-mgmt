@@ -1,0 +1,137 @@
+.characters-ui {
+  padding: 1rem;
+  background: #f9fafb;
+  min-height: 100%;
+}
+
+.chars-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.chars-header h3 {
+  margin: 0;
+  color: #374151;
+}
+
+.char-form-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  margin-bottom: 2rem;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.form-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.form-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+}
+
+.btn-save {
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  padding: 0.5rem 1.5rem;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+
+.chars-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.char-card {
+  background: white;
+  border-radius: 8px;
+  padding: 1.25rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+}
+
+.char-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.char-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.char-card-header h5 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #111827;
+}
+
+.char-role {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: #f3f4f6;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+}
+
+.char-attributes {
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.char-attr {
+  margin-bottom: 0.25rem;
+  color: #4b5563;
+}
+
+.char-bio {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.4;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 0.75rem;
+}
