@@ -138,6 +138,7 @@ PASSWORD_PLACEHOLDER = "****PSWD****"
 
 SETTINGS_FILE = files.get_abs_path("tmp/settings.json")
 _settings: Settings | None = None
+_final_settings: Settings | None = None
 
 
 def _run_background(coro):
@@ -1080,19 +1081,25 @@ def convert_in(settings: dict) -> Settings:
 
 
 def get_settings() -> Settings:
-    global _settings
+    global _settings, _final_settings
+    if _final_settings:
+        return _final_settings
+
     if not _settings:
         _settings = _read_settings_file()
     if not _settings:
         _settings = get_default_settings()
     norm = normalize_settings(_settings)
-    return _apply_env_overrides(norm)
+    _final_settings = _apply_env_overrides(norm)
+    return _final_settings
 
 
 async def set_settings(settings: Settings, apply: bool = True):
-    global _settings
+    global _settings, _final_settings
     previous = _settings
     _settings = normalize_settings(settings, use_env_auth=False)
+    # invalidate cache
+    _final_settings = None
     _write_settings_file(_settings)
     if apply:
         await _apply_settings(previous)
