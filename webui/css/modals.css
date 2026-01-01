@@ -475,3 +475,7 @@
 .toolbar-button:disabled:hover {
   background-color: transparent;
 }
+
+.modal-overlay.hidden {
+  display: none !important;
+}
