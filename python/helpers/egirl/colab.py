@@ -199,6 +199,51 @@ def build_workflow(
     )
 
 
+def build_browser_prompt(
+    prompt: str,
+    *,
+    negative_prompt: str | None = None,
+    steps: int | None = None,
+    guidance: float | None = None,
+    num_images: int | None = None,
+    scheduler: str | None = None,
+) -> str:
+    """Build a natural language task description for the browser agent."""
+
+    settings_text = f"Prompt: '{prompt}'"
+    if negative_prompt:
+        settings_text += f", Negative Prompt: '{negative_prompt}'"
+    if steps:
+        settings_text += f", Steps: {steps}"
+    if guidance:
+        settings_text += f", Guidance Scale: {guidance}"
+    if num_images:
+        settings_text += f", Batch Count: {num_images}"
+    if scheduler:
+        settings_text += f", Sampler: {scheduler}"
+
+    instruction = dedent(
+        f"""
+        I need you to run a Stable Diffusion job on Google Colab.
+
+        1. Go to {COLAB_NOTEBOOK_URL}
+        2. If you are not signed in, ask the user to sign in or handle login if you have credentials.
+        3. Click 'Connect' (Runtime).
+        4. Click 'Runtime' -> 'Run all'.
+        5. Wait for the notebook to install dependencies. Look for the text 'Running on public URL' in the output of the 'Launch WebUI' cell. It might take 5-10 minutes.
+        6. Click the public Gradio link (usually ending in .gradio.live).
+        7. In the new tab (Stable Diffusion WebUI):
+           - Enter {settings_text} in the appropriate fields.
+           - Click 'Generate'.
+        8. Wait for generation to complete.
+        9. Save the generated image(s) to disk.
+        10. Report back with the location of the saved images.
+        """
+    ).strip()
+
+    return instruction
+
+
 def build_download_instructions(
     filename: str | None = None,
     *,

@@ -108,7 +108,41 @@ class EgirlStableDiffusionColabTool(Tool):
                 )
                 return Response(message=message, break_loop=False)
 
-            supported = "overview, workflow, download"
+            if task in {"browser_prompt", "browser_plan", "automate"}:
+                prompt = _first_non_empty(kwargs, "prompt", "text", "positive_prompt")
+                if not prompt:
+                    return Response(message="error: prompt is required for browser automation task", break_loop=False)
+
+                negative_prompt = _first_non_empty(
+                    kwargs, "negative_prompt", "negative"
+                )
+                steps = _optional_int(
+                    _first_non_empty(kwargs, "steps", "num_inference_steps"),
+                    label="steps",
+                )
+                guidance = _optional_float(
+                    _first_non_empty(kwargs, "guidance", "cfg", "cfg_scale"),
+                    label="guidance",
+                )
+                num_images = _optional_int(
+                    _first_non_empty(kwargs, "num_images", "batch_count", "batch_size"),
+                    label="num_images",
+                )
+                scheduler = _first_non_empty(
+                    kwargs, "scheduler", "sampler", "sampling_method"
+                )
+
+                message = colab_helper.build_browser_prompt(
+                    prompt=prompt,
+                    negative_prompt=negative_prompt,
+                    steps=steps,
+                    guidance=guidance,
+                    num_images=num_images,
+                    scheduler=scheduler,
+                )
+                return Response(message=message, break_loop=False)
+
+            supported = "overview, workflow, download, browser_prompt"
             return Response(
                 message=f"unknown task '{task or '<empty>'}', supported: {supported}",
                 break_loop=False,

@@ -66,3 +66,4 @@ inflection
 websockets
 openai-whisper
 playwright
+browser-use
