@@ -821,7 +821,7 @@
                 <div class="modal-container">
                     <div class="modal-header">
                         <h2 x-text="settings.title"></h2>
-                        <button class="modal-close" @click="handleCancel()">&times;</button>
+                        <button class="modal-close" @click="handleCancel()" aria-label="Close modal">&times;</button>
                     </div>
 
                     <div class="modal-content">
@@ -1618,22 +1618,22 @@
                                                     <td x-text="formatDate(task.last_run)"></td>
                                                     <td @click.stop>
                                                         <div class="scheduler-task-actions">
-                                                            <button class="scheduler-task-action" @click="runTask(task.uuid)" title="Run Task">
+                                                            <button class="scheduler-task-action" @click="runTask(task.uuid)" title="Run Task" aria-label="Run Task">
                                                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
                                                                     <path d="M8 5v14l11-7z"/>
                                                                 </svg>
                                                             </button>
-                                                            <button class="scheduler-task-action" @click="resetTaskState(task.uuid)" title="Reset State">
+                                                            <button class="scheduler-task-action" @click="resetTaskState(task.uuid)" title="Reset State" aria-label="Reset State">
                                                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
                                                                     <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
                                                                 </svg>
                                                             </button>
-                                                            <button class="scheduler-task-action" @click="startEditTask(task.uuid)" title="Edit Task">
+                                                            <button class="scheduler-task-action" @click="startEditTask(task.uuid)" title="Edit Task" aria-label="Edit Task">
                                                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
                                                                     <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
                                                                 </svg>
                                                             </button>
-                                                            <button class="scheduler-task-action" @click="deleteTask(task.uuid)" title="Delete Task">
+                                                            <button class="scheduler-task-action" @click="deleteTask(task.uuid)" title="Delete Task" aria-label="Delete Task">
                                                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
                                                                     <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
                                                                 </svg>
@@ -1760,7 +1760,7 @@
                 <div class="modal-container">
                     <div class="modal-header">
                         <h2 class="modal-title" x-text="browser.title"></h2>
-                        <button class="modal-close" @click="handleClose()">&times;</button>
+                        <button class="modal-close" @click="handleClose()" aria-label="Close modal">&times;</button>
                     </div>
                     <div class="modal-content">
                         <div x-show="isLoading" class="loading-spinner">
@@ -1821,7 +1821,8 @@
 
                                             <div class="file-actions">
                                                 <button class="action-button download-button"
-                                                    @click.stop="downloadFile(file)">
+                                                    @click.stop="downloadFile(file)"
+                                                    aria-label="Download" title="Download">
                                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.5 19.5">
                                                         <path
                                                             d="m.75,14.25v2.25c0,1.24,1.01,2.25,2.25,2.25h13.5c1.24,0,2.25-1.01,2.25-2.25v-2.25m-4.5-4.5l-4.5,4.5m0,0l-4.5-4.5m4.5,4.5V.75"
@@ -1829,7 +1830,8 @@
                                                             stroke-linejoin="round" stroke-width="1.5"></path>
                                                     </svg>
                                                 </button>
-                                                <button class="delete-button" @click.stop="deleteFile(file)">
+                                                <button class="delete-button" @click.stop="deleteFile(file)"
+                                                    aria-label="Delete" title="Delete">
                                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15.03 22.53"
                                                         fill="currentColor">
                                                         <path
@@ -1880,7 +1882,7 @@
                 <div class="modal-container">
                     <div class="modal-header">
                         <h2 class="modal-title" x-text="title"></h2>
-                        <button class="modal-close" @click="handleClose()">&times;</button>
+                        <button class="modal-close" @click="handleClose()" aria-label="Close modal">&times;</button>
                     </div>
                     <div class="modal-description" x-text="description"></div>
                     <div class="modal-content" id="viewer">
@@ -1902,7 +1904,7 @@
                 @keydown.escape.window="handleClose()" x-transition>
                 <div class="modal-container full-screen-input-modal">
                     <div class="modal-content">
-                        <button class="modal-close" @click="handleClose()">&times;</button>
+                        <button class="modal-close" @click="handleClose()" aria-label="Close modal">&times;</button>
 
                         <!-- Add toolbar -->
                         <div class="editor-toolbar">
