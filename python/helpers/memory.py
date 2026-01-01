@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Any, List, Sequence
-from langchain.storage import InMemoryByteStore, LocalFileStore
+from langchain_core.stores import InMemoryByteStore
+from langchain.storage import LocalFileStore
 from langchain.embeddings import CacheBackedEmbeddings
 
 # from langchain_chroma import Chroma
