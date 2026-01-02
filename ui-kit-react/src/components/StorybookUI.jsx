@@ -9,6 +9,7 @@ export default function StorybookUI() {
   const [uploadContent, setUploadContent] = useState('');
   const [uploadName, setUploadName] = useState('');
   const [showUpload, setShowUpload] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     fetchDocuments();
@@ -35,6 +36,7 @@ export default function StorybookUI() {
   const handleUpload = async (e) => {
     e.preventDefault();
     if (!uploadContent.trim()) return;
+    setIsUploading(true);
 
     try {
       const response = await fetch('/api/screenwriting/storybook/upload', {
@@ -59,6 +61,8 @@ export default function StorybookUI() {
       setUploadContent('');
     } catch (err) {
       setError(err.message);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -88,21 +92,27 @@ export default function StorybookUI() {
         <div className="storybook-upload">
           <h4>Ingest New Document</h4>
           <form onSubmit={handleUpload}>
+            <label htmlFor="doc-title" className="sr-only">Document Title</label>
             <input
+              id="doc-title"
               type="text"
               placeholder="Document Title"
               value={uploadName}
               onChange={(e) => setUploadName(e.target.value)}
               className="input-field"
             />
+            <label htmlFor="doc-content" className="sr-only">Document Content</label>
             <textarea
+              id="doc-content"
               placeholder="Paste text content here..."
               value={uploadContent}
               onChange={(e) => setUploadContent(e.target.value)}
               className="textarea-field"
               rows={10}
             />
-            <button type="submit" className="btn-primary">Ingest</button>
+            <button type="submit" className="btn-primary" disabled={isUploading}>
+              {isUploading ? 'Ingesting...' : 'Ingest'}
+            </button>
           </form>
         </div>
       )}
@@ -114,14 +124,19 @@ export default function StorybookUI() {
               <p className="empty-state">No documents found. Upload one to get started.</p>
             ) : (
               documents.map((doc) => (
-                <div key={doc.id} className="document-card" onClick={() => setSelectedDoc(doc)}>
+                <button
+                  key={doc.id}
+                  className="document-card"
+                  onClick={() => setSelectedDoc(doc)}
+                  type="button"
+                >
                   <h4>{doc.name}</h4>
                   <p>{doc.description}</p>
                   <span className="doc-meta">{new Date(doc.uploaded_at).toLocaleDateString()}</span>
                   <div className="tags">
                     {doc.tags.map((tag, i) => <span key={i} className="tag">{tag}</span>)}
                   </div>
-                </div>
+                </button>
               ))
             )}
           </div>
@@ -175,7 +190,13 @@ export default function StorybookUI() {
                       >
                         <div className="beat-header">
                           <span className="beat-label">{beat.label}</span>
-                          <button className="btn-icon" title="Draft Dialogue">📝</button>
+                          <button
+                            className="btn-icon"
+                            title="Draft Dialogue"
+                            aria-label="Draft Dialogue"
+                          >
+                            📝
+                          </button>
                         </div>
                         <p>{beat.summary}</p>
                         <small className="visual-prompt">🎨 {beat.visual_prompt}</small>

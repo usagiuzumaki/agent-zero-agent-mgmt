@@ -1,3 +1,3 @@
-## 2026-01-01 - [Accessibility: File Input Proxy]
-**Learning:** Custom file inputs implemented with `label` tags often lack keyboard accessibility (focusable state, Enter/Space activation). Replacing them with a `<button>` proxy that triggers the hidden input's click event (via JS) provides native keyboard support while maintaining custom styling.
-**Action:** When customizing file inputs, use a button element as the trigger and ensure the hidden input is visually hidden but technically functional. Always handle focus/blur events on the button to manage tooltips or focus rings.
+## 2024-05-23 - Interactive Elements Semantics
+**Learning:** React `div` elements with `onClick` handlers are a common pattern that breaks accessibility.
+**Action:** Always prefer `<button>` for interactive elements, using CSS resets to match the desired visual style (e.g., cards, list items). Using semantic HTML handles keyboard interaction (Tab, Enter, Space) and screen reader roles automatically.
