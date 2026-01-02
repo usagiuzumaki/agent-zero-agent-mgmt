@@ -80,6 +80,11 @@
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   cursor: pointer;
   transition: transform 0.2s;
+  /* Button resets */
+  border: none;
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
 }
 
 .document-card:hover {
