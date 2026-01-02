@@ -148,9 +148,16 @@ def cosine_normalizer(val: float) -> float:
 
 
 def get_comparator(condition: str):
+    try:
+        # Optimization: Compile condition once instead of parsing for every document
+        compiled = compile(condition, "<string>", "eval")
+    except Exception:
+        # If compilation fails (e.g. syntax error), return false for all items
+        return lambda _: False
+
     def comparator(data: dict[str, Any]):
         try:
-            result = eval(condition, {}, data)
+            result = eval(compiled, {}, data)
             return result
         except Exception as e:
             # PrintStyle.error(f"Error evaluating condition: {e}")
