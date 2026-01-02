@@ -196,7 +196,7 @@ export function _drawMessage(
 
   // Retrieve saved scroll state if available
   const savedScrollState = messageContainer._savedScrollState || null;
-  drawKvps(bodyDiv, kvps, false, savedScrollState);
+  drawKvps(bodyDiv, kvps, false, savedScrollState ? savedScrollState.kvps : null);
 
   // Clear the saved state after use to avoid applying it to future updates inappropriately
   if (messageContainer._savedScrollState) {
@@ -258,10 +258,21 @@ export function _drawMessage(
   }
 
   // autoscroll the body if needed
-  // if (getAutoScroll()) #TODO needs a better redraw system
-    setTimeout(() => {
-      bodyDiv.scrollTop = bodyDiv.scrollHeight;
-    }, 0);
+  setTimeout(() => {
+    const savedBodyState = savedScrollState ? savedScrollState.body : null;
+
+    if (savedBodyState) {
+      if (savedBodyState.isAtBottom) {
+        bodyDiv.scrollTop = bodyDiv.scrollHeight;
+      } else {
+        bodyDiv.scrollTop = savedBodyState.scrollTop;
+      }
+    } else {
+      if (getAutoScroll()) {
+        bodyDiv.scrollTop = bodyDiv.scrollHeight;
+      }
+    }
+  }, 0);
 
   return messageDiv;
 }
@@ -669,7 +680,9 @@ const KEY_CLASS_MAP = {
 };
 
 function captureScrollState(container) {
-  const state = {};
+  const state = {
+    kvps: {}
+  };
   const rows = container.querySelectorAll(".kvps-row");
   rows.forEach(row => {
     const keyCell = row.querySelector(".kvps-key");
@@ -677,13 +690,22 @@ function captureScrollState(container) {
     if (keyCell && valDiv) {
       const key = keyCell.textContent;
       const isAtBottom = (valDiv.scrollHeight - valDiv.scrollTop - valDiv.clientHeight) < 20; // tolerance
-      state[key] = {
+      state.kvps[key] = {
         scrollTop: valDiv.scrollTop,
         isAtBottom: isAtBottom
       };
     }
   });
-  return Object.keys(state).length > 0 ? state : null;
+
+  const bodyDiv = container.querySelector(".message-body");
+  if (bodyDiv) {
+    state.body = {
+      scrollTop: bodyDiv.scrollTop,
+      isAtBottom: (bodyDiv.scrollHeight - bodyDiv.scrollTop - bodyDiv.clientHeight) < 20
+    };
+  }
+
+  return (Object.keys(state.kvps).length > 0 || state.body) ? state : null;
 }
 
 function drawKvps(container, kvps, latex, savedScrollState = null) {
