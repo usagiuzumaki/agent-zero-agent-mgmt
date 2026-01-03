@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Spinner from './common/Spinner';
 import './StorybookUI.css';
 
 export default function StorybookUI() {
@@ -111,7 +112,14 @@ export default function StorybookUI() {
               rows={10}
             />
             <button type="submit" className="btn-primary" disabled={isUploading}>
-              {isUploading ? 'Ingesting...' : 'Ingest'}
+              {isUploading ? (
+                <>
+                  <Spinner size="small" color="#fff" />
+                  <span>Ingesting...</span>
+                </>
+              ) : (
+                'Ingest'
+              )}
             </button>
           </form>
         </div>
