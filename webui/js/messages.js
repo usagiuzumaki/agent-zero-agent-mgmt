@@ -194,6 +194,12 @@ export function _drawMessage(
   bodyDiv.classList.add("message-body");
   messageDiv.appendChild(bodyDiv);
 
+  // Append messageDiv to container early if container is in DOM (for re-renders)
+  // This allows synchronous scroll restoration in drawKvps and below
+  if (messageContainer.isConnected) {
+    messageContainer.appendChild(messageDiv);
+  }
+
   // Retrieve saved scroll state if available
   const savedScrollState = messageContainer._savedScrollState || null;
   drawKvps(bodyDiv, kvps, false, savedScrollState);
@@ -251,17 +257,35 @@ export function _drawMessage(
     }
   }
 
-  messageContainer.appendChild(messageDiv);
+  // Restore body scroll state if available (MUST be done after content is appended)
+  if (savedScrollState && savedScrollState['__BODY__']) {
+    const s = savedScrollState['__BODY__'];
+    // Restore immediately as we are connected
+    if (s.isAtBottom) {
+      bodyDiv.scrollTop = bodyDiv.scrollHeight;
+    } else {
+      bodyDiv.scrollTop = s.scrollTop;
+    }
+  }
+
+  if (!messageDiv.isConnected) {
+    messageContainer.appendChild(messageDiv);
+  }
 
   if (followUp) {
     messageContainer.classList.add("message-followup");
   }
 
   // autoscroll the body if needed
-  // if (getAutoScroll()) #TODO needs a better redraw system
-    setTimeout(() => {
-      bodyDiv.scrollTop = bodyDiv.scrollHeight;
-    }, 0);
+  // Only auto-scroll if we didn't restore a state (or if we are new)
+  if (!savedScrollState || !savedScrollState['__BODY__']) {
+     if (getAutoScroll()) {
+      // Use setTimeout to allow layout to settle (images etc)
+      setTimeout(() => {
+        bodyDiv.scrollTop = bodyDiv.scrollHeight;
+      }, 0);
+    }
+  }
 
   return messageDiv;
 }
@@ -670,6 +694,8 @@ const KEY_CLASS_MAP = {
 
 function captureScrollState(container) {
   const state = {};
+
+  // Capture KVPs
   const rows = container.querySelectorAll(".kvps-row");
   rows.forEach(row => {
     const keyCell = row.querySelector(".kvps-key");
@@ -683,6 +709,16 @@ function captureScrollState(container) {
       };
     }
   });
+
+  // Capture Body (if scrollable)
+  const body = container.querySelector(".message-body");
+  if (body && body.scrollHeight > body.clientHeight) {
+      state['__BODY__'] = {
+        scrollTop: body.scrollTop,
+        isAtBottom: (body.scrollHeight - body.scrollTop - body.clientHeight) < 20
+      };
+  }
+
   return Object.keys(state).length > 0 ? state : null;
 }
 
@@ -715,8 +751,7 @@ function drawKvps(container, kvps, latex, savedScrollState = null) {
         addValue(value);
       }
 
-      // autoscroll the KVP value if needed
-      setTimeout(() => {
+      const applyScroll = () => {
         const savedState = savedScrollState ? savedScrollState[titleKey] : null;
 
         if (savedState) {
@@ -731,7 +766,14 @@ function drawKvps(container, kvps, latex, savedScrollState = null) {
             tdiv.scrollTop = tdiv.scrollHeight;
           }
         }
-      }, 0);
+      };
+
+      // Apply scroll immediately if connected (prevents flash), else wait
+      if (tdiv.isConnected) {
+        applyScroll();
+      } else {
+        setTimeout(applyScroll, 0);
+      }
 
       function addValue(value) {
         if (typeof value === "object") value = JSON.stringify(value, null, 2);
