@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import Spinner from './common/Spinner';
 import './CharactersUI.css';
 
 export default function CharactersUI() {
   const [characters, setCharacters] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [newChar, setNewChar] = useState({
     name: '',
@@ -13,6 +15,7 @@ export default function CharactersUI() {
     flaw: '',
     bio: ''
   });
+  const [editingId, setEditingId] = useState(null);
 
   useEffect(() => {
     fetchCharacters();
@@ -35,20 +38,61 @@ export default function CharactersUI() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSaving(true);
     try {
-      const response = await fetch('/api/screenwriting/character/add', {
+      const endpoint = editingId
+        ? '/api/screenwriting/character/update'
+        : '/api/screenwriting/character/add';
+
+      const payload = editingId ? { ...newChar, id: editingId } : newChar;
+
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newChar)
+        body: JSON.stringify(payload)
       });
 
       if (response.ok) {
         setShowForm(false);
+        setEditingId(null);
         setNewChar({ name: '', role: 'Protagonist', archetype: '', motivation: '', flaw: '', bio: '' });
         fetchCharacters();
       }
     } catch (err) {
-      console.error("Failed to add character", err);
+      console.error("Failed to save character", err);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleEdit = (char) => {
+    setNewChar({
+      name: char.name || '',
+      role: char.role || 'Protagonist',
+      archetype: char.archetype || '',
+      motivation: char.motivation || '',
+      flaw: char.flaw || '',
+      bio: char.bio || ''
+    });
+    setEditingId(char.id);
+    setShowForm(true);
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this character?')) return;
+
+    try {
+      const response = await fetch('/api/screenwriting/character/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
+      });
+
+      if (response.ok) {
+        fetchCharacters();
+      }
+    } catch (err) {
+      console.error("Failed to delete character", err);
     }
   };
 
@@ -61,20 +105,36 @@ export default function CharactersUI() {
     }
   };
 
-  if (loading) return <div className="loading">Loading Cast...</div>;
+  if (loading) return (
+    <div className="loading-container">
+      <Spinner size="lg" color="var(--color-primary)" />
+      <p>Loading Cast...</p>
+    </div>
+  );
 
   return (
     <div className="characters-ui">
       <div className="chars-header">
         <h3>Cast of Characters</h3>
-        <button className="btn-primary" onClick={() => setShowForm(!showForm)}>
+        <button
+          className="btn-primary"
+          onClick={() => {
+            if (showForm) {
+              setShowForm(false);
+              setEditingId(null);
+              setNewChar({ name: '', role: 'Protagonist', archetype: '', motivation: '', flaw: '', bio: '' });
+            } else {
+              setShowForm(true);
+            }
+          }}
+        >
           {showForm ? 'Cancel' : '+ Add Character'}
         </button>
       </div>
 
       {showForm && (
         <div className="char-form-card">
-          <h4>New Character Profile</h4>
+          <h4>{editingId ? 'Edit Character' : 'New Character Profile'}</h4>
           <form onSubmit={handleSubmit}>
             <div className="form-row">
               <div className="form-group">
@@ -136,7 +196,14 @@ export default function CharactersUI() {
               />
             </div>
 
-            <button type="submit" className="btn-save">Save Character</button>
+            <button type="submit" className="btn-save" disabled={isSaving}>
+              {isSaving ? (
+                <>
+                  <Spinner size="sm" color="#ffffff" className="mr-2" />
+                  Saving...
+                </>
+              ) : 'Save Character'}
+            </button>
           </form>
         </div>
       )}
@@ -159,6 +226,25 @@ export default function CharactersUI() {
               </div>
 
               {char.bio && <p className="char-bio">{char.bio}</p>}
+
+              <div className="char-actions">
+                <button
+                  className="btn-icon"
+                  onClick={() => handleEdit(char)}
+                  title="Edit"
+                  aria-label="Edit Character"
+                >
+                  ✏️
+                </button>
+                <button
+                  className="btn-icon btn-delete"
+                  onClick={() => handleDelete(char.id)}
+                  title="Delete"
+                  aria-label="Delete Character"
+                >
+                  🗑️
+                </button>
+              </div>
             </div>
           ))
         )}
