@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import './CharactersUI.css';
+import Spinner from './common/Spinner';
 
 export default function CharactersUI() {
   const [characters, setCharacters] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [newChar, setNewChar] = useState({
     name: '',
@@ -35,6 +37,7 @@ export default function CharactersUI() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSaving(true);
     try {
       const response = await fetch('/api/screenwriting/character/add', {
         method: 'POST',
@@ -49,6 +52,8 @@ export default function CharactersUI() {
       }
     } catch (err) {
       console.error("Failed to add character", err);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -78,16 +83,18 @@ export default function CharactersUI() {
           <form onSubmit={handleSubmit}>
             <div className="form-row">
               <div className="form-group">
-                <label>Name</label>
+                <label htmlFor="char-name">Name</label>
                 <input
+                  id="char-name"
                   value={newChar.name}
                   onChange={e => setNewChar({...newChar, name: e.target.value})}
                   required
                 />
               </div>
               <div className="form-group">
-                <label>Role</label>
+                <label htmlFor="char-role">Role</label>
                 <select
+                  id="char-role"
                   value={newChar.role}
                   onChange={e => setNewChar({...newChar, role: e.target.value})}
                 >
@@ -101,8 +108,9 @@ export default function CharactersUI() {
 
             <div className="form-row">
               <div className="form-group">
-                <label>Archetype</label>
+                <label htmlFor="char-archetype">Archetype</label>
                 <input
+                  id="char-archetype"
                   placeholder="e.g. The Reluctant Hero"
                   value={newChar.archetype}
                   onChange={e => setNewChar({...newChar, archetype: e.target.value})}
@@ -112,15 +120,17 @@ export default function CharactersUI() {
 
             <div className="form-row">
               <div className="form-group">
-                <label>Motivation (Want)</label>
+                <label htmlFor="char-motivation">Motivation (Want)</label>
                 <input
+                  id="char-motivation"
                   value={newChar.motivation}
                   onChange={e => setNewChar({...newChar, motivation: e.target.value})}
                 />
               </div>
               <div className="form-group">
-                <label>Fatal Flaw (Need)</label>
+                <label htmlFor="char-flaw">Fatal Flaw (Need)</label>
                 <input
+                  id="char-flaw"
                   value={newChar.flaw}
                   onChange={e => setNewChar({...newChar, flaw: e.target.value})}
                 />
@@ -128,15 +138,18 @@ export default function CharactersUI() {
             </div>
 
             <div className="form-group">
-              <label>Bio & Notes</label>
+              <label htmlFor="char-bio">Bio & Notes</label>
               <textarea
+                id="char-bio"
                 rows={3}
                 value={newChar.bio}
                 onChange={e => setNewChar({...newChar, bio: e.target.value})}
               />
             </div>
 
-            <button type="submit" className="btn-save">Save Character</button>
+            <button type="submit" className="btn-save" disabled={isSaving}>
+              {isSaving ? <><Spinner size="sm" /> Saving...</> : 'Save Character'}
+            </button>
           </form>
         </div>
       )}
