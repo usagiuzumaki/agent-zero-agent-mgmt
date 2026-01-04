@@ -726,6 +726,8 @@ function drawKvps(container, kvps, latex, savedScrollState = null) {
   if (kvps) {
     const table = document.createElement("table");
     table.classList.add("msg-kvps");
+    container.appendChild(table);
+
     for (let [key, value] of Object.entries(kvps)) {
       const row = table.insertRow();
       row.classList.add("kvps-row");
@@ -815,7 +817,6 @@ function drawKvps(container, kvps, latex, savedScrollState = null) {
       }
 
     }
-    container.appendChild(table);
   }
 }
 
