@@ -1,0 +1,30 @@
+
+> ui-kit-react@0.0.0 preview /app/ui-kit-react
+> vite preview -- --port 4173
+
+  ➜  Local:   http://localhost:4173/
+  ➜  Network: use --host to expose
+3:07:11 AM [vite] http proxy error: /api/screenwriting/all
+AggregateError [ECONNREFUSED]:
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+3:07:13 AM [vite] http proxy error: /api/screenwriting/all
+AggregateError [ECONNREFUSED]:
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+3:09:13 AM [vite] http proxy error: /api/screenwriting/all
+AggregateError [ECONNREFUSED]:
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+3:09:16 AM [vite] http proxy error: /api/screenwriting/all
+AggregateError [ECONNREFUSED]:
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+3:12:13 AM [vite] http proxy error: /api/screenwriting/all
+AggregateError [ECONNREFUSED]:
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+3:12:15 AM [vite] http proxy error: /api/screenwriting/all
+AggregateError [ECONNREFUSED]:
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
