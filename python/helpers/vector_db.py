@@ -21,7 +21,9 @@ class MyFaiss(FAISS):
     # override aget_by_ids
     def get_by_ids(self, ids: Sequence[str], /) -> List[Document]:
         # return all self.docstore._dict[id] in ids
-        return [self.docstore._dict[id] for id in (ids if isinstance(ids, list) else [ids]) if id in self.docstore._dict]  # type: ignore
+        # Optimization: use .get() to avoid double lookup (check existence + retrieve)
+        ids_list = ids if isinstance(ids, list) else [ids]
+        return [doc for doc in (self.docstore._dict.get(id) for id in ids_list) if doc is not None]  # type: ignore
 
     async def aget_by_ids(self, ids: Sequence[str], /) -> List[Document]:
         return self.get_by_ids(ids)
