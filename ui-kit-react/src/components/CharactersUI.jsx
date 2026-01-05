@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import Spinner from './common/Spinner';
 import './CharactersUI.css';
 
 export default function CharactersUI() {
   const [characters, setCharacters] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [newChar, setNewChar] = useState({
     name: '',
@@ -35,6 +37,7 @@ export default function CharactersUI() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSaving(true);
     try {
       const response = await fetch('/api/screenwriting/character/add', {
         method: 'POST',
@@ -49,6 +52,8 @@ export default function CharactersUI() {
       }
     } catch (err) {
       console.error("Failed to add character", err);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -136,7 +141,15 @@ export default function CharactersUI() {
               />
             </div>
 
-            <button type="submit" className="btn-save">Save Character</button>
+            <button
+              type="submit"
+              className="btn-save"
+              disabled={isSaving}
+              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', opacity: isSaving ? 0.7 : 1 }}
+            >
+              {isSaving && <Spinner size="sm" />}
+              {isSaving ? 'Saving...' : 'Save Character'}
+            </button>
           </form>
         </div>
       )}
