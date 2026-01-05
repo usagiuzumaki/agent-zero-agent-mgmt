@@ -147,6 +147,32 @@ class ScreenwritingManager:
             return self.save_data('character_profiles', profiles)
         return False
     
+    def update_character(self, character_id: str, updates: Dict) -> bool:
+        """Update an existing character profile"""
+        profiles = self.load_data('character_profiles')
+        if profiles and profiles.get('characters'):
+            for i, char in enumerate(profiles['characters']):
+                if char.get('id') == character_id:
+                    # preserve id and created date
+                    updates['id'] = char['id']
+                    updates['created'] = char.get('created', datetime.now().isoformat())
+                    updates['last_updated'] = datetime.now().isoformat()
+
+                    profiles['characters'][i] = updates
+                    return self.save_data('character_profiles', profiles)
+        return False
+
+    def delete_character(self, character_id: str) -> bool:
+        """Delete a character profile"""
+        profiles = self.load_data('character_profiles')
+        if profiles and profiles.get('characters'):
+            initial_len = len(profiles['characters'])
+            profiles['characters'] = [c for c in profiles['characters'] if c.get('id') != character_id]
+
+            if len(profiles['characters']) < initial_len:
+                return self.save_data('character_profiles', profiles)
+        return False
+
     def add_quote(self, quote: str, character: Optional[str] = None, context: Optional[str] = None, 
                   category: Optional[str] = None) -> bool:
         """Add a memorable quote"""
