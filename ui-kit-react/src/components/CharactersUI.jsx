@@ -72,27 +72,37 @@ export default function CharactersUI() {
     <div className="characters-ui">
       <div className="chars-header">
         <h3>Cast of Characters</h3>
-        <button className="btn-primary" onClick={() => setShowForm(!showForm)}>
+        <button
+          className="btn-primary"
+          onClick={() => setShowForm(!showForm)}
+          aria-expanded={showForm}
+          aria-controls="char-form"
+        >
           {showForm ? 'Cancel' : '+ Add Character'}
         </button>
       </div>
 
       {showForm && (
-        <div className="char-form-card">
+        <div id="char-form" className="char-form-card">
           <h4>New Character Profile</h4>
           <form onSubmit={handleSubmit}>
             <div className="form-row">
               <div className="form-group">
-                <label>Name</label>
+                <label htmlFor="char-name">
+                  Name <span aria-hidden="true" style={{color: '#ef4444'}}>*</span>
+                </label>
                 <input
+                  id="char-name"
                   value={newChar.name}
                   onChange={e => setNewChar({...newChar, name: e.target.value})}
                   required
+                  aria-required="true"
                 />
               </div>
               <div className="form-group">
-                <label>Role</label>
+                <label htmlFor="char-role">Role</label>
                 <select
+                  id="char-role"
                   value={newChar.role}
                   onChange={e => setNewChar({...newChar, role: e.target.value})}
                 >
@@ -106,8 +116,9 @@ export default function CharactersUI() {
 
             <div className="form-row">
               <div className="form-group">
-                <label>Archetype</label>
+                <label htmlFor="char-archetype">Archetype</label>
                 <input
+                  id="char-archetype"
                   placeholder="e.g. The Reluctant Hero"
                   value={newChar.archetype}
                   onChange={e => setNewChar({...newChar, archetype: e.target.value})}
@@ -117,15 +128,17 @@ export default function CharactersUI() {
 
             <div className="form-row">
               <div className="form-group">
-                <label>Motivation (Want)</label>
+                <label htmlFor="char-motivation">Motivation (Want)</label>
                 <input
+                  id="char-motivation"
                   value={newChar.motivation}
                   onChange={e => setNewChar({...newChar, motivation: e.target.value})}
                 />
               </div>
               <div className="form-group">
-                <label>Fatal Flaw (Need)</label>
+                <label htmlFor="char-flaw">Fatal Flaw (Need)</label>
                 <input
+                  id="char-flaw"
                   value={newChar.flaw}
                   onChange={e => setNewChar({...newChar, flaw: e.target.value})}
                 />
@@ -133,8 +146,9 @@ export default function CharactersUI() {
             </div>
 
             <div className="form-group">
-              <label>Bio & Notes</label>
+              <label htmlFor="char-bio">Bio & Notes</label>
               <textarea
+                id="char-bio"
                 rows={3}
                 value={newChar.bio}
                 onChange={e => setNewChar({...newChar, bio: e.target.value})}
