@@ -7,14 +7,18 @@ export default function CharactersUI() {
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [showForm, setShowForm] = useState(false);
-  const [newChar, setNewChar] = useState({
+  const [editingId, setEditingId] = useState(null);
+
+  const initialCharState = {
     name: '',
     role: 'Protagonist',
     archetype: '',
     motivation: '',
     flaw: '',
     bio: ''
-  });
+  };
+
+  const [newChar, setNewChar] = useState(initialCharState);
 
   useEffect(() => {
     fetchCharacters();
@@ -22,7 +26,6 @@ export default function CharactersUI() {
 
   const fetchCharacters = async () => {
     try {
-      // Using get_all_data for now as there isn't a dedicated list endpoint documented
       const response = await fetch('/api/screenwriting/all');
       const data = await response.json();
       if (data.character_profiles && data.character_profiles.characters) {
@@ -35,23 +38,80 @@ export default function CharactersUI() {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSaving(true);
+  const handleEdit = (char) => {
+    setNewChar({
+      name: char.name || '',
+      role: char.role || 'Protagonist',
+      archetype: char.archetype || '',
+      motivation: char.motivation || '',
+      flaw: char.flaw || '',
+      bio: char.bio || ''
+    });
+    setEditingId(char.id);
+    setShowForm(true);
+    // Scroll to form
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleDelete = async (charId) => {
+    if (!window.confirm("Are you sure you want to delete this character?")) return;
+
     try {
-      const response = await fetch('/api/screenwriting/character/add', {
+      const response = await fetch('/api/screenwriting/character/delete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newChar)
+        body: JSON.stringify({ id: charId })
       });
 
       if (response.ok) {
-        setShowForm(false);
-        setNewChar({ name: '', role: 'Protagonist', archetype: '', motivation: '', flaw: '', bio: '' });
+        fetchCharacters();
+        // If we were editing this character, reset form
+        if (editingId === charId) {
+          handleCancel();
+        }
+      }
+    } catch (err) {
+      console.error("Failed to delete character", err);
+    }
+  };
+
+  const handleCancel = () => {
+    setShowForm(false);
+    setEditingId(null);
+    setNewChar(initialCharState);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSaving(true);
+
+    try {
+      let response;
+      if (editingId) {
+        // Update existing character
+        response = await fetch('/api/screenwriting/character/update', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: editingId,
+            data: newChar
+          })
+        });
+      } else {
+        // Create new character
+        response = await fetch('/api/screenwriting/character/add', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newChar)
+        });
+      }
+
+      if (response.ok) {
+        handleCancel();
         fetchCharacters();
       }
     } catch (err) {
-      console.error("Failed to add character", err);
+      console.error("Failed to save character", err);
     } finally {
       setIsSaving(false);
     }
@@ -72,27 +132,31 @@ export default function CharactersUI() {
     <div className="characters-ui">
       <div className="chars-header">
         <h3>Cast of Characters</h3>
-        <button className="btn-primary" onClick={() => setShowForm(!showForm)}>
-          {showForm ? 'Cancel' : '+ Add Character'}
-        </button>
+        {!showForm && (
+          <button className="btn-primary" onClick={() => setShowForm(true)}>
+            + Add Character
+          </button>
+        )}
       </div>
 
       {showForm && (
         <div className="char-form-card">
-          <h4>New Character Profile</h4>
+          <h4>{editingId ? 'Edit Character Profile' : 'New Character Profile'}</h4>
           <form onSubmit={handleSubmit}>
             <div className="form-row">
               <div className="form-group">
-                <label>Name</label>
+                <label htmlFor="char-name">Name</label>
                 <input
+                  id="char-name"
                   value={newChar.name}
                   onChange={e => setNewChar({...newChar, name: e.target.value})}
                   required
                 />
               </div>
               <div className="form-group">
-                <label>Role</label>
+                <label htmlFor="char-role">Role</label>
                 <select
+                  id="char-role"
                   value={newChar.role}
                   onChange={e => setNewChar({...newChar, role: e.target.value})}
                 >
@@ -106,8 +170,9 @@ export default function CharactersUI() {
 
             <div className="form-row">
               <div className="form-group">
-                <label>Archetype</label>
+                <label htmlFor="char-archetype">Archetype</label>
                 <input
+                  id="char-archetype"
                   placeholder="e.g. The Reluctant Hero"
                   value={newChar.archetype}
                   onChange={e => setNewChar({...newChar, archetype: e.target.value})}
@@ -117,15 +182,17 @@ export default function CharactersUI() {
 
             <div className="form-row">
               <div className="form-group">
-                <label>Motivation (Want)</label>
+                <label htmlFor="char-motivation">Motivation (Want)</label>
                 <input
+                  id="char-motivation"
                   value={newChar.motivation}
                   onChange={e => setNewChar({...newChar, motivation: e.target.value})}
                 />
               </div>
               <div className="form-group">
-                <label>Fatal Flaw (Need)</label>
+                <label htmlFor="char-flaw">Fatal Flaw (Need)</label>
                 <input
+                  id="char-flaw"
                   value={newChar.flaw}
                   onChange={e => setNewChar({...newChar, flaw: e.target.value})}
                 />
@@ -133,23 +200,34 @@ export default function CharactersUI() {
             </div>
 
             <div className="form-group">
-              <label>Bio & Notes</label>
+              <label htmlFor="char-bio">Bio & Notes</label>
               <textarea
+                id="char-bio"
                 rows={3}
                 value={newChar.bio}
                 onChange={e => setNewChar({...newChar, bio: e.target.value})}
               />
             </div>
 
-            <button
-              type="submit"
-              className="btn-save"
-              disabled={isSaving}
-              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', opacity: isSaving ? 0.7 : 1 }}
-            >
-              {isSaving && <Spinner size="sm" />}
-              {isSaving ? 'Saving...' : 'Save Character'}
-            </button>
+            <div className="form-actions">
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={handleCancel}
+                disabled={isSaving}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="btn-save"
+                disabled={isSaving}
+                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', opacity: isSaving ? 0.7 : 1 }}
+              >
+                {isSaving && <Spinner size="sm" />}
+                {isSaving ? 'Saving...' : (editingId ? 'Update Character' : 'Save Character')}
+              </button>
+            </div>
           </form>
         </div>
       )}
@@ -172,6 +250,24 @@ export default function CharactersUI() {
               </div>
 
               {char.bio && <p className="char-bio">{char.bio}</p>}
+
+              <div className="char-actions">
+                <button
+                  className="btn-text"
+                  onClick={() => handleEdit(char)}
+                  aria-label={`Edit ${char.name}`}
+                >
+                  Edit
+                </button>
+                <button
+                  className="btn-text delete"
+                  onClick={() => handleDelete(char.id)}
+                  aria-label={`Delete ${char.name}`}
+                  style={{ color: '#ef4444' }}
+                >
+                  Delete
+                </button>
+              </div>
             </div>
           ))
         )}
