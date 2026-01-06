@@ -251,8 +251,14 @@ export default function CharactersUI() {
               />
             </div>
 
-            <button type="submit" className="btn-save" disabled={isSaving}>
-              {isSaving ? <><Spinner size="sm" /> Saving...</> : 'Save Character'}
+            <button
+              type="submit"
+              className="btn-save"
+              disabled={isSaving}
+              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center' }}
+            >
+              {isSaving ? <Spinner size="sm" color="white" /> : null}
+              {isSaving ? 'Saving...' : 'Save Character'}
             </button>
           </form>
         </div>
