@@ -1,9 +1,10 @@
-// copy button
-import { openImageModal } from "./image_modal.js";
-import { marked } from "../vendor/marked/marked.esm.js";
-import { getAutoScroll } from "/index.js";
-import { store as _messageResizeStore } from "/components/messages/resize/message-resize-store.js"; // keep here, required in html
-import { store as attachmentsStore } from "/components/chat/attachments/attachmentsStore.js";
+
+const openImageModal = () => {};
+const marked = { parse: (t) => t };
+const getAutoScroll = () => true;
+const _messageResizeStore = { getSetting: () => ({ minimized: false }), minimizeMessageClass: () => {}, maximizeMessageClass: () => {} };
+const attachmentsStore = { getAttachmentDisplayInfo: () => ({ isImage: false, filename: "mock", previewUrl: "", clickHandler: () => {} }) };
+window.katex = { render: () => {} };
 
 const chatHistory = document.getElementById("chat-history");
 
@@ -478,7 +479,7 @@ export function drawMessageUser(
       } else {
         // Render as file tile with title and icon
         attachmentDiv.classList.add("file-type");
-        
+
         // File icon
         if (displayInfo.previewUrl && displayInfo.previewUrl !== displayInfo.filename) {
           const iconImg = document.createElement("img");
@@ -487,12 +488,12 @@ export function drawMessageUser(
           iconImg.classList.add("file-icon");
           attachmentDiv.appendChild(iconImg);
         }
-        
+
         // File title
         const fileTitle = document.createElement("div");
         fileTitle.classList.add("file-title");
         fileTitle.textContent = displayInfo.filename;
-                
+
         attachmentDiv.appendChild(fileTitle);
       }
 
