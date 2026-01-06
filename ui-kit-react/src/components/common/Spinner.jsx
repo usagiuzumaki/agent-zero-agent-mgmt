@@ -1,22 +1,26 @@
 import React from 'react';
 import './Spinner.css';
 
-/**
- * Reusable Spinner Component
- * @param {Object} props
- * @param {'sm' | 'md' | 'lg'} [props.size='sm'] - Size of the spinner
- * @param {string} [props.color='currentColor'] - Color of the spinner
- * @param {string} [props.className=''] - Additional class names
- */
-const Spinner = ({ size = 'sm', color = 'currentColor', className = '' }) => {
+export default function Spinner({ size = 'sm', color = 'currentColor' }) {
+  const dims = {
+    sm: '16px',
+    md: '24px',
+    lg: '32px'
+  };
+
   return (
     <div
-      className={`spinner spinner-${size} ${className}`}
-      style={{ borderTopColor: color }}
+      className="spinner"
       role="status"
       aria-label="Loading"
-    />
+      style={{
+        width: dims[size],
+        height: dims[size],
+        border: `2px solid ${color}`,
+        borderRightColor: 'transparent'
+      }}
+    >
+      <span className="sr-only">Loading...</span>
+    </div>
   );
-};
-
-export default Spinner;
+}

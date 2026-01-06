@@ -1,29 +1,22 @@
 .spinner {
   display: inline-block;
-  border: 2px solid rgba(0, 0, 0, 0.1);
   border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-.spinner-sm {
-  width: 16px;
-  height: 16px;
-  border-width: 2px;
-}
-
-.spinner-md {
-  width: 24px;
-  height: 24px;
-  border-width: 3px;
-}
-
-.spinner-lg {
-  width: 40px;
-  height: 40px;
-  border-width: 4px;
+  animation: spin 0.75s linear infinite;
+  vertical-align: text-bottom;
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  to { transform: rotate(360deg); }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Spinner from './common/Spinner';
 import './CharactersUI.css';
+import Spinner from './common/Spinner';
 
 export default function CharactersUI() {
   const [characters, setCharacters] = useState([]);
@@ -84,7 +85,6 @@ export default function CharactersUI() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSaving(true);
-
     try {
       let response;
       if (editingId) {
@@ -144,7 +144,9 @@ export default function CharactersUI() {
         fetchCharacters();
       }
     } catch (err) {
-      console.error("Failed to delete character", err);
+      console.error("Failed to add character", err);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -184,9 +186,7 @@ export default function CharactersUI() {
           <form onSubmit={handleSubmit}>
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="char-name">
-                  Name <span aria-hidden="true" style={{color: '#ef4444'}}>*</span>
-                </label>
+                <label htmlFor="char-name">Name</label>
                 <input
                   id="char-name"
                   value={newChar.name}
@@ -251,25 +251,9 @@ export default function CharactersUI() {
               />
             </div>
 
-            <div className="form-actions">
-              <button
-                type="button"
-                className="btn-secondary"
-                onClick={handleCancel}
-                disabled={isSaving}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="btn-save"
-                disabled={isSaving}
-                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', opacity: isSaving ? 0.7 : 1 }}
-              >
-                {isSaving && <Spinner size="sm" />}
-                {isSaving ? 'Saving...' : (editingId ? 'Update Character' : 'Save Character')}
-              </button>
-            </div>
+            <button type="submit" className="btn-save" disabled={isSaving}>
+              {isSaving ? <><Spinner size="sm" /> Saving...</> : 'Save Character'}
+            </button>
           </form>
         </div>
       )}
