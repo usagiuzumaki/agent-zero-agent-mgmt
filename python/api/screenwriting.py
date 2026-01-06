@@ -51,10 +51,16 @@ def add_character():
 
 @screenwriting_bp.route('/api/screenwriting/character/update', methods=['POST'])
 def update_character():
-    """Update a character profile"""
+    """Update an existing character profile"""
     try:
-        character_data = request.get_json()
-        if manager.update_character(character_data):
+        data = request.get_json()
+        character_id = data.get('id')
+        character_data = data.get('data')
+
+        if not character_id or not character_data:
+            return jsonify({'error': 'Missing character ID or data'}), 400
+
+        if manager.update_character(character_id, character_data):
             return jsonify({'message': 'Character updated successfully'}), 200
         return jsonify({'error': 'Failed to update character'}), 400
     except Exception as e:
@@ -67,6 +73,10 @@ def delete_character():
     try:
         data = request.get_json()
         character_id = data.get('id')
+
+        if not character_id:
+            return jsonify({'error': 'Missing character ID'}), 400
+
         if manager.delete_character(character_id):
             return jsonify({'message': 'Character deleted successfully'}), 200
         return jsonify({'error': 'Failed to delete character'}), 400

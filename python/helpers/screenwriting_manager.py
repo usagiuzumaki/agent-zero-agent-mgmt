@@ -146,6 +146,32 @@ class ScreenwritingManager:
             profiles['characters'].append(character_data)
             return self.save_data('character_profiles', profiles)
         return False
+
+    def update_character(self, character_id: str, character_data: Dict) -> bool:
+        """Update an existing character profile"""
+        profiles = self.load_data('character_profiles')
+        if profiles and profiles.get('characters'):
+            for i, char in enumerate(profiles['characters']):
+                if char.get('id') == character_id:
+                    # Preserve ID and creation date
+                    character_data['id'] = character_id
+                    character_data['created'] = char.get('created')
+                    character_data['last_updated'] = datetime.now().isoformat()
+
+                    profiles['characters'][i] = character_data
+                    return self.save_data('character_profiles', profiles)
+        return False
+
+    def delete_character(self, character_id: str) -> bool:
+        """Delete a character profile"""
+        profiles = self.load_data('character_profiles')
+        if profiles and profiles.get('characters'):
+            initial_count = len(profiles['characters'])
+            profiles['characters'] = [c for c in profiles['characters'] if c.get('id') != character_id]
+
+            if len(profiles['characters']) < initial_count:
+                return self.save_data('character_profiles', profiles)
+        return False
     
     def update_character(self, character_data: Dict) -> bool:
         """Update an existing character profile"""
