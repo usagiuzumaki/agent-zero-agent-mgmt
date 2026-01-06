@@ -119,10 +119,12 @@ export default function StorybookUI() {
             <button type="submit" className="btn-primary" disabled={isUploading}>
               {isUploading ? (
                 <>
-                  <Spinner size="sm" color="#ffffff" className="mr-2" />
-                  Ingesting...
+                  <Spinner size="small" color="#fff" />
+                  <span>Ingesting...</span>
                 </>
-              ) : 'Ingest'}
+              ) : (
+                'Ingest'
+              )}
             </button>
           </form>
         </div>
