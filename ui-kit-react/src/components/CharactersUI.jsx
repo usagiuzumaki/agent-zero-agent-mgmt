@@ -7,6 +7,7 @@ export default function CharactersUI() {
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState(null);
   const [newChar, setNewChar] = useState({
     name: '',
     role: 'Protagonist',
@@ -33,6 +34,39 @@ export default function CharactersUI() {
       console.error("Failed to load characters", err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const resetForm = () => {
+    setShowForm(false);
+    setEditingId(null);
+    setNewChar({ name: '', role: 'Protagonist', archetype: '', motivation: '', flaw: '', bio: '' });
+  };
+
+  const handleEdit = (char) => {
+    setNewChar({ ...char });
+    setEditingId(char.id);
+    setShowForm(true);
+    // Scroll to top of form area
+    const formElement = document.querySelector('.char-form-card');
+    if (formElement) formElement.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this character?")) return;
+
+    try {
+      const response = await fetch('/api/screenwriting/character/delete', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
+      });
+
+      if (response.ok) {
+        fetchCharacters();
+      }
+    } catch (err) {
+      console.error("Failed to delete character", err);
     }
   };
 
@@ -138,16 +172,18 @@ export default function CharactersUI() {
           <form onSubmit={handleSubmit}>
             <div className="form-row">
               <div className="form-group">
-                <label>Name</label>
+                <label htmlFor="char-name">Name</label>
                 <input
+                  id="char-name"
                   value={newChar.name}
                   onChange={e => setNewChar({...newChar, name: e.target.value})}
                   required
                 />
               </div>
               <div className="form-group">
-                <label>Role</label>
+                <label htmlFor="char-role">Role</label>
                 <select
+                  id="char-role"
                   value={newChar.role}
                   onChange={e => setNewChar({...newChar, role: e.target.value})}
                 >
@@ -161,8 +197,9 @@ export default function CharactersUI() {
 
             <div className="form-row">
               <div className="form-group">
-                <label>Archetype</label>
+                <label htmlFor="char-archetype">Archetype</label>
                 <input
+                  id="char-archetype"
                   placeholder="e.g. The Reluctant Hero"
                   value={newChar.archetype}
                   onChange={e => setNewChar({...newChar, archetype: e.target.value})}
@@ -172,15 +209,17 @@ export default function CharactersUI() {
 
             <div className="form-row">
               <div className="form-group">
-                <label>Motivation (Want)</label>
+                <label htmlFor="char-motivation">Motivation (Want)</label>
                 <input
+                  id="char-motivation"
                   value={newChar.motivation}
                   onChange={e => setNewChar({...newChar, motivation: e.target.value})}
                 />
               </div>
               <div className="form-group">
-                <label>Fatal Flaw (Need)</label>
+                <label htmlFor="char-flaw">Fatal Flaw (Need)</label>
                 <input
+                  id="char-flaw"
                   value={newChar.flaw}
                   onChange={e => setNewChar({...newChar, flaw: e.target.value})}
                 />
@@ -188,8 +227,9 @@ export default function CharactersUI() {
             </div>
 
             <div className="form-group">
-              <label>Bio & Notes</label>
+              <label htmlFor="char-bio">Bio & Notes</label>
               <textarea
+                id="char-bio"
                 rows={3}
                 value={newChar.bio}
                 onChange={e => setNewChar({...newChar, bio: e.target.value})}

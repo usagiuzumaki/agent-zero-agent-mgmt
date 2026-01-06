@@ -1,7 +1,7 @@
 from python.helpers.tool import Tool, Response
 
 
-class StoryStructure(Tool):
+class ScriptAnalyzer(Tool):
     """Validate plot progression using beat sheets."""
 
     async def execute(
