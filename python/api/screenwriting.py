@@ -54,27 +54,20 @@ def update_character():
     """Update a character profile"""
     try:
         character_data = request.get_json()
-        char_id = character_data.get('id')
-        if not char_id:
-            return jsonify({'error': 'Character ID required'}), 400
-
-        if manager.update_character(char_id, character_data):
+        if manager.update_character(character_data):
             return jsonify({'message': 'Character updated successfully'}), 200
         return jsonify({'error': 'Failed to update character'}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
 
-@screenwriting_bp.route('/api/screenwriting/character/delete', methods=['DELETE'])
+@screenwriting_bp.route('/api/screenwriting/character/delete', methods=['POST'])
 def delete_character():
     """Delete a character profile"""
     try:
         data = request.get_json()
-        char_id = data.get('id')
-        if not char_id:
-            return jsonify({'error': 'Character ID required'}), 400
-
-        if manager.delete_character(char_id):
+        character_id = data.get('id')
+        if manager.delete_character(character_id):
             return jsonify({'message': 'Character deleted successfully'}), 200
         return jsonify({'error': 'Failed to delete character'}), 400
     except Exception as e:
