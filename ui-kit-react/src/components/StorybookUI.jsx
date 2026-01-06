@@ -76,7 +76,12 @@ export default function StorybookUI() {
     return '#ef4444'; // Dark Red (Climax)
   };
 
-  if (loading && !documents.length) return <div className="loading">Loading Storybook...</div>;
+  if (loading && !documents.length) return (
+    <div className="loading-container">
+      <Spinner size="lg" color="var(--color-primary)" />
+      <p>Loading Storybook...</p>
+    </div>
+  );
 
   return (
     <div className="storybook-ui">

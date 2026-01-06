@@ -6,10 +6,17 @@ from agents.screenwriting.co_writer import CoWriter
 from agents.screenwriting.dialogue_evaluator import DialogueEvaluator
 from agents.screenwriting.script_formatter import ScriptFormatter
 import json
+from python.helpers.print_style import PrintStyle
 
 class ScreenwritingProduction(Tool):
     """
     Orchestrates a screenwriting production line by handing off tasks to specialized agents.
+    Each agent handles a specific writing tool process:
+    1. PlotAnalyzer (Structure)
+    2. CreativeIdeas (Brainstorming)
+    3. CoWriter (Drafting)
+    4. DialogueEvaluator (Refinement)
+    5. ScriptFormatter (Formatting)
     """
 
     async def execute(self, task: str = "", project_name: str = "", **kwargs):
@@ -23,7 +30,7 @@ class ScreenwritingProduction(Tool):
         if not task:
             return Response(message="Task description is required.", break_loop=False)
 
-        print(f"[{self.agent.agent_name}] Starting production line for project: {project_name}")
+        PrintStyle(font_color="#8E44AD", bold=True).print(f"[{self.agent.agent_name}] Starting production line for project: {project_name}")
 
         current_input = f"Project: {project_name}\nTask: {task}"
         results = []
@@ -59,7 +66,7 @@ class ScreenwritingProduction(Tool):
         """
         Runs a specific agent stage.
         """
-        print(f"[{self.agent.agent_name}] Handoff to: {stage_name}")
+        PrintStyle(font_color="#3498DB").print(f"[{self.agent.agent_name}] Handoff to: {stage_name}")
 
         # Instantiate the agent
         sub_number = self.agent.number + 1

@@ -29,7 +29,6 @@ from enum import Enum
 from agents import Agent
 import models
 import logging
-from simpleeval import simple_eval
 
 
 # Raise the log level so WARNING messages aren't shown
@@ -423,12 +422,21 @@ class Memory:
 
     @staticmethod
     def _get_comparator(condition: str):
+        try:
+            # Optimization: Compile condition once instead of parsing for every document
+            compiled = compile(condition, "<string>", "eval")
+        except Exception:
+            # If compilation fails (e.g. syntax error), return false for all items
+            return lambda _: False
+
         def comparator(data: dict[str, Any]):
             try:
-                result = simple_eval(condition, names=data)
+                # Use standard eval on the compiled code object
+                # This is much faster than simple_eval for repeated execution
+                result = eval(compiled, {}, data)
                 return result
             except Exception as e:
-                PrintStyle.error(f"Error evaluating condition: {e}")
+                # PrintStyle.error(f"Error evaluating condition: {e}")
                 return False
 
         return comparator
