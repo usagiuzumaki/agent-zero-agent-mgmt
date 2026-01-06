@@ -117,6 +117,37 @@ export default function CharactersUI() {
     }
   };
 
+  const handleEdit = (char) => {
+    setNewChar({
+      name: char.name || '',
+      role: char.role || 'Protagonist',
+      archetype: char.archetype || '',
+      motivation: char.motivation || '',
+      flaw: char.flaw || '',
+      bio: char.bio || ''
+    });
+    setEditingId(char.id);
+    setShowForm(true);
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this character?')) return;
+
+    try {
+      const response = await fetch('/api/screenwriting/character/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
+      });
+
+      if (response.ok) {
+        fetchCharacters();
+      }
+    } catch (err) {
+      console.error("Failed to delete character", err);
+    }
+  };
+
   const getRoleColor = (role) => {
     switch(role.toLowerCase()) {
       case 'protagonist': return 'var(--color-primary)';
@@ -126,7 +157,12 @@ export default function CharactersUI() {
     }
   };
 
-  if (loading) return <div className="loading">Loading Cast...</div>;
+  if (loading) return (
+    <div className="loading-container">
+      <Spinner size="lg" color="var(--color-primary)" />
+      <p>Loading Cast...</p>
+    </div>
+  );
 
   return (
     <div className="characters-ui">
