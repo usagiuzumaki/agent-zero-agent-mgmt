@@ -1,3 +1,5 @@
+@import './components/common/utilities.css';
+
 :root {
   --color-primary: #4f46e5;
   --color-background: #ffffff;

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Spinner from './common/Spinner';
 import './StorybookUI.css';
 
 export default function StorybookUI() {
@@ -75,7 +76,12 @@ export default function StorybookUI() {
     return '#ef4444'; // Dark Red (Climax)
   };
 
-  if (loading && !documents.length) return <div className="loading">Loading Storybook...</div>;
+  if (loading && !documents.length) return (
+    <div className="loading-container">
+      <Spinner size="lg" color="var(--color-primary)" />
+      <p>Loading Storybook...</p>
+    </div>
+  );
 
   return (
     <div className="storybook-ui">
@@ -111,7 +117,12 @@ export default function StorybookUI() {
               rows={10}
             />
             <button type="submit" className="btn-primary" disabled={isUploading}>
-              {isUploading ? 'Ingesting...' : 'Ingest'}
+              {isUploading ? (
+                <>
+                  <Spinner size="sm" color="#ffffff" className="mr-2" />
+                  Ingesting...
+                </>
+              ) : 'Ingest'}
             </button>
           </form>
         </div>
