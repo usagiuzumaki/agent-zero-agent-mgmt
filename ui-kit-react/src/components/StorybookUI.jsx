@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import Spinner from './common/Spinner';
 import './StorybookUI.css';
+import Spinner from './common/Spinner';
 
 export default function StorybookUI() {
   const [documents, setDocuments] = useState([]);
@@ -37,6 +39,7 @@ export default function StorybookUI() {
     e.preventDefault();
     if (!uploadContent.trim()) return;
     setIsUploading(true);
+    setError(null);
 
     try {
       const response = await fetch('/api/screenwriting/storybook/upload', {
@@ -75,44 +78,67 @@ export default function StorybookUI() {
     return '#ef4444'; // Dark Red (Climax)
   };
 
-  if (loading && !documents.length) return <div className="loading">Loading Storybook...</div>;
+  if (loading && !documents.length) {
+    return (
+      <div className="storybook-ui loading-container">
+         <Spinner size="large" />
+         <p>Loading Storybook...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="storybook-ui">
       <div className="storybook-header">
         <h3>Storybook</h3>
-        <button className="btn-secondary" onClick={() => setShowUpload(!showUpload)}>
+        <button
+          className="btn-secondary"
+          onClick={() => setShowUpload(!showUpload)}
+          aria-expanded={showUpload}
+          aria-controls="upload-panel"
+        >
           {showUpload ? 'Cancel' : 'New Document'}
         </button>
       </div>
 
-      {error && <div className="error-message">{error}</div>}
+      {error && (
+        <div className="error-message" role="alert">
+          <span>{error}</span>
+          <button className="btn-close-error" onClick={() => setError(null)} aria-label="Dismiss error">×</button>
+        </div>
+      )}
 
       {showUpload && (
-        <div className="storybook-upload">
+        <div id="upload-panel" className="storybook-upload">
           <h4>Ingest New Document</h4>
           <form onSubmit={handleUpload}>
-            <label htmlFor="doc-title" className="sr-only">Document Title</label>
+            <label htmlFor="doc-title" className="input-label">Document Title</label>
             <input
               id="doc-title"
               type="text"
-              placeholder="Document Title"
+              placeholder="e.g. My Screenplay Draft"
               value={uploadName}
               onChange={(e) => setUploadName(e.target.value)}
               className="input-field"
             />
-            <label htmlFor="doc-content" className="sr-only">Document Content</label>
+            <label htmlFor="doc-content" className="input-label">Paste Text Content</label>
             <textarea
               id="doc-content"
-              placeholder="Paste text content here..."
+              placeholder="Paste text content here to generate beats..."
               value={uploadContent}
               onChange={(e) => setUploadContent(e.target.value)}
               className="textarea-field"
               rows={10}
             />
-            <button type="submit" className="btn-primary" disabled={isUploading}>
-              {isUploading ? 'Ingesting...' : 'Ingest'}
-            </button>
+            <div className="form-actions">
+              <button type="submit" className="btn-primary" disabled={isUploading}>
+                {isUploading ? (
+                  <span className="flex-center gap-2">
+                    <Spinner size="small" color="white" /> Ingesting...
+                  </span>
+                ) : 'Ingest Document'}
+              </button>
+            </div>
           </form>
         </div>
       )}
@@ -132,7 +158,7 @@ export default function StorybookUI() {
                 >
                   <h4>{doc.name}</h4>
                   <p>{doc.description}</p>
-                  <span className="doc-meta">{new Date(doc.uploaded_at).toLocaleDateString()}</span>
+                  <span className="doc-meta">Uploaded: {new Date(doc.uploaded_at).toLocaleDateString()}</span>
                   <div className="tags">
                     {doc.tags.map((tag, i) => <span key={i} className="tag">{tag}</span>)}
                   </div>
@@ -164,7 +190,7 @@ export default function StorybookUI() {
                   </div>
                   <p className="chapter-summary">{chapter.summary}</p>
 
-                  <div className="beats-timeline">
+                  <div className="beats-timeline" aria-hidden="true">
                      {/* Visual Timeline Bar */}
                      <div className="timeline-track">
                        {chapter.beats.map((beat, i) => (
@@ -193,7 +219,7 @@ export default function StorybookUI() {
                           <button
                             className="btn-icon"
                             title="Draft Dialogue"
-                            aria-label="Draft Dialogue"
+                            aria-label={`Draft Dialogue for ${beat.label}`}
                           >
                             📝
                           </button>
