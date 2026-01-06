@@ -20,6 +20,15 @@ export default function AgentChat({ onLog }) {
     setInput('');
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      if (input.trim()) {
+        sendMessage();
+      }
+    }
+  };
+
   const handleTool = (tool) => {
     tool.action((msg) => {
       setMessages((prev) => [
@@ -48,9 +57,17 @@ export default function AgentChat({ onLog }) {
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
           placeholder="Type a message"
+          aria-label="Message input"
         />
-        <button onClick={sendMessage}>Send</button>
+        <button
+          onClick={sendMessage}
+          disabled={!input.trim()}
+          aria-label="Send message"
+        >
+          Send
+        </button>
       </div>
     </div>
   );
