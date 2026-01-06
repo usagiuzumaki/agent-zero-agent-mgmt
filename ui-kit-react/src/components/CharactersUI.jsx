@@ -104,7 +104,12 @@ export default function CharactersUI() {
     }
   };
 
-  if (loading) return <div className="loading">Loading Cast...</div>;
+  if (loading) return (
+    <div className="loading">
+      <Spinner size="md" />
+      <span>Loading Cast...</span>
+    </div>
+  );
 
   return (
     <div className="characters-ui">
