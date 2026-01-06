@@ -168,25 +168,31 @@ export default function CharactersUI() {
     <div className="characters-ui">
       <div className="chars-header">
         <h3>Cast of Characters</h3>
-        {!showForm && (
-          <button className="btn-primary" onClick={() => setShowForm(true)}>
-            + Add Character
-          </button>
-        )}
+        <button
+          className="btn-primary"
+          onClick={() => setShowForm(!showForm)}
+          aria-expanded={showForm}
+          aria-controls="char-form"
+        >
+          {showForm ? 'Cancel' : '+ Add Character'}
+        </button>
       </div>
 
       {showForm && (
-        <div className="char-form-card">
-          <h4>{editingId ? 'Edit Character Profile' : 'New Character Profile'}</h4>
+        <div id="char-form" className="char-form-card">
+          <h4>New Character Profile</h4>
           <form onSubmit={handleSubmit}>
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="char-name">Name</label>
+                <label htmlFor="char-name">
+                  Name <span aria-hidden="true" style={{color: '#ef4444'}}>*</span>
+                </label>
                 <input
                   id="char-name"
                   value={newChar.name}
                   onChange={e => setNewChar({...newChar, name: e.target.value})}
                   required
+                  aria-required="true"
                 />
               </div>
               <div className="form-group">
