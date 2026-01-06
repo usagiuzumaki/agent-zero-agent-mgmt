@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Spinner from './common/Spinner';
 import './StorybookUI.css';
-import Spinner from './common/Spinner';
 
 export default function StorybookUI() {
   const [documents, setDocuments] = useState([]);

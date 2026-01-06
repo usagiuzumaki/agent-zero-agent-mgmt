@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Spinner from './common/Spinner';
 import './CharactersUI.css';
-import Spinner from './common/Spinner';
 
 export default function CharactersUI() {
   const [characters, setCharacters] = useState([]);
@@ -54,6 +53,12 @@ export default function CharactersUI() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleCancel = () => {
+    setShowForm(false);
+    setEditingId(null);
+    setNewChar(initialCharState);
+  };
+
   const handleDelete = async (charId) => {
     if (!window.confirm("Are you sure you want to delete this character?")) return;
 
@@ -74,12 +79,6 @@ export default function CharactersUI() {
     } catch (err) {
       console.error("Failed to delete character", err);
     }
-  };
-
-  const handleCancel = () => {
-    setShowForm(false);
-    setEditingId(null);
-    setNewChar(initialCharState);
   };
 
   const handleSubmit = async (e) => {
@@ -117,39 +116,6 @@ export default function CharactersUI() {
     }
   };
 
-  const handleEdit = (char) => {
-    setNewChar({
-      name: char.name || '',
-      role: char.role || 'Protagonist',
-      archetype: char.archetype || '',
-      motivation: char.motivation || '',
-      flaw: char.flaw || '',
-      bio: char.bio || ''
-    });
-    setEditingId(char.id);
-    setShowForm(true);
-  };
-
-  const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this character?')) return;
-
-    try {
-      const response = await fetch('/api/screenwriting/character/delete', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id })
-      });
-
-      if (response.ok) {
-        fetchCharacters();
-      }
-    } catch (err) {
-      console.error("Failed to add character", err);
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
   const getRoleColor = (role) => {
     switch(role.toLowerCase()) {
       case 'protagonist': return 'var(--color-primary)';
@@ -161,7 +127,7 @@ export default function CharactersUI() {
 
   if (loading) return (
     <div className="loading-container">
-      <Spinner size="lg" color="var(--color-primary)" />
+      <Spinner size="lg" color="primary" />
       <p>Loading Cast...</p>
     </div>
   );
@@ -186,13 +152,16 @@ export default function CharactersUI() {
           <form onSubmit={handleSubmit}>
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="char-name">Name</label>
+                <label htmlFor="char-name">
+                  Name <span className="required-star" aria-hidden="true">*</span>
+                </label>
                 <input
                   id="char-name"
                   value={newChar.name}
                   onChange={e => setNewChar({...newChar, name: e.target.value})}
                   required
                   aria-required="true"
+                  placeholder="Character Name"
                 />
               </div>
               <div className="form-group">
@@ -229,6 +198,7 @@ export default function CharactersUI() {
                   id="char-motivation"
                   value={newChar.motivation}
                   onChange={e => setNewChar({...newChar, motivation: e.target.value})}
+                  placeholder="What drives them?"
                 />
               </div>
               <div className="form-group">
@@ -237,6 +207,7 @@ export default function CharactersUI() {
                   id="char-flaw"
                   value={newChar.flaw}
                   onChange={e => setNewChar({...newChar, flaw: e.target.value})}
+                  placeholder="What holds them back?"
                 />
               </div>
             </div>
@@ -248,15 +219,16 @@ export default function CharactersUI() {
                 rows={3}
                 value={newChar.bio}
                 onChange={e => setNewChar({...newChar, bio: e.target.value})}
+                placeholder="Backstory, physical description, or key traits..."
               />
             </div>
 
             <button type="submit" className="btn-save" disabled={isSaving}>
               {isSaving ? (
-                <>
-                  <Spinner size="small" color="#fff" />
+                <div className="btn-save-content">
+                  <Spinner size="small" color="white" />
                   <span>Saving...</span>
-                </>
+                </div>
               ) : (
                 'Save Character'
               )}
@@ -267,7 +239,17 @@ export default function CharactersUI() {
 
       <div className="chars-grid">
         {characters.length === 0 ? (
-          <p className="empty-state">No characters yet. Start building your cast!</p>
+          <div className="empty-state-container">
+            <p className="empty-state-text">
+              No characters yet. Every story needs a cast!
+            </p>
+            <button
+              className="btn-primary"
+              onClick={() => setShowForm(true)}
+            >
+              Create First Character
+            </button>
+          </div>
         ) : (
           characters.map((char) => (
             <div key={char.id} className="char-card" style={{borderTop: `4px solid ${getRoleColor(char.role)}`}}>
