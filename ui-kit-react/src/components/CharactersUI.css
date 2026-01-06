@@ -49,6 +49,10 @@
   margin-bottom: 0.25rem;
 }
 
+.required-star {
+  color: #ef4444;
+}
+
 .form-group input,
 .form-group select,
 .form-group textarea {
@@ -76,10 +80,32 @@
   margin-top: 1rem;
 }
 
+.btn-save-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
 .chars-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
+}
+
+.empty-state-container {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 3rem;
+  background: white;
+  border-radius: 8px;
+  border: 1px dashed #d1d5db;
+}
+
+.empty-state-text {
+  color: #6b7280;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
 }
 
 .char-card {
