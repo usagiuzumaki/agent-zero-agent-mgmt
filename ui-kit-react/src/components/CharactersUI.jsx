@@ -148,7 +148,7 @@ export default function CharactersUI() {
 
       {showForm && (
         <div id="char-form" className="char-form-card">
-          <h4>New Character Profile</h4>
+          <h4>{editingId ? 'Edit Character Profile' : 'New Character Profile'}</h4>
           <form onSubmit={handleSubmit}>
             <div className="form-row">
               <div className="form-group">
