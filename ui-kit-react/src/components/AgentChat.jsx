@@ -54,12 +54,17 @@ export default function AgentChat({ onLog }) {
         ))}
       </div>
       <div className="input-row">
-        <input
+        <textarea
           value={input}
-          onChange={(e) => setInput(e.target.value)}
+          onChange={(e) => {
+            setInput(e.target.value);
+            e.target.style.height = 'auto';
+            e.target.style.height = e.target.scrollHeight + 'px';
+          }}
           onKeyDown={handleKeyDown}
           placeholder="Type a message"
           aria-label="Message input"
+          rows={1}
         />
         <button
           onClick={sendMessage}
