@@ -8,7 +8,7 @@ from agents.screenwriting.script_formatter import ScriptFormatter
 import json
 from python.helpers.print_style import PrintStyle
 
-class ScreenwritingProduction(Tool):
+class ScreenwritingPipeline(Tool):
     """
     Orchestrates a screenwriting production line by handing off tasks to specialized agents.
     Each agent handles a specific writing tool process:
