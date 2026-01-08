@@ -71,10 +71,10 @@ export default function StorybookUI() {
   const calculateTensionColor = (beatIndex, totalBeats) => {
     // Simple visualizer: start low, rise, dip, rise high
     const progress = beatIndex / totalBeats;
-    if (progress < 0.25) return '#60a5fa'; // Blue (setup)
-    if (progress < 0.5) return '#fbbf24';  // Yellow (rising)
-    if (progress < 0.75) return '#f87171'; // Red (climax approach)
-    return '#ef4444'; // Dark Red (Climax)
+    if (progress < 0.25) return 'var(--color-tension-low)';
+    if (progress < 0.5) return 'var(--color-tension-med)';
+    if (progress < 0.75) return 'var(--color-tension-high)';
+    return 'var(--color-tension-climax)';
   };
 
   if (loading && !documents.length) {

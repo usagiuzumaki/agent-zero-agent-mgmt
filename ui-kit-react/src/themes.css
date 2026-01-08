@@ -1,0 +1,79 @@
+/* THEMES DEFINITIONS */
+
+/*
+ * 🎰 STORY CASINO (Primary)
+ * Vibe: Candy Futuristic, Dopamine, Neon, Glassmorphism
+ */
+[data-theme="casino"] {
+  --color-background: #0f172a; /* Slate-900 */
+  --color-surface: rgba(30, 41, 59, 0.7); /* Slate-800 with opacity */
+  --color-text: #f8fafc; /* Slate-50 */
+  --color-text-muted: #94a3b8; /* Slate-400 */
+  --color-primary: #d946ef; /* Fuchsia-500 */
+  --color-primary-hover: #c026d3; /* Fuchsia-600 */
+  --color-secondary: #8b5cf6; /* Violet-500 */
+  --color-border: rgba(255, 255, 255, 0.1);
+  --font-family: 'Inter', system-ui, sans-serif;
+  --border-radius: 16px;
+
+  --shadow-card: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.18);
+
+  /* Tension / Role Colors - Neon variants */
+  --color-tension-low: #38bdf8; /* Sky-400 */
+  --color-tension-med: #facc15; /* Yellow-400 */
+  --color-tension-high: #f472b6; /* Pink-400 */
+  --color-tension-climax: #ef4444; /* Red-500 */
+}
+
+/*
+ * 🕯️ LIVING STORYBOOK (Writing Mode)
+ * Vibe: Parchment, Ink, Serif, Warmth
+ */
+[data-theme="storybook"] {
+  --color-background: #fdf6e3; /* Solarized Light / Parchment */
+  --color-surface: #eee8d5; /* Slightly darker parchment */
+  --color-text: #433422; /* Dark Brown Ink */
+  --color-text-muted: #8b7f6f;
+  --color-primary: #b58900; /* Gold/Ochre */
+  --color-primary-hover: #9e7800;
+  --color-secondary: #268bd2; /* Ink Blue */
+  --color-border: #d3cbb7;
+  --font-family: 'Georgia', 'Merriweather', serif;
+  --border-radius: 4px;
+
+  --shadow-card: 2px 2px 5px rgba(0,0,0,0.05);
+  --glass-border: 1px solid #d3cbb7;
+
+  /* Tension / Role Colors - Watercolor/Ink variants */
+  --color-tension-low: #268bd2; /* Blue */
+  --color-tension-med: #b58900; /* Yellow */
+  --color-tension-high: #cb4b16; /* Orange */
+  --color-tension-climax: #dc322f; /* Red */
+}
+
+/*
+ * 🧿 ARCANE TERMINAL (Advanced)
+ * Vibe: Hacker Witch, Monospace, Dark, Glowing
+ */
+[data-theme="terminal"] {
+  --color-background: #0c0c0c; /* Black */
+  --color-surface: #111111; /* Dark Gray */
+  --color-text: #34d399; /* Emerald-400 (Terminal Green) */
+  --color-text-muted: #059669; /* Emerald-600 */
+  --color-primary: #10b981; /* Emerald-500 */
+  --color-primary-hover: #059669;
+  --color-secondary: #8b5cf6; /* Violet-500 (Magic) */
+  --color-border: #064e3b; /* Emerald-900 */
+  --font-family: 'Courier New', 'Fira Code', monospace;
+  --border-radius: 0px;
+
+  --shadow-card: 0 0 10px rgba(16, 185, 129, 0.2);
+  --glass-border: 1px solid #10b981;
+
+  /* Tension / Role Colors - Phosphor variants */
+  --color-tension-low: #34d399; /* Green */
+  --color-tension-med: #fbbf24; /* Amber */
+  --color-tension-high: #f472b6; /* Pink */
+  --color-tension-climax: #ef4444; /* Red */
+}

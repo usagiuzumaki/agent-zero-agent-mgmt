@@ -119,9 +119,9 @@ export default function CharactersUI() {
   const getRoleColor = (role) => {
     switch(role.toLowerCase()) {
       case 'protagonist': return 'var(--color-primary)';
-      case 'antagonist': return '#ef4444';
-      case 'supporting': return '#10b981';
-      default: return '#6b7280';
+      case 'antagonist': return 'var(--color-tension-climax)';
+      case 'supporting': return 'var(--color-secondary)';
+      default: return 'var(--color-text-muted)';
     }
   };
 
