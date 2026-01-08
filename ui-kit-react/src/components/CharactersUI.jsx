@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Spinner from './common/Spinner';
 import './CharactersUI.css';
 
@@ -8,6 +8,7 @@ export default function CharactersUI() {
   const [isSaving, setIsSaving] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const nameInputRef = useRef(null);
 
   const initialCharState = {
     name: '',
@@ -23,6 +24,12 @@ export default function CharactersUI() {
   useEffect(() => {
     fetchCharacters();
   }, []);
+
+  useEffect(() => {
+    if (showForm && nameInputRef.current) {
+      nameInputRef.current.focus();
+    }
+  }, [showForm]);
 
   const fetchCharacters = async () => {
     try {
@@ -156,6 +163,7 @@ export default function CharactersUI() {
                   Name <span className="required-star" aria-hidden="true">*</span>
                 </label>
                 <input
+                  ref={nameInputRef}
                   id="char-name"
                   value={newChar.name}
                   onChange={e => setNewChar({...newChar, name: e.target.value})}
@@ -223,16 +231,21 @@ export default function CharactersUI() {
               />
             </div>
 
-            <button type="submit" className="btn-save" disabled={isSaving}>
-              {isSaving ? (
-                <div className="btn-save-content">
-                  <Spinner size="small" color="white" />
-                  <span>Saving...</span>
-                </div>
-              ) : (
-                'Save Character'
-              )}
-            </button>
+            <div className="form-actions">
+              <button type="button" className="btn-secondary" onClick={handleCancel}>
+                Cancel
+              </button>
+              <button type="submit" className="btn-save" disabled={isSaving}>
+                {isSaving ? (
+                  <div className="btn-save-content">
+                    <Spinner size="small" color="white" />
+                    <span>Saving...</span>
+                  </div>
+                ) : (
+                  'Save Character'
+                )}
+              </button>
+            </div>
           </form>
         </div>
       )}
