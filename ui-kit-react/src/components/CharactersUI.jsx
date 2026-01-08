@@ -24,6 +24,21 @@ export default function CharactersUI() {
     fetchCharacters();
   }, []);
 
+  // Handle form scrolling and focus when it opens
+  useEffect(() => {
+    if (showForm) {
+      // Use a small timeout to ensure DOM is updated, although standard effects run after paint.
+      // But for smooth scrolling sometimes a slight delay helps with layout shifts.
+      // However, trying direct access first is better.
+      const formElement = document.getElementById('char-form');
+      if (formElement) {
+        formElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const nameInput = document.getElementById('char-name');
+        if (nameInput) nameInput.focus();
+      }
+    }
+  }, [showForm]);
+
   const fetchCharacters = async () => {
     try {
       const response = await fetch('/api/screenwriting/all');
@@ -49,8 +64,12 @@ export default function CharactersUI() {
     });
     setEditingId(char.id);
     setShowForm(true);
-    // Scroll to form
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCreate = () => {
+     setNewChar(initialCharState);
+     setEditingId(null);
+     setShowForm(true);
   };
 
   const handleCancel = () => {
@@ -127,7 +146,7 @@ export default function CharactersUI() {
 
   if (loading) return (
     <div className="loading-container">
-      <Spinner size="lg" color="primary" />
+      <Spinner size="large" color="primary" />
       <p>Loading Cast...</p>
     </div>
   );
@@ -136,19 +155,23 @@ export default function CharactersUI() {
     <div className="characters-ui">
       <div className="chars-header">
         <h3>Cast of Characters</h3>
-        <button
-          className="btn-primary"
-          onClick={() => setShowForm(!showForm)}
-          aria-expanded={showForm}
-          aria-controls="char-form"
-        >
-          {showForm ? 'Cancel' : '+ Add Character'}
-        </button>
+        {!showForm && (
+            <button
+            className="btn-primary"
+            onClick={handleCreate}
+            aria-expanded={showForm}
+            aria-controls="char-form"
+            >
+            + Add Character
+            </button>
+        )}
       </div>
 
       {showForm && (
-        <div id="char-form" className="char-form-card">
-          <h4>{editingId ? 'Edit Character Profile' : 'New Character Profile'}</h4>
+        <div id="char-form" className="char-form-card" role="region" aria-label="Character Form">
+          <div className="form-header">
+              <h4>{editingId ? 'Edit Character Profile' : 'New Character Profile'}</h4>
+          </div>
           <form onSubmit={handleSubmit}>
             <div className="form-row">
               <div className="form-group">
@@ -223,16 +246,21 @@ export default function CharactersUI() {
               />
             </div>
 
-            <button type="submit" className="btn-save" disabled={isSaving}>
-              {isSaving ? (
-                <div className="btn-save-content">
-                  <Spinner size="small" color="white" />
-                  <span>Saving...</span>
-                </div>
-              ) : (
-                'Save Character'
-              )}
-            </button>
+            <div className="form-actions-footer">
+                <button type="button" className="btn-secondary" onClick={handleCancel} disabled={isSaving}>
+                    Cancel
+                </button>
+                <button type="submit" className="btn-save" disabled={isSaving}>
+                {isSaving ? (
+                    <div className="btn-save-content">
+                    <Spinner size="small" color="white" />
+                    <span>Saving...</span>
+                    </div>
+                ) : (
+                    'Save Character'
+                )}
+                </button>
+            </div>
           </form>
         </div>
       )}
@@ -245,7 +273,7 @@ export default function CharactersUI() {
             </p>
             <button
               className="btn-primary"
-              onClick={() => setShowForm(true)}
+              onClick={handleCreate}
             >
               Create First Character
             </button>
