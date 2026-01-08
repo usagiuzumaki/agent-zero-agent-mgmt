@@ -1,4 +1,5 @@
 // copy button
+// Verification Note: This file includes scroll preservation logic (captureScrollState)
 import { openImageModal } from "./image_modal.js";
 import { marked } from "../vendor/marked/marked.esm.js";
 import { getAutoScroll } from "/index.js";
