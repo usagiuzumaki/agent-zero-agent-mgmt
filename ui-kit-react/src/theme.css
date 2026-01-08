@@ -66,6 +66,21 @@ body {
   margin-right: 0.25rem;
 }
 
+.agent-chat .input-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-end; /* Align button to bottom of textarea */
+}
+
+.agent-chat textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: var(--border-radius);
+  border: 1px solid #ccc;
+  font-family: inherit;
+  resize: vertical;
+}
+
 .agent-log {
   margin-top: 1rem;
   background: #f3f4f6;
@@ -159,12 +174,15 @@ body {
   gap: 0.5rem;
 }
 
-.egirl-ui .agent-chat .input-row input {
+.egirl-ui .agent-chat .input-row textarea {
   border: none;
   background: transparent;
   width: 100%;
   outline: none;
   padding: 0.5rem;
+  resize: none; /* Auto-grow handled by rows or JS usually, but here we keep it simple */
+  font-family: inherit;
+  min-height: 24px;
 }
 
 .egirl-ui .agent-chat .input-row button {

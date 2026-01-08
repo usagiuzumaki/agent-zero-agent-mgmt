@@ -1,10 +1,5 @@
 from agents import Agent
 from python.helpers.tool import Tool, Response
-from python.helpers.print_style import PrintStyle
-import json
-import inspect
-
-# Import all screenwriting agents
 from agents.screenwriting.plot_analyzer import PlotAnalyzer
 from agents.screenwriting.creative_ideas import CreativeIdeas
 from agents.screenwriting.co_writer import CoWriter

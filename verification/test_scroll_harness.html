@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scroll State Test Harness</title>
+    <style>
+        .message-container {
+            border: 1px solid #ccc;
+            margin: 10px;
+            padding: 10px;
+        }
+        .kvps-row {
+            display: flex;
+            margin-bottom: 5px;
+        }
+        .kvps-key {
+            width: 100px;
+            font-weight: bold;
+        }
+        .kvps-val {
+            flex-grow: 1;
+            height: 50px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+        }
+        /* Ensure we have enough content to scroll */
+        pre { margin: 0; }
+        .message-body {
+            height: 100px;
+            overflow-y: auto;
+            border: 1px solid blue;
+        }
+    </style>
+    <!-- Alpine mock -->
+    <script>
+        window.Alpine = { store: (n, v) => {} };
+        window.$store = { messageResize: { getSetting: () => ({ minimized: false }) } };
+    </script>
+</head>
+<body>
+    <div id="chat-history"></div>
+
+    <script type="module">
+        import * as msgModule from './messages_test.js';
+        window.msgModule = msgModule;
+        console.log("Module loaded", msgModule);
+    </script>
+</body>
+</html>
