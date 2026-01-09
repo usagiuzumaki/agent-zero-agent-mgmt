@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Spinner from './common/Spinner';
+import ConfirmationModal from './common/ConfirmationModal';
 import './CharactersUI.css';
 
 export default function CharactersUI() {
@@ -8,6 +9,10 @@ export default function CharactersUI() {
   const [isSaving, setIsSaving] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [charToDelete, setCharToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const nameInputRef = useRef(null);
 
   const initialCharState = {
     name: '',
@@ -23,6 +28,13 @@ export default function CharactersUI() {
   useEffect(() => {
     fetchCharacters();
   }, []);
+
+  // Focus management
+  useEffect(() => {
+    if (showForm && nameInputRef.current) {
+      nameInputRef.current.focus();
+    }
+  }, [showForm]);
 
   const fetchCharacters = async () => {
     try {
@@ -50,7 +62,12 @@ export default function CharactersUI() {
     setEditingId(char.id);
     setShowForm(true);
     // Scroll to form
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    const formElement = document.getElementById('char-form');
+    if (formElement) {
+        formElement.scrollIntoView({ behavior: 'smooth' });
+    } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   const handleCancel = () => {
@@ -59,25 +76,35 @@ export default function CharactersUI() {
     setNewChar(initialCharState);
   };
 
-  const handleDelete = async (charId) => {
-    if (!window.confirm("Are you sure you want to delete this character?")) return;
+  const confirmDelete = (char) => {
+    setCharToDelete(char);
+    setDeleteConfirmOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (!charToDelete) return;
+    setIsDeleting(true);
 
     try {
       const response = await fetch('/api/screenwriting/character/delete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: charId })
+        body: JSON.stringify({ id: charToDelete.id })
       });
 
       if (response.ok) {
         fetchCharacters();
         // If we were editing this character, reset form
-        if (editingId === charId) {
+        if (editingId === charToDelete.id) {
           handleCancel();
         }
       }
     } catch (err) {
       console.error("Failed to delete character", err);
+    } finally {
+      setIsDeleting(false);
+      setDeleteConfirmOpen(false);
+      setCharToDelete(null);
     }
   };
 
@@ -118,16 +145,16 @@ export default function CharactersUI() {
 
   const getRoleColor = (role) => {
     switch(role.toLowerCase()) {
-      case 'protagonist': return 'var(--color-primary)';
-      case 'antagonist': return 'var(--color-tension-climax)';
-      case 'supporting': return 'var(--color-secondary)';
-      default: return 'var(--color-text-muted)';
+      case 'protagonist': return 'var(--color-primary, #4f46e5)';
+      case 'antagonist': return 'var(--color-tension-climax, #ef4444)';
+      case 'supporting': return 'var(--color-secondary, #10b981)';
+      default: return 'var(--color-text-muted, #6b7280)';
     }
   };
 
   if (loading) return (
     <div className="loading-container">
-      <Spinner size="lg" color="primary" />
+      <Spinner size="large" color="primary" />
       <p>Loading Cast...</p>
     </div>
   );
@@ -136,40 +163,47 @@ export default function CharactersUI() {
     <div className="characters-ui">
       <div className="chars-header">
         <h3>Cast of Characters</h3>
-        <button
-          className="btn-primary"
-          onClick={() => setShowForm(!showForm)}
-          aria-expanded={showForm}
-          aria-controls="char-form"
-        >
-          {showForm ? 'Cancel' : '+ Add Character'}
-        </button>
+        {!showForm && (
+            <button
+            className="btn-primary"
+            onClick={() => setShowForm(true)}
+            aria-expanded={showForm}
+            >
+            + Add Character
+            </button>
+        )}
       </div>
 
       {showForm && (
-        <div id="char-form" className="char-form-card">
-          <h4>{editingId ? 'Edit Character Profile' : 'New Character Profile'}</h4>
+        <div id="char-form" className="char-form-card fade-in" role="region" aria-label="Character Form">
+          <div className="form-header">
+             <h4>{editingId ? 'Edit Character Profile' : 'New Character Profile'}</h4>
+          </div>
           <form onSubmit={handleSubmit}>
-            <div className="form-row">
-              <div className="form-group">
+            <div className="form-grid">
+              <div className="form-group span-2">
                 <label htmlFor="char-name">
                   Name <span className="required-star" aria-hidden="true">*</span>
                 </label>
                 <input
                   id="char-name"
+                  ref={nameInputRef}
                   value={newChar.name}
                   onChange={e => setNewChar({...newChar, name: e.target.value})}
                   required
                   aria-required="true"
                   placeholder="Character Name"
+                  className="input-field"
                 />
               </div>
+
               <div className="form-group">
                 <label htmlFor="char-role">Role</label>
                 <select
                   id="char-role"
                   value={newChar.role}
                   onChange={e => setNewChar({...newChar, role: e.target.value})}
+                  className="select-field"
                 >
                   <option>Protagonist</option>
                   <option>Antagonist</option>
@@ -177,21 +211,18 @@ export default function CharactersUI() {
                   <option>Minor</option>
                 </select>
               </div>
-            </div>
 
-            <div className="form-row">
-              <div className="form-group">
+               <div className="form-group">
                 <label htmlFor="char-archetype">Archetype</label>
                 <input
                   id="char-archetype"
                   placeholder="e.g. The Reluctant Hero"
                   value={newChar.archetype}
                   onChange={e => setNewChar({...newChar, archetype: e.target.value})}
+                  className="input-field"
                 />
               </div>
-            </div>
 
-            <div className="form-row">
               <div className="form-group">
                 <label htmlFor="char-motivation">Motivation (Want)</label>
                 <input
@@ -199,8 +230,10 @@ export default function CharactersUI() {
                   value={newChar.motivation}
                   onChange={e => setNewChar({...newChar, motivation: e.target.value})}
                   placeholder="What drives them?"
+                  className="input-field"
                 />
               </div>
+
               <div className="form-group">
                 <label htmlFor="char-flaw">Fatal Flaw (Need)</label>
                 <input
@@ -208,31 +241,43 @@ export default function CharactersUI() {
                   value={newChar.flaw}
                   onChange={e => setNewChar({...newChar, flaw: e.target.value})}
                   placeholder="What holds them back?"
+                  className="input-field"
+                />
+              </div>
+
+              <div className="form-group span-full">
+                <label htmlFor="char-bio">Bio & Notes</label>
+                <textarea
+                  id="char-bio"
+                  rows={4}
+                  value={newChar.bio}
+                  onChange={e => setNewChar({...newChar, bio: e.target.value})}
+                  placeholder="Backstory, physical description, or key traits..."
+                  className="textarea-field"
                 />
               </div>
             </div>
 
-            <div className="form-group">
-              <label htmlFor="char-bio">Bio & Notes</label>
-              <textarea
-                id="char-bio"
-                rows={3}
-                value={newChar.bio}
-                onChange={e => setNewChar({...newChar, bio: e.target.value})}
-                placeholder="Backstory, physical description, or key traits..."
-              />
+            <div className="form-actions">
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={handleCancel}
+                disabled={isSaving}
+              >
+                Cancel
+              </button>
+              <button type="submit" className="btn-save" disabled={isSaving}>
+                {isSaving ? (
+                  <div className="btn-save-content">
+                    <Spinner size="small" color="white" />
+                    <span>Saving...</span>
+                  </div>
+                ) : (
+                  'Save Character'
+                )}
+              </button>
             </div>
-
-            <button type="submit" className="btn-save" disabled={isSaving}>
-              {isSaving ? (
-                <div className="btn-save-content">
-                  <Spinner size="small" color="white" />
-                  <span>Saving...</span>
-                </div>
-              ) : (
-                'Save Character'
-              )}
-            </button>
           </form>
         </div>
       )}
@@ -243,25 +288,29 @@ export default function CharactersUI() {
             <p className="empty-state-text">
               No characters yet. Every story needs a cast!
             </p>
-            <button
-              className="btn-primary"
-              onClick={() => setShowForm(true)}
-            >
-              Create First Character
-            </button>
+            {!showForm && (
+                <button
+                className="btn-primary"
+                onClick={() => setShowForm(true)}
+                >
+                Create First Character
+                </button>
+            )}
           </div>
         ) : (
           characters.map((char) => (
             <div key={char.id} className="char-card" style={{borderTop: `4px solid ${getRoleColor(char.role)}`}}>
               <div className="char-card-header">
                 <h5>{char.name}</h5>
-                <span className="char-role" style={{color: getRoleColor(char.role)}}>{char.role}</span>
+                <span className="char-role-badge" style={{backgroundColor: getRoleColor(char.role) + '20', color: getRoleColor(char.role)}}>
+                    {char.role}
+                </span>
               </div>
 
               <div className="char-attributes">
-                {char.archetype && <div className="char-attr"><strong>Archetype:</strong> {char.archetype}</div>}
-                {char.motivation && <div className="char-attr"><strong>Want:</strong> {char.motivation}</div>}
-                {char.flaw && <div className="char-attr"><strong>Flaw:</strong> {char.flaw}</div>}
+                {char.archetype && <div className="char-attr"><span className="attr-label">Archetype:</span> {char.archetype}</div>}
+                {char.motivation && <div className="char-attr"><span className="attr-label">Want:</span> {char.motivation}</div>}
+                {char.flaw && <div className="char-attr"><span className="attr-label">Flaw:</span> {char.flaw}</div>}
               </div>
 
               {char.bio && <p className="char-bio">{char.bio}</p>}
@@ -276,9 +325,8 @@ export default function CharactersUI() {
                 </button>
                 <button
                   className="btn-text delete"
-                  onClick={() => handleDelete(char.id)}
+                  onClick={() => confirmDelete(char)}
                   aria-label={`Delete ${char.name}`}
-                  style={{ color: '#ef4444' }}
                 >
                   Delete
                 </button>
@@ -287,6 +335,17 @@ export default function CharactersUI() {
           ))
         )}
       </div>
+
+      <ConfirmationModal
+        isOpen={deleteConfirmOpen}
+        title="Delete Character"
+        message={`Are you sure you want to delete ${charToDelete?.name}? This action cannot be undone.`}
+        confirmLabel="Delete"
+        cancelLabel="Keep"
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteConfirmOpen(false)}
+        isProcessing={isDeleting}
+      />
     </div>
   );
 }
