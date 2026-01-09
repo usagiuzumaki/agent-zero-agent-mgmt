@@ -1,7 +1,18 @@
 {
-  "characters": [],
+  "characters": [
+    {
+      "name": "Playwright Hero",
+      "role": "Protagonist",
+      "archetype": "",
+      "motivation": "",
+      "flaw": "",
+      "bio": "Created by automated test.",
+      "id": "43c0dd70",
+      "created": "2026-01-09T08:54:21.307792"
+    }
+  ],
   "relationships": [],
   "character_arcs": [],
   "created": "2026-01-07T00:00:00.000000",
-  "last_updated": "2026-01-07T00:00:00.000000"
+  "last_updated": "2026-01-09T08:54:21.722513"
 }
