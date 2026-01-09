@@ -129,11 +129,14 @@ class Topic(Record):
     def __init__(self, history: "History"):
         self.history = history
         self.summary: str = ""
+        self.summary_tokens: int = 0
         self.messages: list[Message] = []
 
     def get_tokens(self):
         if self.summary:
-            return tokens.approximate_tokens(self.summary)
+            if not self.summary_tokens:
+                self.summary_tokens = tokens.approximate_tokens(self.summary)
+            return self.summary_tokens
         else:
             return sum(msg.get_tokens() for msg in self.messages)
 
@@ -153,6 +156,7 @@ class Topic(Record):
 
     async def summarize(self):
         self.summary = await self.summarize_messages(self.messages)
+        self.summary_tokens = tokens.approximate_tokens(self.summary)
         return self.summary
 
     async def compress_large_messages(self) -> bool:
@@ -239,6 +243,7 @@ class Topic(Record):
         return {
             "_cls": "Topic",
             "summary": self.summary,
+            "summary_tokens": self.summary_tokens,
             "messages": [m.to_dict() for m in self.messages],
         }
 
@@ -246,6 +251,7 @@ class Topic(Record):
     def from_dict(data: dict, history: "History"):
         topic = Topic(history=history)
         topic.summary = data.get("summary", "")
+        topic.summary_tokens = data.get("summary_tokens", 0)
         topic.messages = [
             Message.from_dict(m, history=history) for m in data.get("messages", [])
         ]
@@ -256,11 +262,14 @@ class Bulk(Record):
     def __init__(self, history: "History"):
         self.history = history
         self.summary: str = ""
+        self.summary_tokens: int = 0
         self.records: list[Record] = []
 
     def get_tokens(self):
         if self.summary:
-            return tokens.approximate_tokens(self.summary)
+            if not self.summary_tokens:
+                self.summary_tokens = tokens.approximate_tokens(self.summary)
+            return self.summary_tokens
         else:
             return sum([r.get_tokens() for r in self.records])
 
@@ -283,12 +292,14 @@ class Bulk(Record):
                 "fw.topic_summary.msg.md", content=self.output_text()
             ),
         )
+        self.summary_tokens = tokens.approximate_tokens(self.summary)
         return self.summary
 
     def to_dict(self):
         return {
             "_cls": "Bulk",
             "summary": self.summary,
+            "summary_tokens": self.summary_tokens,
             "records": [r.to_dict() for r in self.records],
         }
 
@@ -296,6 +307,7 @@ class Bulk(Record):
     def from_dict(data: dict, history: "History"):
         bulk = Bulk(history=history)
         bulk.summary = data["summary"]
+        bulk.summary_tokens = data.get("summary_tokens", 0)
         cls = data["_cls"]
         bulk.records = [Record.from_dict(r, history=history) for r in data["records"]]
         return bulk
