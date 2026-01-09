@@ -75,6 +75,14 @@
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
 }
 
+/* Form Actions */
+.form-actions-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
 .btn-save {
   background: var(--color-primary);
   color: white;
@@ -83,7 +91,11 @@
   border-radius: 4px;
   font-weight: 500;
   cursor: pointer;
-  margin-top: 1rem;
+}
+
+.btn-save:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 .btn-save-content {
@@ -194,6 +206,21 @@
 .btn-icon:hover {
   opacity: 1;
   background: var(--color-background);
+}
+
+.btn-text {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--color-text-muted);
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.btn-text:hover {
+  background: var(--color-background);
+  color: var(--color-text);
 }
 
 .btn-delete:hover {
