@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Spinner from './common/Spinner';
 import './CharactersUI.css';
 
@@ -8,6 +8,9 @@ export default function CharactersUI() {
   const [isSaving, setIsSaving] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
+
+  // Ref for the name input to manage focus accessibility
+  const nameInputRef = useRef(null);
 
   const initialCharState = {
     name: '',
@@ -23,6 +26,13 @@ export default function CharactersUI() {
   useEffect(() => {
     fetchCharacters();
   }, []);
+
+  // UX: Focus the Name input when the form opens
+  useEffect(() => {
+    if (showForm && nameInputRef.current) {
+      nameInputRef.current.focus();
+    }
+  }, [showForm]);
 
   const fetchCharacters = async () => {
     try {
@@ -49,7 +59,7 @@ export default function CharactersUI() {
     });
     setEditingId(char.id);
     setShowForm(true);
-    // Scroll to form
+    // Scroll to form (focus handled by useEffect)
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -157,6 +167,7 @@ export default function CharactersUI() {
                 </label>
                 <input
                   id="char-name"
+                  ref={nameInputRef}
                   value={newChar.name}
                   onChange={e => setNewChar({...newChar, name: e.target.value})}
                   required
@@ -223,16 +234,26 @@ export default function CharactersUI() {
               />
             </div>
 
-            <button type="submit" className="btn-save" disabled={isSaving}>
-              {isSaving ? (
-                <div className="btn-save-content">
-                  <Spinner size="small" color="white" />
-                  <span>Saving...</span>
-                </div>
-              ) : (
-                'Save Character'
-              )}
-            </button>
+            <div className="form-actions-footer">
+              <button
+                type="button"
+                className="btn-text"
+                onClick={handleCancel}
+                disabled={isSaving}
+              >
+                Cancel
+              </button>
+              <button type="submit" className="btn-save" disabled={isSaving}>
+                {isSaving ? (
+                  <div className="btn-save-content">
+                    <Spinner size="small" color="white" />
+                    <span>Saving...</span>
+                  </div>
+                ) : (
+                  'Save Character'
+                )}
+              </button>
+            </div>
           </form>
         </div>
       )}
