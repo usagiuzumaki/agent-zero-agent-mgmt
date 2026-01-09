@@ -1,0 +1,78 @@
+{
+  "documents": [
+    {
+      "id": "d398f8f0",
+      "name": "Test Script",
+      "description": "Uploaded via StorybookUI",
+      "tags": [],
+      "chapters": [
+        {
+          "id": "chapter-1",
+          "title": "INT.",
+          "summary": "INT. ROOM - DAY\nA test script content.",
+          "beats": [
+            {
+              "id": "1-1",
+              "label": "Beat 1",
+              "summary": "INT.",
+              "visual_prompt": "Illustrate the mood of: INT."
+            },
+            {
+              "id": "1-2",
+              "label": "Beat 2",
+              "summary": "ROOM - DAY\nA test script content.",
+              "visual_prompt": "Illustrate the mood of: ROOM - DAY\nA test script content."
+            }
+          ],
+          "notes": [
+            "Track emotional shift near beat Beat 1",
+            "Track emotional shift near beat Beat 2"
+          ]
+        }
+      ],
+      "suggestions": [
+        "Add clickable references between chapters for character callbacks and thematic echoes.",
+        "Bundle art prompts per chapter so illustrators can batch-render concept frames."
+      ],
+      "uploaded_at": "2026-01-09T22:21:29.869887"
+    },
+    {
+      "id": "81467819",
+      "name": "Test Script",
+      "description": "Uploaded via StorybookUI",
+      "tags": [],
+      "chapters": [
+        {
+          "id": "chapter-1",
+          "title": "INT.",
+          "summary": "INT. ROOM - DAY\nA test script content.",
+          "beats": [
+            {
+              "id": "1-1",
+              "label": "Beat 1",
+              "summary": "INT.",
+              "visual_prompt": "Illustrate the mood of: INT."
+            },
+            {
+              "id": "1-2",
+              "label": "Beat 2",
+              "summary": "ROOM - DAY\nA test script content.",
+              "visual_prompt": "Illustrate the mood of: ROOM - DAY\nA test script content."
+            }
+          ],
+          "notes": [
+            "Track emotional shift near beat Beat 1",
+            "Track emotional shift near beat Beat 2"
+          ]
+        }
+      ],
+      "suggestions": [
+        "Add clickable references between chapters for character callbacks and thematic echoes.",
+        "Bundle art prompts per chapter so illustrators can batch-render concept frames."
+      ],
+      "uploaded_at": "2026-01-09T22:22:20.468545"
+    }
+  ],
+  "created": "2026-01-09T22:21:29.868960",
+  "last_updated": "2026-01-09T22:22:20.468556"
+}

@@ -1,52 +1,79 @@
-import time
 from playwright.sync_api import sync_playwright
+import time
 
-def run():
+def verify_characters():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
-        page = browser.new_page()
+        context = browser.new_context()
+        page = context.new_page()
 
+        print("Navigating to UI...")
         page.goto("http://localhost:4173")
-        page.wait_for_load_state("networkidle")
 
-        # Click "Open Agent"
-        if page.get_by_role("button", name="Open Agent").is_visible():
-            page.get_by_role("button", name="Open Agent").click()
+        # Wait for potential initial load
+        time.sleep(2)
 
-        # Select "Screenwriting"
-        page.select_option("select.ui-select", "screenwriting")
+        # Open Agent -> Screenwriting
+        print("Opening Screenwriting mode...")
+        page.click("text=Open Agent")
 
-        # Wait for "Characters" tab button and click it
-        page.get_by_role("tab", name="Characters").click()
+        # Need to select the option
+        # Use first() or stricter locator
+        page.locator("select.ui-select").first.select_option(value="screenwriting")
 
-        # Wait for "Cast of Characters" header to confirm we are in Characters UI
-        page.wait_for_selector("text=Cast of Characters")
+        time.sleep(1)
 
-        # Click "+ Add Character"
-        page.get_by_role("button", name="+ Add Character").click()
+        # Go to Characters tab
+        print("Clicking Characters tab...")
+        page.click("#tab-characters")
 
-        # Fill form using LABELS (verifies htmlFor)
-        page.get_by_label("Name").fill("Test Character")
-        page.get_by_label("Role").select_option("Protagonist")
+        # Check for Add Character button
+        print("Checking for Add Character button...")
+        page.wait_for_selector("text=+ Add Character")
 
-        # Intercept add request to delay it
-        def handle_route(route):
-            time.sleep(2)
-            route.fulfill(status=200, body='{"status":"ok"}')
+        # Add a character
+        page.click("text=+ Add Character")
 
-        page.route("**/api/screenwriting/character/add", handle_route)
+        # Fill form
+        print("Filling form...")
+        page.fill("#char-name", "Test Hero")
+        page.fill("#char-archetype", "The Tester")
+        page.fill("#char-motivation", "To pass the test")
+        page.fill("#char-flaw", "Timeouts")
+        page.fill("#char-bio", "A generated hero.")
 
-        # Click Save
-        save_btn = page.get_by_role("button", name="Save Character")
-        save_btn.click()
+        # Save
+        print("Saving...")
+        page.click("button.btn-save")
 
-        # Wait a tiny bit for React state update
-        time.sleep(0.5)
+        # Verify spinner or button disabled state if possible, but mainly check if it appears in list
+        print("Waiting for character in list...")
+        page.wait_for_selector("text=Test Hero")
 
-        # Screenshot
-        page.screenshot(path="verification/saving_state.png")
+        print("Character 'Test Hero' found!")
+
+        # Cleanup (Delete)
+        print("Deleting character...")
+
+        # We need to handle the dialog BEFORE clicking delete
+        def handle_dialog(dialog):
+            print(f"Dialog message: {dialog.message}")
+            dialog.accept()
+
+        page.on("dialog", handle_dialog)
+
+        page.click("text=Delete")
+
+        # Verify deletion
+        time.sleep(2)
+
+        content = page.content()
+        if "Test Hero" not in content:
+            print("Character successfully deleted.")
+        else:
+            print("Character still visible (might need refresh or wait).")
 
         browser.close()
 
 if __name__ == "__main__":
-    run()
+    verify_characters()
