@@ -75,6 +75,10 @@
   gap: 1rem;
 }
 
+.document-card-wrapper {
+  position: relative;
+}
+
 .document-card {
   background: var(--color-surface);
   color: var(--color-text);
@@ -88,12 +92,38 @@
   border: none;
   text-align: left;
   width: 100%;
+  height: 100%;
   font-family: var(--font-family);
 }
 
 .document-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.btn-delete-doc {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 1.5rem;
+  line-height: 1;
+  padding: 0 0.5rem;
+  cursor: pointer;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.2s, background-color 0.2s;
+}
+
+.document-card-wrapper:hover .btn-delete-doc {
+  opacity: 1;
+}
+
+.btn-delete-doc:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
 }
 
 .document-card h4 {
@@ -250,9 +280,32 @@
   color: var(--color-text-muted);
   cursor: pointer;
   padding: 0;
-  margin-bottom: 1rem;
   font-family: var(--font-family);
 }
+
+.doc-view-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.btn-danger-outline {
+  background: transparent;
+  border: 1px solid #ef4444;
+  color: #ef4444;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.btn-danger-outline:hover {
+  background: #ef4444;
+  color: white;
+}
+
 /* Enhanced Storybook CSS */
 
 .chapter-header-row {
@@ -297,10 +350,24 @@
   transform: translateX(-50%);
   cursor: pointer;
   transition: transform 0.2s;
+  padding: 0; /* Button reset */
+  appearance: none; /* Button reset */
 }
 
-.timeline-dot:hover {
+.timeline-dot:hover, .timeline-dot:focus {
   transform: translateX(-50%) scale(1.2);
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-primary);
+}
+
+@keyframes highlightPulse {
+  0% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4); border-color: var(--color-primary); }
+  70% { box-shadow: 0 0 0 10px rgba(79, 70, 229, 0); border-color: var(--color-primary); }
+  100% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0); }
+}
+
+.highlight-pulse {
+  animation: highlightPulse 1s infinite;
 }
 
 .beat-header {

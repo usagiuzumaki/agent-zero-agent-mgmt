@@ -68,6 +68,41 @@ export default function StorybookUI() {
     }
   };
 
+  const handleDelete = async (docId, e) => {
+    e.stopPropagation(); // Prevent card click
+    if (!confirm('Are you sure you want to delete this document?')) return;
+
+    try {
+      const response = await fetch('/api/screenwriting/storybook/delete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id: docId }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete document');
+      }
+
+      if (selectedDoc && selectedDoc.id === docId) {
+        setSelectedDoc(null);
+      }
+      await fetchDocuments();
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const scrollToBeat = (beatId) => {
+    const element = document.getElementById(`beat-${beatId}`);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      element.classList.add('highlight-pulse');
+      setTimeout(() => element.classList.remove('highlight-pulse'), 2000);
+    }
+  };
+
   const calculateTensionColor = (beatIndex, totalBeats) => {
     // Simple visualizer: start low, rise, dip, rise high
     const progress = beatIndex / totalBeats;
@@ -149,25 +184,42 @@ export default function StorybookUI() {
               <p className="empty-state">No documents found. Upload one to get started.</p>
             ) : (
               documents.map((doc) => (
-                <button
-                  key={doc.id}
-                  className="document-card"
-                  onClick={() => setSelectedDoc(doc)}
-                  type="button"
-                >
-                  <h4>{doc.name}</h4>
-                  <p>{doc.description}</p>
-                  <span className="doc-meta">Uploaded: {new Date(doc.uploaded_at).toLocaleDateString()}</span>
-                  <div className="tags">
-                    {doc.tags.map((tag, i) => <span key={i} className="tag">{tag}</span>)}
-                  </div>
-                </button>
+                <div key={doc.id} className="document-card-wrapper">
+                  <button
+                    className="document-card"
+                    onClick={() => setSelectedDoc(doc)}
+                    type="button"
+                  >
+                    <h4>{doc.name}</h4>
+                    <p>{doc.description}</p>
+                    <span className="doc-meta">Uploaded: {new Date(doc.uploaded_at).toLocaleDateString()}</span>
+                    <div className="tags">
+                      {doc.tags.map((tag, i) => <span key={i} className="tag">{tag}</span>)}
+                    </div>
+                  </button>
+                  <button
+                    className="btn-delete-doc"
+                    onClick={(e) => handleDelete(doc.id, e)}
+                    title="Delete Document"
+                    aria-label={`Delete ${doc.name}`}
+                  >
+                    ×
+                  </button>
+                </div>
               ))
             )}
           </div>
         ) : (
           <div className="document-view">
-            <button className="btn-back" onClick={() => setSelectedDoc(null)}>← Back to List</button>
+            <div className="doc-view-header-row">
+              <button className="btn-back" onClick={() => setSelectedDoc(null)}>← Back to List</button>
+              <button
+                className="btn-danger-outline"
+                onClick={(e) => handleDelete(selectedDoc.id, e)}
+              >
+                Delete Document
+              </button>
+            </div>
             <div className="doc-header">
               <h3>{selectedDoc.name}</h3>
               {selectedDoc.suggestions && selectedDoc.suggestions.length > 0 && (
@@ -193,14 +245,16 @@ export default function StorybookUI() {
                      {/* Visual Timeline Bar */}
                      <div className="timeline-track">
                        {chapter.beats.map((beat, i) => (
-                         <div
+                         <button
                            key={i}
                            className="timeline-dot"
                            style={{
                              left: `${(i / (chapter.beats.length - 1 || 1)) * 100}%`,
                              backgroundColor: calculateTensionColor(i, chapter.beats.length)
                            }}
-                           title={beat.label}
+                           title={`Jump to ${beat.label}`}
+                           onClick={() => scrollToBeat(beat.id)}
+                           aria-label={`Jump to ${beat.label}`}
                          />
                        ))}
                      </div>
@@ -210,6 +264,7 @@ export default function StorybookUI() {
                     {chapter.beats.map((beat, bIndex) => (
                       <div
                         key={beat.id}
+                        id={`beat-${beat.id}`}
                         className="beat-card"
                         style={{borderLeft: `3px solid ${calculateTensionColor(bIndex, chapter.beats.length)}`}}
                       >
