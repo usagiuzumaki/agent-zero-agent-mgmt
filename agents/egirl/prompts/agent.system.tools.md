@@ -24,3 +24,10 @@
 
 {{ include './agent.system.tool.egirl_sd_colab_tool.md' }}
 
+{{ include './agent.system.tool.screenwriting_pipeline.md' }}
+
+{{ include './agent.system.tool.screenwriting_specialist.md' }}
+
+{{ include './agent.system.tool.screenwriting.md' }}
+
+{{ include './agent.system.tool.fountain_to_html.md' }}
