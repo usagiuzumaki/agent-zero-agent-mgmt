@@ -68,6 +68,31 @@ export default function StorybookUI() {
     }
   };
 
+  const handleDelete = async (e, docId) => {
+    e.stopPropagation();
+    if (!window.confirm("Are you sure you want to delete this document?")) return;
+
+    try {
+      const response = await fetch('/api/screenwriting/storybook/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: docId })
+      });
+
+      if (response.ok) {
+        fetchDocuments();
+        if (selectedDoc && selectedDoc.id === docId) {
+          setSelectedDoc(null);
+        }
+      } else {
+        throw new Error('Failed to delete document');
+      }
+    } catch (err) {
+      console.error("Failed to delete document", err);
+      setError("Failed to delete document");
+    }
+  };
+
   const calculateTensionColor = (beatIndex, totalBeats) => {
     // Simple visualizer: start low, rise, dip, rise high
     const progress = beatIndex / totalBeats;
@@ -149,19 +174,35 @@ export default function StorybookUI() {
               <p className="empty-state">No documents found. Upload one to get started.</p>
             ) : (
               documents.map((doc) => (
-                <button
+                <div
                   key={doc.id}
                   className="document-card"
-                  onClick={() => setSelectedDoc(doc)}
-                  type="button"
                 >
-                  <h4>{doc.name}</h4>
+                  <div className="doc-card-header">
+                    <h4>{doc.name}</h4>
+                    <button
+                      className="btn-icon delete-btn"
+                      onClick={(e) => handleDelete(e, doc.id)}
+                      aria-label={`Delete ${doc.name}`}
+                      title="Delete document"
+                    >
+                      🗑️
+                    </button>
+                  </div>
                   <p>{doc.description}</p>
                   <span className="doc-meta">Uploaded: {new Date(doc.uploaded_at).toLocaleDateString()}</span>
                   <div className="tags">
                     {doc.tags.map((tag, i) => <span key={i} className="tag">{tag}</span>)}
                   </div>
-                </button>
+                  <div className="doc-actions">
+                    <button
+                      className="btn-text"
+                      onClick={() => setSelectedDoc(doc)}
+                    >
+                      Open Document
+                    </button>
+                  </div>
+                </div>
               ))
             )}
           </div>
