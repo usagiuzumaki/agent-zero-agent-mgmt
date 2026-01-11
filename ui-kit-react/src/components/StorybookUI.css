@@ -75,10 +75,17 @@
   gap: 1rem;
 }
 
+.document-card-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
 .document-card {
   background: var(--color-surface);
   color: var(--color-text);
   padding: 1rem;
+  padding-bottom: 3rem; /* Space for actions */
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-card, 0 1px 3px rgba(0,0,0,0.1));
   border: var(--glass-border);
@@ -89,11 +96,21 @@
   text-align: left;
   width: 100%;
   font-family: var(--font-family);
+  height: 100%;
 }
 
 .document-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.document-card-actions {
+  position: absolute;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  display: flex;
+  gap: 0.5rem;
+  z-index: 10;
 }
 
 .document-card h4 {
@@ -154,6 +171,12 @@
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-card);
   border: var(--glass-border);
+}
+
+.doc-view-header-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
 }
 
 .doc-header {
@@ -242,6 +265,22 @@
   border-radius: 4px;
   cursor: pointer;
   font-family: var(--font-family);
+}
+
+.btn-danger-outline {
+    background: transparent;
+    border: 1px solid #ef4444;
+    color: #ef4444;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: var(--font-family);
+    transition: all 0.2s;
+}
+
+.btn-danger-outline:hover {
+    background: #ef4444;
+    color: white;
 }
 
 .btn-back {

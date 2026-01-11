@@ -11,6 +11,7 @@ export default function StorybookUI() {
   const [uploadName, setUploadName] = useState('');
   const [showUpload, setShowUpload] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     fetchDocuments();
@@ -31,6 +32,35 @@ export default function StorybookUI() {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async (e, docId, docName) => {
+    e.stopPropagation(); // Prevent opening the document
+    if (!window.confirm(`Are you sure you want to delete "${docName}"?`)) return;
+
+    setIsDeleting(true);
+    try {
+      const response = await fetch('/api/screenwriting/storybook/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: docId })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete document');
+      }
+
+      // If the deleted document was selected, go back to list
+      if (selectedDoc && selectedDoc.id === docId) {
+        setSelectedDoc(null);
+      }
+
+      await fetchDocuments();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -149,25 +179,46 @@ export default function StorybookUI() {
               <p className="empty-state">No documents found. Upload one to get started.</p>
             ) : (
               documents.map((doc) => (
-                <button
-                  key={doc.id}
-                  className="document-card"
-                  onClick={() => setSelectedDoc(doc)}
-                  type="button"
-                >
-                  <h4>{doc.name}</h4>
-                  <p>{doc.description}</p>
-                  <span className="doc-meta">Uploaded: {new Date(doc.uploaded_at).toLocaleDateString()}</span>
-                  <div className="tags">
-                    {doc.tags.map((tag, i) => <span key={i} className="tag">{tag}</span>)}
+                <div key={doc.id} className="document-card-wrapper">
+                  <button
+                    className="document-card"
+                    onClick={() => setSelectedDoc(doc)}
+                    type="button"
+                  >
+                    <h4>{doc.name}</h4>
+                    <p>{doc.description}</p>
+                    <span className="doc-meta">Uploaded: {new Date(doc.uploaded_at).toLocaleDateString()}</span>
+                    <div className="tags">
+                      {doc.tags.map((tag, i) => <span key={i} className="tag">{tag}</span>)}
+                    </div>
+                  </button>
+                  <div className="document-card-actions">
+                     <button
+                        className="btn-text delete"
+                        onClick={(e) => handleDelete(e, doc.id, doc.name)}
+                        aria-label={`Delete ${doc.name}`}
+                        disabled={isDeleting}
+                        title="Delete Document"
+                     >
+                        <span className="material-symbols-outlined">delete</span>
+                     </button>
                   </div>
-                </button>
+                </div>
               ))
             )}
           </div>
         ) : (
           <div className="document-view">
-            <button className="btn-back" onClick={() => setSelectedDoc(null)}>← Back to List</button>
+            <div className="doc-view-header-row">
+                <button className="btn-back" onClick={() => setSelectedDoc(null)}>← Back to List</button>
+                <button
+                    className="btn-danger-outline"
+                    onClick={(e) => handleDelete(e, selectedDoc.id, selectedDoc.name)}
+                    disabled={isDeleting}
+                >
+                    Delete Document
+                </button>
+            </div>
             <div className="doc-header">
               <h3>{selectedDoc.name}</h3>
               {selectedDoc.suggestions && selectedDoc.suggestions.length > 0 && (
