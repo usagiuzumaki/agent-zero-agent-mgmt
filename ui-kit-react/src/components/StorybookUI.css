@@ -82,13 +82,13 @@
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-card, 0 1px 3px rgba(0,0,0,0.1));
   border: var(--glass-border);
-  cursor: pointer;
   transition: transform 0.2s;
-  /* Button resets */
-  border: none;
+  /* Reset */
   text-align: left;
   width: 100%;
   font-family: var(--font-family);
+  display: flex;
+  flex-direction: column;
 }
 
 .document-card:hover {
@@ -96,10 +96,23 @@
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
+.doc-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
 .document-card h4 {
   margin-top: 0;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0;
   color: var(--color-text);
+}
+
+.delete-btn {
+  font-size: 1rem;
+  padding: 0.25rem;
+  margin-left: 0.5rem;
 }
 
 .doc-meta {
@@ -113,6 +126,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.25rem;
+  margin-bottom: 1rem;
 }
 
 .tag {
@@ -122,6 +136,27 @@
   font-size: 0.7rem;
   padding: 0.125rem 0.5rem;
   border-radius: 9999px;
+}
+
+.doc-actions {
+  margin-top: auto;
+  border-top: 1px solid var(--color-border);
+  padding-top: 0.5rem;
+  text-align: right;
+}
+
+.btn-text {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.btn-text:hover {
+  background: rgba(79, 70, 229, 0.1);
 }
 
 /* Upload Form */
