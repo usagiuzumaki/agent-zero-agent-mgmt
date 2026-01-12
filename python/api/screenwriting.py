@@ -207,3 +207,20 @@ def upload_storybook():
         return jsonify({'error': 'Failed to ingest document'}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+@screenwriting_bp.route('/api/screenwriting/storybook/delete', methods=['POST'])
+def delete_storybook():
+    """Delete a storybook document"""
+    try:
+        data = request.get_json(force=True)
+        doc_id = data.get('id')
+
+        if not doc_id:
+            return jsonify({'error': 'Missing document ID'}), 400
+
+        if manager.delete_document(doc_id):
+            return jsonify({'message': 'Document deleted successfully'}), 200
+        return jsonify({'error': 'Failed to delete document'}), 400
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500

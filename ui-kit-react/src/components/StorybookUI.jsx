@@ -68,6 +68,29 @@ export default function StorybookUI() {
     }
   };
 
+  const handleDelete = async (e, docId) => {
+    e.stopPropagation();
+    if (!window.confirm('Are you sure you want to delete this document?')) return;
+
+    try {
+      const response = await fetch('/api/screenwriting/storybook/delete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id: docId }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete document');
+      }
+
+      await fetchDocuments();
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
   const calculateTensionColor = (beatIndex, totalBeats) => {
     // Simple visualizer: start low, rise, dip, rise high
     const progress = beatIndex / totalBeats;
@@ -108,37 +131,55 @@ export default function StorybookUI() {
       )}
 
       {showUpload && (
-        <div id="upload-panel" className="storybook-upload">
-          <h4>Ingest New Document</h4>
-          <form onSubmit={handleUpload}>
-            <label htmlFor="doc-title" className="input-label">Document Title</label>
-            <input
-              id="doc-title"
-              type="text"
-              placeholder="e.g. My Screenplay Draft"
-              value={uploadName}
-              onChange={(e) => setUploadName(e.target.value)}
-              className="input-field"
-            />
-            <label htmlFor="doc-content" className="input-label">Paste Text Content</label>
-            <textarea
-              id="doc-content"
-              placeholder="Paste text content here to generate beats..."
-              value={uploadContent}
-              onChange={(e) => setUploadContent(e.target.value)}
-              className="textarea-field"
-              rows={10}
-            />
-            <div className="form-actions">
-              <button type="submit" className="btn-primary" disabled={isUploading}>
-                {isUploading ? (
-                  <span className="flex-center gap-2">
-                    <Spinner size="small" color="white" /> Ingesting...
-                  </span>
-                ) : 'Ingest Document'}
-              </button>
-            </div>
-          </form>
+        <div className="modal-overlay" onClick={() => setShowUpload(false)}>
+          <div
+            id="upload-panel"
+            className="storybook-upload-modal"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="upload-title"
+          >
+            <h4 id="upload-title">Ingest New Document</h4>
+            <form onSubmit={handleUpload}>
+              <label htmlFor="doc-title" className="input-label">Document Title</label>
+              <input
+                id="doc-title"
+                type="text"
+                placeholder="e.g. My Screenplay Draft"
+                value={uploadName}
+                onChange={(e) => setUploadName(e.target.value)}
+                className="input-field"
+                autoFocus
+              />
+              <label htmlFor="doc-content" className="input-label">Paste Text Content</label>
+              <textarea
+                id="doc-content"
+                placeholder="Paste text content here to generate beats..."
+                value={uploadContent}
+                onChange={(e) => setUploadContent(e.target.value)}
+                className="textarea-field"
+                rows={10}
+              />
+              <div className="form-actions">
+                <button
+                   type="button"
+                   className="btn-secondary"
+                   onClick={() => setShowUpload(false)}
+                   disabled={isUploading}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="btn-primary" disabled={isUploading}>
+                  {isUploading ? (
+                    <span className="flex-center gap-2">
+                      <Spinner size="small" color="white" /> Ingesting...
+                    </span>
+                  ) : 'Ingest Document'}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
 
@@ -149,19 +190,35 @@ export default function StorybookUI() {
               <p className="empty-state">No documents found. Upload one to get started.</p>
             ) : (
               documents.map((doc) => (
-                <button
+                <div
                   key={doc.id}
                   className="document-card"
                   onClick={() => setSelectedDoc(doc)}
-                  type="button"
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      setSelectedDoc(doc);
+                    }
+                  }}
                 >
-                  <h4>{doc.name}</h4>
+                  <div className="doc-card-header">
+                    <h4>{doc.name}</h4>
+                    <button
+                      className="btn-icon delete-btn"
+                      onClick={(e) => handleDelete(e, doc.id)}
+                      title="Delete Document"
+                      aria-label={`Delete ${doc.name}`}
+                    >
+                      🗑️
+                    </button>
+                  </div>
                   <p>{doc.description}</p>
                   <span className="doc-meta">Uploaded: {new Date(doc.uploaded_at).toLocaleDateString()}</span>
                   <div className="tags">
                     {doc.tags.map((tag, i) => <span key={i} className="tag">{tag}</span>)}
                   </div>
-                </button>
+                </div>
               ))
             )}
           </div>

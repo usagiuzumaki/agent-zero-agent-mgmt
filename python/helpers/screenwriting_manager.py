@@ -306,6 +306,18 @@ class ScreenwritingManager:
             return self.save_data('book_outline', current_outline)
         return False
 
+    def delete_document(self, doc_id: str) -> bool:
+        """Delete a storybook document"""
+        storybook = self.load_data('storybook')
+        if storybook and storybook.get('documents'):
+            original_len = len(storybook['documents'])
+            storybook['documents'] = [
+                d for d in storybook['documents'] if d.get('id') != doc_id
+            ]
+            if len(storybook['documents']) < original_len:
+                return self.save_data('storybook', storybook)
+        return False
+
     def ingest_story_document(
         self,
         name: str,
