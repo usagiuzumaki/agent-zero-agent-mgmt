@@ -162,6 +162,7 @@ export default function CharactersUI() {
                   required
                   aria-required="true"
                   placeholder="Character Name"
+                  autoFocus
                 />
               </div>
               <div className="form-group">
@@ -223,16 +224,26 @@ export default function CharactersUI() {
               />
             </div>
 
-            <button type="submit" className="btn-save" disabled={isSaving}>
-              {isSaving ? (
-                <div className="btn-save-content">
-                  <Spinner size="small" color="white" />
-                  <span>Saving...</span>
-                </div>
-              ) : (
-                'Save Character'
-              )}
-            </button>
+            <div className="form-actions">
+              <button
+                type="button"
+                className="btn-cancel"
+                onClick={handleCancel}
+                disabled={isSaving}
+              >
+                Cancel
+              </button>
+              <button type="submit" className="btn-save" disabled={isSaving}>
+                {isSaving ? (
+                  <div className="btn-save-content">
+                    <Spinner size="small" color="white" />
+                    <span>Saving...</span>
+                  </div>
+                ) : (
+                  'Save Character'
+                )}
+              </button>
+            </div>
           </form>
         </div>
       )}

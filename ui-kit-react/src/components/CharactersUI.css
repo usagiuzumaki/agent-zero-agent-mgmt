@@ -75,6 +75,13 @@
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
 }
 
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
 .btn-save {
   background: var(--color-primary);
   color: white;
@@ -83,7 +90,23 @@
   border-radius: 4px;
   font-weight: 500;
   cursor: pointer;
-  margin-top: 1rem;
+}
+
+.btn-cancel {
+  background: transparent;
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-cancel:hover {
+  background: var(--color-background);
+  color: var(--color-text);
+  border-color: var(--color-text-muted);
 }
 
 .btn-save-content {
