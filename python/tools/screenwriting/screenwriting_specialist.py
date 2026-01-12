@@ -32,6 +32,9 @@ class ScreenwritingSpecialist(Tool):
     - WorldBuilder: Develops setting and lore
     """
 
+    def __init__(self, agent, name, method, args, message, loop_data, **kwargs):
+        super().__init__(agent, name, method, args, message, loop_data, **kwargs)
+
     async def execute(self, specialist: str = "", task: str = "", **kwargs):
         """
         Executes a task using a specific specialist agent.
