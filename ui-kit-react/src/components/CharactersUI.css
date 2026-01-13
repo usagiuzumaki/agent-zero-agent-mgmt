@@ -83,7 +83,32 @@
   border-radius: 4px;
   font-weight: 500;
   cursor: pointer;
-  margin-top: 1rem;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  border-top: 1px solid var(--color-border);
+  padding-top: 1rem;
+}
+
+.btn-cancel {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.btn-cancel:hover {
+  background: var(--color-background);
+  color: var(--color-text);
 }
 
 .btn-save-content {

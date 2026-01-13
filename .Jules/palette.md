@@ -5,3 +5,7 @@
 ## 2024-10-27 - Async Feedback and Explicit Labeling
 **Learning:** Users often click submit buttons multiple times if there is no immediate visual feedback (loading spinner/disabled state) during async operations. Also, implicit label association (just placing label near input) is insufficient for screen readers; explicit `htmlFor` + `id` is required.
 **Action:** Always implement `isSaving`/`isLoading` states on submit buttons and use explicit `htmlFor` attributes on all form labels.
+
+## 2025-02-12 - Form Focus & Exit Paths
+**Learning:** Users opening inline forms often experience friction if they have to click again to start typing, or if the "Cancel" action is only located in a header toggle far from the submit button.
+**Action:** Always verify that opening a form auto-focuses the primary input and provides a secondary "Cancel" button adjacent to the primary "Save" action to create a clear, localized decision point.
