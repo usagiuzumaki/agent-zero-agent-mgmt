@@ -28,6 +28,12 @@ class DirtyJson:
 
     @staticmethod
     def parse_string(json_string):
+        # Optimization: Try standard json.loads first for performance
+        try:
+            return json.loads(json_string)
+        except (json.JSONDecodeError, TypeError):
+            pass
+
         parser = DirtyJson()
         return parser.parse(json_string)
 
