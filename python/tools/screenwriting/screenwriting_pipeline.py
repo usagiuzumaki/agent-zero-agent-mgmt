@@ -19,6 +19,9 @@ class ScreenwritingPipeline(Tool):
     5. ScriptFormatter (Formatting)
     """
 
+    def __init__(self, agent, name, method, args, message, loop_data, **kwargs):
+        super().__init__(agent, name, method, args, message, loop_data, **kwargs)
+
     async def execute(self, task: str = "", project_name: str = "", **kwargs):
         """
         Executes a screenwriting task by passing it through a chain of specialized agents.
