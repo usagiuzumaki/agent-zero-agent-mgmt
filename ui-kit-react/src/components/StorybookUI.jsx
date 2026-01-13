@@ -68,6 +68,27 @@ export default function StorybookUI() {
     }
   };
 
+  const handleDelete = async (docId, docName) => {
+    if (!window.confirm(`Are you sure you want to delete "${docName}"? This cannot be undone.`)) return;
+
+    try {
+      const response = await fetch('/api/screenwriting/storybook/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: docId })
+      });
+
+      if (response.ok) {
+        fetchDocuments();
+      } else {
+        throw new Error('Failed to delete document');
+      }
+    } catch (err) {
+      console.error("Failed to delete document", err);
+      setError("Failed to delete document");
+    }
+  };
+
   const calculateTensionColor = (beatIndex, totalBeats) => {
     // Simple visualizer: start low, rise, dip, rise high
     const progress = beatIndex / totalBeats;
@@ -149,19 +170,29 @@ export default function StorybookUI() {
               <p className="empty-state">No documents found. Upload one to get started.</p>
             ) : (
               documents.map((doc) => (
-                <button
-                  key={doc.id}
-                  className="document-card"
-                  onClick={() => setSelectedDoc(doc)}
-                  type="button"
-                >
-                  <h4>{doc.name}</h4>
-                  <p>{doc.description}</p>
-                  <span className="doc-meta">Uploaded: {new Date(doc.uploaded_at).toLocaleDateString()}</span>
-                  <div className="tags">
-                    {doc.tags.map((tag, i) => <span key={i} className="tag">{tag}</span>)}
+                <div key={doc.id} className="document-card">
+                  <button
+                    className="document-content-clickable"
+                    onClick={() => setSelectedDoc(doc)}
+                    aria-label={`Open ${doc.name}`}
+                  >
+                    <h4>{doc.name}</h4>
+                    <p>{doc.description}</p>
+                    <span className="doc-meta">Uploaded: {new Date(doc.uploaded_at).toLocaleDateString()}</span>
+                    <div className="tags">
+                      {doc.tags.map((tag, i) => <span key={i} className="tag">{tag}</span>)}
+                    </div>
+                  </button>
+                  <div className="doc-actions">
+                    <button
+                      className="btn-text delete-doc-btn"
+                      onClick={() => handleDelete(doc.id, doc.name)}
+                      aria-label={`Delete ${doc.name}`}
+                    >
+                      Delete
+                    </button>
                   </div>
-                </button>
+                </div>
               ))
             )}
           </div>

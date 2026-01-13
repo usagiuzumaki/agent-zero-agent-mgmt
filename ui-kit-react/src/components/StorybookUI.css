@@ -96,6 +96,48 @@
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
+.document-content-clickable {
+  cursor: pointer;
+  outline: none;
+  background: transparent;
+  border: none;
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+  padding: 0;
+  color: inherit;
+}
+
+.document-content-clickable:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.doc-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.delete-doc-btn {
+  color: #ef4444;
+  font-size: 0.85rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-family: var(--font-family);
+}
+
+.delete-doc-btn:hover {
+  background: #fee2e2;
+}
+
 .document-card h4 {
   margin-top: 0;
   margin-bottom: 0.5rem;
