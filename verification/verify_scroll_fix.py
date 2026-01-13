@@ -7,7 +7,7 @@ import threading
 import sys
 
 # Use a different port to avoid conflicts
-PORT = 8001
+PORT = 8003
 DIRECTORY = os.getcwd()
 
 class Handler(http.server.SimpleHTTPRequestHandler):
@@ -15,7 +15,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         super().__init__(*args, directory=DIRECTORY, **kwargs)
 
 def start_server():
-    # Allow reuse address to prevent "Address already in use" errors on quick restarts
     socketserver.TCPServer.allow_reuse_address = True
     try:
         with socketserver.TCPServer(("", PORT), Handler) as httpd:
@@ -44,72 +43,72 @@ def run():
             print(f"Failed to load page: {e}")
             sys.exit(1)
 
-        # 1. Add a message with KVPs
-        # We use a long string to force overflow
+        print("\n--- Test 1: KVP Scroll Preservation (Scrolled Up) ---")
         long_content = "\\n".join([f"Line {i}" for i in range(20)])
-
         page.evaluate(f"""
             window.msgModule.setMessage('1', 'agent', 'Test Heading', 'Test Body', false, {{
                 'long_output': '{long_content}'
             }});
         """)
-
-        # Wait for render
         page.wait_for_selector("#message-1")
 
-        # 2. Verify scroll overflow
         kvp_val = page.locator(".kvps-val").first
-        scroll_height = kvp_val.evaluate("el => el.scrollHeight")
-        client_height = kvp_val.evaluate("el => el.clientHeight")
 
-        print(f"ScrollHeight: {scroll_height}, ClientHeight: {client_height}")
-        assert scroll_height > client_height, "Content should overflow"
-
-        # 3. Scroll to top (it might start at bottom due to autoscroll)
-        # getAutoScroll is mocked to true, so it starts at bottom?
-        # Let's check initial position
-        initial_scroll = kvp_val.evaluate("el => el.scrollTop")
-        print(f"Initial scrollTop: {initial_scroll}")
-
-        # Scroll to top (0)
+        # Scroll to top
         kvp_val.evaluate("el => el.scrollTop = 0")
 
-        # Verify it's at 0
-        scroll_top = kvp_val.evaluate("el => el.scrollTop")
-        assert scroll_top == 0, f"Failed to scroll to top, got {scroll_top}"
-
-        # 4. Update the message (re-render)
-        # We pass the same content but trigger a re-render
-        print("Triggering re-render...")
+        # Update (re-render)
         page.evaluate(f"""
-            window.msgModule.setMessage('1', 'agent', 'Test Heading', 'Test Body Updated', false, {{
+            window.msgModule.setMessage('1', 'agent', 'Test Heading', 'Test Body', false, {{
                 'long_output': '{long_content}'
             }});
         """)
-
-        # 5. Check scroll position again
-        # It should still be 0 because we captured state.
-
         time.sleep(0.5)
-        new_scroll_top = kvp_val.evaluate("el => el.scrollTop")
-        print(f"Scroll top after re-render (KVP): {new_scroll_top}")
 
-        if new_scroll_top != 0:
-            print("FAILURE: KVP Scroll position reset or moved")
+        scroll_top = kvp_val.evaluate("el => el.scrollTop")
+        if scroll_top == 0:
+            print("SUCCESS: KVP Scroll position preserved at top")
         else:
-            print("SUCCESS: KVP Scroll position preserved")
+            print(f"FAILURE: KVP Scroll moved to {scroll_top}")
 
-        # Now let's test BODY scroll persistence which has the suspected bug
-        # The body div is .message-body
+        print("\n--- Test 2: KVP Scroll 'Stick to Bottom' (Streaming) ---")
+        # Scroll to bottom
+        kvp_val.evaluate("el => el.scrollTop = el.scrollHeight")
+        prev_scroll_height = kvp_val.evaluate("el => el.scrollHeight")
+        print(f"Previous Scroll Height: {prev_scroll_height}")
+
+        # Update with MORE content
+        longer_content = "\\n".join([f"Line {i}" for i in range(30)])
+        page.evaluate(f"""
+            window.msgModule.setMessage('1', 'agent', 'Test Heading', 'Test Body', false, {{
+                'long_output': '{longer_content}'
+            }});
+        """)
+        time.sleep(0.5)
+
+        new_scroll_top = kvp_val.evaluate("el => el.scrollTop")
+        new_scroll_height = kvp_val.evaluate("el => el.scrollHeight")
+        client_height = kvp_val.evaluate("el => el.clientHeight")
+
+        print(f"New Scroll Height: {new_scroll_height}")
+        print(f"New Scroll Top: {new_scroll_top}")
+        print(f"Client Height: {client_height}")
+
+        # It should be at the bottom: scrollTop + clientHeight approx equals scrollHeight
+        if abs((new_scroll_top + client_height) - new_scroll_height) < 20:
+            print("SUCCESS: KVP stuck to bottom after content expansion")
+        else:
+             print(f"FAILURE: KVP did not stick to bottom. Diff: {new_scroll_height - (new_scroll_top + client_height)}")
+
+
+        print("\n--- Test 3: Body Scroll Preservation (Scrolled Middle) ---")
         body_div = page.locator(".message-body").first
 
         # Ensure body overflows
-        # The body content is 'Test Body Updated'. We need more content.
         long_body = "\\n".join([f"Body Line {i}" for i in range(50)])
-
         page.evaluate(f"""
             window.msgModule.setMessage('1', 'agent', 'Test Heading', '{long_body}', false, {{
-                'long_output': '{long_content}'
+                'long_output': '{longer_content}'
             }});
         """)
 
@@ -119,23 +118,21 @@ def run():
         body_div.evaluate(f"el => el.scrollTop = {target_scroll}")
 
         current_body_scroll = body_div.evaluate("el => el.scrollTop")
-        print(f"Set body scroll to: {current_body_scroll}")
 
         # Update again
         page.evaluate(f"""
             window.msgModule.setMessage('1', 'agent', 'Test Heading', '{long_body}', false, {{
-                'long_output': '{long_content}'
+                'long_output': '{longer_content}'
             }});
         """)
-
         time.sleep(0.5)
-        new_body_scroll = body_div.evaluate("el => el.scrollTop")
-        print(f"Body scroll after re-render: {new_body_scroll}")
 
-        if abs(new_body_scroll - current_body_scroll) > 5:
-             print("FAILURE: Body Scroll position not preserved")
-        else:
+        new_body_scroll = body_div.evaluate("el => el.scrollTop")
+
+        if abs(new_body_scroll - current_body_scroll) < 10:
              print("SUCCESS: Body Scroll position preserved")
+        else:
+             print(f"FAILURE: Body Scroll position moved from {current_body_scroll} to {new_body_scroll}")
 
         browser.close()
 

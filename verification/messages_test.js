@@ -1,10 +1,17 @@
+// Mock file created from webui/js/messages.js content
+// with imports stripped for independent testing
+// NOTE: This file is a modified copy of messages.js to remove ES module dependencies
+// that are hard to mock in a simple http.server environment.
+// Ideally this should use an import map or bundler, but for this specific verification task,
+// this isolation is sufficient.
 
-const openImageModal = () => {};
-const marked = { parse: (t) => t };
-const getAutoScroll = () => true;
-const _messageResizeStore = { getSetting: () => ({ minimized: false }), minimizeMessageClass: () => {}, maximizeMessageClass: () => {} };
-const attachmentsStore = { getAttachmentDisplayInfo: () => ({ isImage: false, filename: "mock", previewUrl: "", clickHandler: () => {} }) };
-window.katex = { render: () => {} };
+// Mock dependencies (global scope in browser test)
+const openImageModal = (window.imageModalModule || {}).openImageModal || (() => {});
+// Ensure marked is available
+const marked = (window.markedModule || {}).marked || { parse: t => t };
+const getAutoScroll = (window.getAutoScroll || (() => true));
+const _messageResizeStore = window.messageResizeStore;
+const attachmentsStore = window.attachmentsStore;
 
 const chatHistory = document.getElementById("chat-history");
 
@@ -220,6 +227,7 @@ export function _drawMessage(
 
       processedContent = convertImageTags(processedContent);
       processedContent = convertImgFilePaths(processedContent);
+      // Use mocked marked parser
       processedContent = marked.parse(processedContent, { breaks: true });
       processedContent = convertPathsToLinks(processedContent);
       processedContent = addBlankTargetsToLinks(processedContent);
