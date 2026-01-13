@@ -82,13 +82,44 @@
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-card, 0 1px 3px rgba(0,0,0,0.1));
   border: var(--glass-border);
-  cursor: pointer;
   transition: transform 0.2s;
-  /* Button resets */
-  border: none;
   text-align: left;
   width: 100%;
   font-family: var(--font-family);
+  display: flex;
+  flex-direction: column;
+}
+
+.document-content-clickable {
+  background: transparent;
+  border: none;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+  color: inherit;
+  font-family: inherit;
+  flex: 1;
+}
+
+.doc-actions {
+  margin-top: 1rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.delete-doc-btn {
+  color: #ef4444;
+  opacity: 0.7;
+  font-size: 1.2rem;
+  transition: opacity 0.2s;
+}
+
+.delete-doc-btn:hover {
+  opacity: 1;
+  background: rgba(239, 68, 68, 0.1);
 }
 
 .document-card:hover {

@@ -68,6 +68,28 @@ export default function StorybookUI() {
     }
   };
 
+  const handleDelete = async (docId) => {
+    if (!window.confirm("Are you sure you want to delete this document? This cannot be undone.")) return;
+
+    try {
+      const response = await fetch('/api/screenwriting/storybook/delete', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id: docId })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete document');
+      }
+
+      await fetchDocuments();
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
   const calculateTensionColor = (beatIndex, totalBeats) => {
     // Simple visualizer: start low, rise, dip, rise high
     const progress = beatIndex / totalBeats;
@@ -149,19 +171,36 @@ export default function StorybookUI() {
               <p className="empty-state">No documents found. Upload one to get started.</p>
             ) : (
               documents.map((doc) => (
-                <button
-                  key={doc.id}
-                  className="document-card"
-                  onClick={() => setSelectedDoc(doc)}
-                  type="button"
-                >
-                  <h4>{doc.name}</h4>
-                  <p>{doc.description}</p>
-                  <span className="doc-meta">Uploaded: {new Date(doc.uploaded_at).toLocaleDateString()}</span>
-                  <div className="tags">
-                    {doc.tags.map((tag, i) => <span key={i} className="tag">{tag}</span>)}
+                <div key={doc.id} className="document-card">
+                  <button
+                    className="document-content-clickable"
+                    onClick={() => setSelectedDoc(doc)}
+                    type="button"
+                  >
+                    <h4>{doc.name}</h4>
+                    <p>{doc.description}</p>
+                    <span className="doc-meta">Uploaded: {new Date(doc.uploaded_at).toLocaleDateString()}</span>
+                    <div className="tags">
+                      {doc.tags.map((tag, i) => <span key={i} className="tag">{tag}</span>)}
+                    </div>
+                  </button>
+                  <div className="doc-actions">
+                    <button
+                      className="btn-icon delete-doc-btn"
+                      onClick={() => handleDelete(doc.id)}
+                      aria-label={`Delete ${doc.name}`}
+                      title="Delete Document"
+                    >
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path d="M4 7H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M10 11V17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M14 11V17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M5 7L6 19C6 20.1046 6.89543 21 8 21H16C17.1046 21 18 20.1046 18 19L19 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M9 7V4C9 3.44772 9.44772 3 10 3H14C14.5523 3 15 3.44772 15 4V7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </button>
                   </div>
-                </button>
+                </div>
               ))
             )}
           </div>

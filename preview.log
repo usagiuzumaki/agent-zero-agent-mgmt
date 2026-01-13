@@ -1,6 +1,6 @@
 
 > ui-kit-react@0.0.0 preview /app/ui-kit-react
-> vite preview -- --port 4173
+> vite preview -- --port 4173 --host 0.0.0.0
 
   ➜  Local:   http://localhost:4173/
   ➜  Network: use --host to expose
