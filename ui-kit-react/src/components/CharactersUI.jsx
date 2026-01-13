@@ -157,6 +157,7 @@ export default function CharactersUI() {
                 </label>
                 <input
                   id="char-name"
+                  autoFocus
                   value={newChar.name}
                   onChange={e => setNewChar({...newChar, name: e.target.value})}
                   required
@@ -223,16 +224,26 @@ export default function CharactersUI() {
               />
             </div>
 
-            <button type="submit" className="btn-save" disabled={isSaving}>
-              {isSaving ? (
-                <div className="btn-save-content">
-                  <Spinner size="small" color="white" />
-                  <span>Saving...</span>
-                </div>
-              ) : (
-                'Save Character'
-              )}
-            </button>
+            <div className="form-actions">
+              <button type="submit" className="btn-save" disabled={isSaving}>
+                {isSaving ? (
+                  <div className="btn-save-content">
+                    <Spinner size="small" color="white" />
+                    <span>Saving...</span>
+                  </div>
+                ) : (
+                  'Save Character'
+                )}
+              </button>
+              <button
+                type="button"
+                className="btn-text"
+                onClick={handleCancel}
+                disabled={isSaving}
+              >
+                Cancel
+              </button>
+            </div>
           </form>
         </div>
       )}
