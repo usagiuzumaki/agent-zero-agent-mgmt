@@ -699,6 +699,10 @@ const KEY_CLASS_MAP = {
   reasoning: "msg-thoughts",
 };
 
+/**
+ * Captures the scroll state of KVPs and message body.
+ * This is critical for preserving scroll position during re-renders.
+ */
 function captureScrollState(container) {
   const state = {
     kvps: {}
