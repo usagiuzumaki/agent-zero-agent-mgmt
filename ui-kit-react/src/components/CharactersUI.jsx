@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Spinner from './common/Spinner';
+import CharacterCard from './CharacterCard';
 import './CharactersUI.css';
 
 export default function CharactersUI() {
@@ -9,22 +10,18 @@ export default function CharactersUI() {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
 
-  const initialCharState = {
+  const initialCharState = useMemo(() => ({
     name: '',
     role: 'Protagonist',
     archetype: '',
     motivation: '',
     flaw: '',
     bio: ''
-  };
+  }), []);
 
   const [newChar, setNewChar] = useState(initialCharState);
 
-  useEffect(() => {
-    fetchCharacters();
-  }, []);
-
-  const fetchCharacters = async () => {
+  const fetchCharacters = useCallback(async () => {
     try {
       const response = await fetch('/api/screenwriting/all');
       const data = await response.json();
@@ -36,9 +33,13 @@ export default function CharactersUI() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const handleEdit = (char) => {
+  useEffect(() => {
+    fetchCharacters();
+  }, [fetchCharacters]);
+
+  const handleEdit = useCallback((char) => {
     setNewChar({
       name: char.name || '',
       role: char.role || 'Protagonist',
@@ -51,15 +52,15 @@ export default function CharactersUI() {
     setShowForm(true);
     // Scroll to form
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  }, []);
 
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     setShowForm(false);
     setEditingId(null);
     setNewChar(initialCharState);
-  };
+  }, [initialCharState]);
 
-  const handleDelete = async (charId) => {
+  const handleDelete = useCallback(async (charId) => {
     if (!window.confirm("Are you sure you want to delete this character?")) return;
 
     try {
@@ -79,7 +80,7 @@ export default function CharactersUI() {
     } catch (err) {
       console.error("Failed to delete character", err);
     }
-  };
+  }, [editingId, fetchCharacters, handleCancel]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -113,15 +114,6 @@ export default function CharactersUI() {
       console.error("Failed to save character", err);
     } finally {
       setIsSaving(false);
-    }
-  };
-
-  const getRoleColor = (role) => {
-    switch(role.toLowerCase()) {
-      case 'protagonist': return 'var(--color-primary)';
-      case 'antagonist': return 'var(--color-tension-climax)';
-      case 'supporting': return 'var(--color-secondary)';
-      default: return 'var(--color-text-muted)';
     }
   };
 
@@ -252,38 +244,12 @@ export default function CharactersUI() {
           </div>
         ) : (
           characters.map((char) => (
-            <div key={char.id} className="char-card" style={{borderTop: `4px solid ${getRoleColor(char.role)}`}}>
-              <div className="char-card-header">
-                <h5>{char.name}</h5>
-                <span className="char-role" style={{color: getRoleColor(char.role)}}>{char.role}</span>
-              </div>
-
-              <div className="char-attributes">
-                {char.archetype && <div className="char-attr"><strong>Archetype:</strong> {char.archetype}</div>}
-                {char.motivation && <div className="char-attr"><strong>Want:</strong> {char.motivation}</div>}
-                {char.flaw && <div className="char-attr"><strong>Flaw:</strong> {char.flaw}</div>}
-              </div>
-
-              {char.bio && <p className="char-bio">{char.bio}</p>}
-
-              <div className="char-actions">
-                <button
-                  className="btn-text"
-                  onClick={() => handleEdit(char)}
-                  aria-label={`Edit ${char.name}`}
-                >
-                  Edit
-                </button>
-                <button
-                  className="btn-text delete"
-                  onClick={() => handleDelete(char.id)}
-                  aria-label={`Delete ${char.name}`}
-                  style={{ color: '#ef4444' }}
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
+            <CharacterCard
+              key={char.id}
+              char={char}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
           ))
         )}
       </div>
