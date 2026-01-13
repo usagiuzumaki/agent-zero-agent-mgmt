@@ -10,7 +10,7 @@ class WorldBuilder(ScreenwritingAgent):
     def __init__(self, number: int, config: AgentConfig, context=None):
         super().__init__(number, config, context)
 
-    async def check(self, bible: str) -> str:
+    async def build(self, bible: str) -> str:
         """Use tools to verify world-building consistency."""
         self.hist_add_user_message(
             "Review the following world-building bible for consistency and contradictions:\n" + bible
