@@ -263,6 +263,17 @@
   border-radius: 4px;
   cursor: pointer;
   font-family: var(--font-family);
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #4338ca; /* Indigo-700, slightly darker */
+}
+
+.btn-primary:disabled {
+  background-color: var(--color-text-muted);
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .btn-secondary {
@@ -389,6 +400,10 @@
   margin-bottom: 0.5rem;
   font-weight: 500;
   color: var(--color-text);
+}
+
+.required-star {
+  color: var(--color-tension-climax);
 }
 
 .flex-center {
