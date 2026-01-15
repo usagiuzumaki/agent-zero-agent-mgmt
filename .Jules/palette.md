@@ -9,3 +9,7 @@
 ## 2024-10-28 - State Persistence in Toggled Forms
 **Learning:** Toggling a form's visibility without resetting its state preserves "ghost data" from previous edits, confusing users who expect a fresh start on "Add New".
 **Action:** Bind "Cancel/Close" buttons to a handler that explicitly resets form state, rather than just toggling the boolean visibility flag.
+
+## 2024-05-24 - Chat Interface Accessibility
+**Learning:** Chat interfaces often lack `role="log"` and `aria-live="polite"`, making them silent for screen reader users. Also, empty states can collapse to 0 height, confusing users and failing tests.
+**Action:** Always add `role="log"` to chat message containers and ensure a `min-height` with a helpful empty state message.
