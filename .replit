@@ -16,10 +16,10 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Agent Zero Web UI"
+args = "Aria Bot Web UI"
 
 [[workflows.workflow]]
-name = "Agent Zero Web UI"
+name = "Aria Bot Web UI"
 author = "agent"
 
 [[workflows.workflow.tasks]]
