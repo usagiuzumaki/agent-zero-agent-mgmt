@@ -15,7 +15,7 @@ from python.helpers.print_style import PrintStyle
 
 class BackupService:
     """
-    Core backup and restore service for Agent Zero.
+    Core backup and restore service for Aria Bot.
 
     Features:
     - JSON-based metadata with user-editable path specifications
@@ -42,7 +42,7 @@ class BackupService:
         include_patterns, exclude_patterns = self._parse_patterns(default_patterns)
 
         return {
-            "backup_name": f"agent-zero-backup-{timestamp[:10]}",
+            "backup_name": f"aria-bot-backup-{timestamp[:10]}",
             "include_hidden": False,
             "include_patterns": include_patterns,
             "exclude_patterns": exclude_patterns,
@@ -60,11 +60,11 @@ class BackupService:
         # Ensure paths don't have double slashes
         agent_root = self.agent_zero_root.rstrip('/')
 
-        return f"""# Agent Zero Knowledge (excluding defaults)
+        return f"""# Aria Bot Knowledge (excluding defaults)
 {agent_root}/knowledge/**
 !{agent_root}/knowledge/default/**
 
-# Agent Zero Instruments (excluding defaults)
+# Aria Bot Instruments (excluding defaults)
 {agent_root}/instruments/**
 !{agent_root}/instruments/default/**
 
@@ -80,7 +80,7 @@ class BackupService:
 {agent_root}/tmp/uploads/**"""
 
     def _get_agent_zero_version(self) -> str:
-        """Get current Agent Zero version"""
+        """Get current Aria Bot version"""
         try:
             # Get version from git info (same as run_ui.py)
             gitinfo = git.get_git_info()
@@ -344,7 +344,7 @@ class BackupService:
         include_patterns: List[str],
         exclude_patterns: List[str],
         include_hidden: bool = False,
-        backup_name: str = "agent-zero-backup"
+        backup_name: str = "aria-bot-backup"
     ) -> str:
         """Create backup archive and return path to created file"""
 
