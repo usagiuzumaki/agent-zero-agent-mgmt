@@ -330,13 +330,6 @@ class DirtyJson:
         return "".join(result).strip()
 
     def _peek(self, n):
-        # Optimization: avoid slicing for single char lookahead
-        if n == 1:
-            idx = self.index + 1
-            if idx < len(self.json_string):
-                return self.json_string[idx]
-            return ""
-
         # Optimization: use slicing instead of loop
         peek_start = self.index + 1
         peek_end = peek_start + n
