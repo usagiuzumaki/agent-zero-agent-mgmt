@@ -142,9 +142,13 @@ export default function StorybookUI() {
               onChange={(e) => setUploadName(e.target.value)}
               className="input-field"
             />
-            <label htmlFor="doc-content" className="input-label">Paste Text Content</label>
+            <label htmlFor="doc-content" className="input-label">
+              Paste Text Content <span className="required-star" aria-hidden="true">*</span>
+            </label>
             <textarea
               id="doc-content"
+              required
+              aria-required="true"
               placeholder="Paste text content here to generate beats..."
               value={uploadContent}
               onChange={(e) => setUploadContent(e.target.value)}
@@ -152,7 +156,11 @@ export default function StorybookUI() {
               rows={10}
             />
             <div className="form-actions">
-              <button type="submit" className="btn-primary" disabled={isUploading}>
+              <button
+                type="submit"
+                className="btn-primary"
+                disabled={isUploading || !uploadContent.trim()}
+              >
                 {isUploading ? (
                   <span className="flex-center gap-2">
                     <Spinner size="small" color="white" /> Ingesting...
