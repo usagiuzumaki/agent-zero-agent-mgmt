@@ -15,5 +15,17 @@ export default defineConfig({
         changeOrigin: true,
       }
     }
+  },
+  preview: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+      },
+      '/image_get': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+      }
+    }
   }
 })
