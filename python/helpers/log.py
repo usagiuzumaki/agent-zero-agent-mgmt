@@ -4,7 +4,6 @@ from typing import Any, Literal, Optional, Dict
 import uuid
 from collections import OrderedDict  # Import OrderedDict
 from python.helpers.strings import truncate_text_by_ratio
-import copy
 
 Type = Literal[
     "agent",
@@ -48,14 +47,10 @@ def _truncate_key(text: str) -> str:
 def _truncate_value(val: Any) -> Any:
     # If dict, recursively truncate each value
     if isinstance(val, dict):
-        for k in list(val.keys()):
-            val[k] = _truncate_value(val[k])
-        return val
-    # If list or tuple, recursively truncate each item
+        return {k: _truncate_value(v) for k, v in val.items()}
+    # If list, recursively truncate each item
     if isinstance(val, list):
-        for i in range(len(val)):
-            val[i] = _truncate_value(val[i])
-        return val
+        return [_truncate_value(x) for x in val]
     if isinstance(val, tuple):
         return tuple(_truncate_value(x) for x in val)
 
@@ -185,13 +180,12 @@ class Log:
 
         # Truncate kvps
         if kvps is not None:
-            kvps = copy.deepcopy(kvps) # deep copy to avoid modifying the original kvps
+            # No need to deepcopy, _truncate_value creates new copies
             kvps = OrderedDict({
                 _truncate_key(k): _truncate_value(v) for k, v in kvps.items()
             })
         # Apply truncation to kwargs merged into kvps later
-        if kwargs is not None:
-            kwargs = copy.deepcopy(kwargs) # deep copy to avoid modifying the original kwargs
+        # No need to deepcopy, _truncate_value creates new copies
         kwargs = { _truncate_key(k): _truncate_value(v) for k, v in (kwargs or {}).items() }
 
         # Ensure kvps is OrderedDict even if None
@@ -242,7 +236,7 @@ class Log:
             item.content = _truncate_content(content)
 
         if kvps is not None:
-            kvps = copy.deepcopy(kvps) # deep copy to avoid modifying the original kvps
+            # No need to deepcopy, _truncate_value creates new copies
             item.kvps = OrderedDict({
                 _truncate_key(k): _truncate_value(v) for k, v in kvps.items()
             })  # Ensure order
@@ -251,7 +245,7 @@ class Log:
             item.temp = temp
 
         if kwargs:
-            kwargs = copy.deepcopy(kwargs) # deep copy to avoid modifying the original kwargs
+            # No need to deepcopy, _truncate_value creates new copies
             if item.kvps is None:
                 item.kvps = OrderedDict()  # Ensure kvps is an OrderedDict
             for k, v in kwargs.items():
