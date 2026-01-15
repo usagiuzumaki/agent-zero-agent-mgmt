@@ -11,6 +11,7 @@ export default function StorybookUI() {
   const [uploadName, setUploadName] = useState('');
   const [showUpload, setShowUpload] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
 
   useEffect(() => {
     fetchDocuments();
@@ -71,6 +72,7 @@ export default function StorybookUI() {
   const handleDelete = async (docId) => {
     if (!window.confirm("Are you sure you want to delete this document? This cannot be undone.")) return;
 
+    setDeletingId(docId);
     try {
       const response = await fetch('/api/screenwriting/storybook/delete', {
         method: 'POST',
@@ -87,6 +89,8 @@ export default function StorybookUI() {
       await fetchDocuments();
     } catch (err) {
       setError(err.message);
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -152,7 +156,7 @@ export default function StorybookUI() {
               rows={10}
             />
             <div className="form-actions">
-              <button type="submit" className="btn-primary" disabled={isUploading}>
+              <button type="submit" className="btn-primary" disabled={isUploading || !uploadContent.trim()}>
                 {isUploading ? (
                   <span className="flex-center gap-2">
                     <Spinner size="small" color="white" /> Ingesting...
@@ -190,14 +194,19 @@ export default function StorybookUI() {
                       onClick={() => handleDelete(doc.id)}
                       aria-label={`Delete ${doc.name}`}
                       title="Delete Document"
+                      disabled={deletingId === doc.id}
                     >
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                        <path d="M4 7H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M10 11V17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M14 11V17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M5 7L6 19C6 20.1046 6.89543 21 8 21H16C17.1046 21 18 20.1046 18 19L19 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M9 7V4C9 3.44772 9.44772 3 10 3H14C14.5523 3 15 3.44772 15 4V7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
+                      {deletingId === doc.id ? (
+                        <Spinner size="small" />
+                      ) : (
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                          <path d="M4 7H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M10 11V17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M14 11V17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M5 7L6 19C6 20.1046 6.89543 21 8 21H16C17.1046 21 18 20.1046 18 19L19 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M9 7V4C9 3.44772 9.44772 3 10 3H14C14.5523 3 15 3.44772 15 4V7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      )}
                     </button>
                   </div>
                 </div>
