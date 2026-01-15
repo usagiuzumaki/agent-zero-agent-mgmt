@@ -134,8 +134,8 @@ export default function CharactersUI() {
       <div className="chars-header">
         <h3>Cast of Characters</h3>
         <button
-          className="btn-primary"
-          onClick={() => setShowForm(!showForm)}
+          className={showForm ? "btn-secondary" : "btn-primary"}
+          onClick={showForm ? handleCancel : () => setShowForm(true)}
           aria-expanded={showForm}
           aria-controls="char-form"
         >
@@ -159,6 +159,7 @@ export default function CharactersUI() {
                   required
                   aria-required="true"
                   placeholder="Character Name"
+                  autoFocus
                 />
               </div>
               <div className="form-group">
@@ -220,16 +221,26 @@ export default function CharactersUI() {
               />
             </div>
 
-            <button type="submit" className="btn-save" disabled={isSaving}>
-              {isSaving ? (
-                <div className="btn-save-content">
-                  <Spinner size="small" color="white" />
-                  <span>Saving...</span>
-                </div>
-              ) : (
-                'Save Character'
-              )}
-            </button>
+            <div className="form-actions">
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={handleCancel}
+                style={{ marginRight: '1rem' }}
+              >
+                Cancel
+              </button>
+              <button type="submit" className="btn-save" disabled={isSaving} style={{ marginTop: 0 }}>
+                {isSaving ? (
+                  <div className="btn-save-content">
+                    <Spinner size="small" color="white" />
+                    <span>Saving...</span>
+                  </div>
+                ) : (
+                  'Save Character'
+                )}
+              </button>
+            </div>
           </form>
         </div>
       )}
