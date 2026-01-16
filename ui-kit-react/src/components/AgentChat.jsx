@@ -12,6 +12,7 @@ export default function AgentChat({ onLog }) {
   // Scroll logic
   const messagesEndRef = useRef(null);
   const containerRef = useRef(null);
+  const textareaRef = useRef(null);
   const [isNearBottom, setIsNearBottom] = useState(true);
 
   // Check if user is near bottom on scroll
@@ -32,6 +33,21 @@ export default function AgentChat({ onLog }) {
     }
   }, [messages, isNearBottom]);
 
+  // Auto-resize textarea
+  useEffect(() => {
+    if (textareaRef.current) {
+      // Reset height to auto to calculate correct scrollHeight
+      textareaRef.current.style.height = 'auto';
+
+      const scrollHeight = textareaRef.current.scrollHeight;
+      // Set new height based on scrollHeight, capped at 150px
+      const newHeight = Math.min(scrollHeight, 150);
+      textareaRef.current.style.height = `${newHeight}px`;
+
+      // Show scrollbar only if content exceeds max height
+      textareaRef.current.style.overflowY = scrollHeight > 150 ? 'auto' : 'hidden';
+    }
+  }, [input]);
 
   const sendMessage = () => {
     if (!input.trim()) return;
@@ -86,19 +102,58 @@ export default function AgentChat({ onLog }) {
       </div>
       <div className="input-row">
         <textarea
+          ref={textareaRef}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Type a message (Shift+Enter for new line)"
+          placeholder="Type a message..."
           aria-label="Message input"
-          rows={3}
+          rows={1}
+          style={{
+            minHeight: '40px',
+            maxHeight: '150px',
+            resize: 'none',
+            overflowY: 'hidden' // Initial state, updated by useEffect
+          }}
         />
         <button
           onClick={sendMessage}
           disabled={!input.trim()}
           aria-label="Send message"
+          title="Send message"
+          style={{
+            height: '40px',
+            width: '40px',
+            padding: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: '50%' // Make it circular for the icon
+          }}
         >
-          Send
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <path
+              d="M22 2L11 13"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M22 2L15 22L11 13L2 9L22 2Z"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
         </button>
       </div>
     </div>
