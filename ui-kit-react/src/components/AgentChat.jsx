@@ -1,5 +1,6 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { getTools } from '../plugins';
+import MessageList from './MessageList';
 
 /**
  * Chat panel with message list, input box and plugin action buttons.
@@ -15,7 +16,7 @@ export default function AgentChat({ onLog }) {
   const [isNearBottom, setIsNearBottom] = useState(true);
 
   // Check if user is near bottom on scroll
-  const handleScroll = () => {
+  const handleScroll = useCallback(() => {
     const container = containerRef.current;
     if (container) {
       const { scrollTop, scrollHeight, clientHeight } = container;
@@ -23,7 +24,7 @@ export default function AgentChat({ onLog }) {
       const bottom = scrollHeight - scrollTop - clientHeight < 50;
       setIsNearBottom(bottom);
     }
-  };
+  }, []);
 
   // Scroll to bottom when messages change, IF we were already near bottom
   useEffect(() => {
@@ -67,16 +68,12 @@ export default function AgentChat({ onLog }) {
 
   return (
     <div className="agent-chat">
-      <div
-        className="messages"
-        ref={containerRef}
+      <MessageList
+        messages={messages}
+        containerRef={containerRef}
         onScroll={handleScroll}
-      >
-        {messages.map((m) => (
-          <div key={m.id} className={`msg msg-${m.sender}`}>{m.text}</div>
-        ))}
-        <div ref={messagesEndRef} />
-      </div>
+        messagesEndRef={messagesEndRef}
+      />
       <div className="tool-bar">
         {tools.map((tool) => (
           <button key={tool.name} onClick={() => handleTool(tool)}>
