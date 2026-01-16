@@ -172,7 +172,23 @@ export default function StorybookUI() {
         {!selectedDoc ? (
           <div className="document-list">
             {documents.length === 0 ? (
-              <p className="empty-state">No documents found. Upload one to get started.</p>
+              <div className="empty-state-container">
+                <div className="empty-state-icon" aria-hidden="true">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 6.25278V19.2528M12 6.25278C10.8321 5.47686 9.24649 5 7.5 5C5.74696 5 4.15607 5.48237 3 6.27214V19.2721C4.15607 18.4824 5.74696 18 7.5 18C9.25304 18 10.8439 18.4824 12 19.2721M12 6.25278C13.1679 5.47686 14.7535 5 16.5 5C18.253 5 19.8439 5.48237 21 6.27214V19.2721C19.8439 18.4824 18.253 18 16.5 18C14.747 18 13.1561 18.4824 12 19.2721" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+                <h3>Start Your Story</h3>
+                <p className="empty-state-text">
+                  Your storybook is empty. Upload a script or document to begin analyzing your narrative structure.
+                </p>
+                <button
+                  className="btn-primary"
+                  onClick={() => setShowUpload(true)}
+                >
+                  Ingest New Document
+                </button>
+              </div>
             ) : (
               documents.map((doc) => (
                 <div key={doc.id} className="document-card">
@@ -197,7 +213,7 @@ export default function StorybookUI() {
                       disabled={deletingId === doc.id}
                     >
                       {deletingId === doc.id ? (
-                        <Spinner size="small" />
+                        <Spinner size="small" color="danger" />
                       ) : (
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                           <path d="M4 7H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
