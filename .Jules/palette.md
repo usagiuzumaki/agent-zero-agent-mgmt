@@ -9,3 +9,7 @@
 ## 2024-10-28 - State Persistence in Toggled Forms
 **Learning:** Toggling a form's visibility without resetting its state preserves "ghost data" from previous edits, confusing users who expect a fresh start on "Add New".
 **Action:** Bind "Cancel/Close" buttons to a handler that explicitly resets form state, rather than just toggling the boolean visibility flag.
+
+## 2025-01-28 - CSS Utility Isolation
+**Learning:** Utility classes (e.g., `.btn-primary`) are often locally scoped or missing from global stylesheets in this project, leading to broken styles when reused.
+**Action:** Verify class existence before use, or rely on inline styles/component-specific CSS to ensure consistent appearance, especially for micro-interactions like icon buttons.
