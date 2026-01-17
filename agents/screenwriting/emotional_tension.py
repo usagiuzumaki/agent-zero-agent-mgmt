@@ -10,7 +10,7 @@ class EmotionalTension(ScreenwritingAgent):
     def __init__(self, number: int, config: AgentConfig, context=None):
         super().__init__(number, config, context)
 
-    async def gauge(self, script: str) -> str:
+    async def analyze(self, script: str) -> str:
         """Assess emotional tension across the script.
 
         Employs tools and instruments to map intensity levels.

@@ -1,7 +1,7 @@
 import pytest
 import models
 from agents import AgentConfig
-from .pacing_metrics import PacingMetrics
+from .mbti_evaluator import MBTIEvaluator
 
 
 def dummy_config():
@@ -17,10 +17,10 @@ def dummy_config():
 
 
 @pytest.mark.asyncio
-async def test_analyze_basic():
-    agent = PacingMetrics(0, dummy_config())
-    metrics_str = await agent.analyze("Run! Jump. Stop?")
-    assert "Sentences" in metrics_str
-    assert "3" in metrics_str
-    assert "Exclamations" in metrics_str
-    assert "1" in metrics_str
+async def test_analyze_mbti():
+    agent = MBTIEvaluator(0, dummy_config())
+    # "Alone" -> I, "Analysis" -> T, "Plan" -> J
+    result = await agent.analyze("I like being alone and doing analysis. I plan everything.")
+    assert "MBTI Analysis" in result
+    assert "Estimated Type" in result
+    assert "Scores" in result
