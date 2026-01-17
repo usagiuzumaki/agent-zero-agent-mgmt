@@ -71,7 +71,17 @@ export default function AgentChat({ onLog }) {
         className="messages"
         ref={containerRef}
         onScroll={handleScroll}
+        role="log"
+        aria-live="polite"
+        aria-label="Chat history"
+        tabIndex={0}
+        style={{ minHeight: '200px' }}
       >
+        {messages.length === 0 && (
+          <div className="empty-state" style={{ padding: '1rem', color: 'var(--color-text-muted)', textAlign: 'center' }}>
+            Start a conversation...
+          </div>
+        )}
         {messages.map((m) => (
           <div key={m.id} className={`msg msg-${m.sender}`}>{m.text}</div>
         ))}
