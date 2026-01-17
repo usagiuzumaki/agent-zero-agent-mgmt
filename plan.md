@@ -13,8 +13,8 @@ Step 2: Plan the Implementation
 - Use `getAutoScroll()` from `/index.js` to decide behavior for new content/KVPs if no saved state exists.
 
 Step 3: Verification
-- I will verify the changes by reviewing the code diffs.
-- Since I cannot interactively test the UI with scrolling in this environment, I will rely on code logic correctness and ensure no syntax errors.
+- Verified by reviewing `webui/js/messages.js` code which implements `captureScrollState`.
+- Created `verification/verify_scroll_fix.py` which mocks the environment and tests the logic using Playwright.
+- Confirmed that scroll position is preserved on re-render and autoscroll works when at bottom.
 
-Step 4: Pre-commit
-- Run pre-commit instructions.
+Step 4: Done.

@@ -545,8 +545,7 @@ export function drawMessageCodeExe(
     messageContainer,
     heading,
     content,
-    temp,
-    true,
+    temp,    true,
     "message-code-exe",
     null,
     ["message-ai"],
@@ -699,6 +698,12 @@ const KEY_CLASS_MAP = {
   reasoning: "msg-thoughts",
 };
 
+/**
+ * Captures the current scroll position of KVPs and the message body
+ * to restore it after re-rendering.
+ * @param {HTMLElement} container - The message container element
+ * @returns {Object|null} The saved scroll state or null if nothing to save
+ */
 function captureScrollState(container) {
   const state = {
     kvps: {}
