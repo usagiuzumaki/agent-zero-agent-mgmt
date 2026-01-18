@@ -19,3 +19,7 @@ class EmotionalTension(ScreenwritingAgent):
             "Use tools and instruments to assess emotional tension in:\n" + script
         )
         return await self.monologue()
+
+    async def analyze(self, text: str) -> str:
+        """Standardized analysis method for pipeline integration."""
+        return await self.gauge(text)
