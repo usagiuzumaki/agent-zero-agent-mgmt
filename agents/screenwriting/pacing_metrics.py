@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 from typing import Dict
+import json
 
 from agents import AgentConfig
 from .base import ScreenwritingAgent
@@ -25,3 +26,8 @@ class PacingMetrics(ScreenwritingAgent):
             "avg_sentence_length": avg_len,
             "exclamations": script.count("!"),
         }
+
+    async def analyze(self, text: str) -> str:
+        """Standardized analysis method for pipeline integration."""
+        metrics = self.compute(text)
+        return f"## Pacing Metrics\n\n```json\n{json.dumps(metrics, indent=2)}\n```"

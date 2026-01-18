@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 from typing import Dict, Tuple
+import json
 
 from agents import AgentConfig
 from .base import ScreenwritingAgent
@@ -31,3 +32,8 @@ class MBTIEvaluator(ScreenwritingAgent):
             scores[b] += sum(1 for w in words if w in set_b)
         mbti = "".join(a if scores[a] >= scores[b] else b for a, b, *_ in TRAITS)
         return {"type": mbti, "scores": scores}
+
+    async def analyze(self, text: str) -> str:
+        """Standardized analysis method for pipeline integration."""
+        result = self.evaluate(text)
+        return f"## MBTI Evaluation\n\n**Type:** {result['type']}\n\n```json\n{json.dumps(result['scores'], indent=2)}\n```"
