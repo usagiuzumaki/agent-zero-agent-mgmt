@@ -346,3 +346,23 @@ body {
 #panel-assistant {
   overflow: hidden;
 }
+
+/* Send Button Icon Style */
+.agent-chat .input-row .send-btn {
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex-shrink: 0;
+}
+
+/* Ensure specificity for egirl-ui override if needed */
+.egirl-ui .agent-chat .input-row .send-btn {
+  padding: 0.5rem;
+  border-radius: 50%;
+  width: 2.5rem;
+  height: 2.5rem;
+}
