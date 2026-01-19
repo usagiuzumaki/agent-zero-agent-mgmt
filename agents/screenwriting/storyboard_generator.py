@@ -13,6 +13,9 @@ class StoryboardGenerator(ScreenwritingAgent):
     async def generate(self, script: str) -> str:
         """Use tools to craft a visual storyboard from script text."""
         self.hist_add_user_message(
-            "Create a concise visual storyboard for the following script:\n" + script
-        )
+            "Create a concise visual storyboard for the following script:\n" + script)
         return await self.monologue()
+
+    async def analyze(self, text: str) -> str:
+        """Standard interface for pipeline execution."""
+        return await self.generate(text)

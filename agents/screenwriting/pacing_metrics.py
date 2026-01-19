@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+import json
 from typing import Dict
 
 from agents import AgentConfig
@@ -17,7 +18,10 @@ class PacingMetrics(ScreenwritingAgent):
 
     def compute(self, script: str) -> Dict[str, float]:
         """Return counts of sentences and average sentence length."""
-        sentences = [s.strip() for s in re.split(r"[.!?]+", script) if s.strip()]
+        sentences = [
+            s.strip() for s in re.split(
+                r"[.!?]+",
+                script) if s.strip()]
         word_counts = [len(s.split()) for s in sentences]
         avg_len = sum(word_counts) / len(word_counts) if word_counts else 0.0
         return {
@@ -25,3 +29,9 @@ class PacingMetrics(ScreenwritingAgent):
             "avg_sentence_length": avg_len,
             "exclamations": script.count("!"),
         }
+
+    async def analyze(self, text: str) -> str:
+        """Run pacing analysis and return a formatted string."""
+        metrics = self.compute(text)
+        json_output = json.dumps(metrics, indent=2)
+        return f"**Pacing Metrics**\n```json\n{json_output}\n```"

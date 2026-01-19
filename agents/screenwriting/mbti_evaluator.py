@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+import json
 from typing import Dict, Tuple
 
 from agents import AgentConfig
@@ -25,9 +26,17 @@ class MBTIEvaluator(ScreenwritingAgent):
     def evaluate(self, text: str) -> Dict[str, object]:
         """Return raw trait scores and a best-guess type."""
         words = re.findall(r"\w+", text.lower())
-        scores: Dict[str, int] = {trait: 0 for pair in TRAITS for trait in pair[:2]}
+        scores: Dict[str, int] = {
+            trait: 0 for pair in TRAITS for trait in pair[:2]}
         for a, b, set_a, set_b in TRAITS:
             scores[a] += sum(1 for w in words if w in set_a)
             scores[b] += sum(1 for w in words if w in set_b)
-        mbti = "".join(a if scores[a] >= scores[b] else b for a, b, *_ in TRAITS)
+        mbti = "".join(a if scores[a] >= scores[b]
+                       else b for a, b, *_ in TRAITS)
         return {"type": mbti, "scores": scores}
+
+    async def analyze(self, text: str) -> str:
+        """Run MBTI evaluation and return a formatted string."""
+        result = self.evaluate(text)
+        json_output = json.dumps(result['scores'], indent=2)
+        return f"**MBTI Evaluation**\nType: {result['type']}\n```json\n{json_output}\n```"
