@@ -1,6 +1,6 @@
 """Agent that tracks and amplifies emotional stakes in scripts."""
 
-from agents import AgentConfig
+from agents import AgentConfig, UserMessage
 from .base import ScreenwritingAgent
 
 
@@ -16,6 +16,10 @@ class EmotionalTension(ScreenwritingAgent):
         Employs tools and instruments to map intensity levels.
         """
         self.hist_add_user_message(
-            "Use tools and instruments to assess emotional tension in:\n" + script
+            UserMessage("Use tools and instruments to assess emotional tension in:\n" + script)
         )
         return await self.monologue()
+
+    async def analyze(self, text: str) -> str:
+        """Standard interface for pipeline integration."""
+        return await self.gauge(text)

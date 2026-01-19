@@ -2,7 +2,7 @@
 
 from typing import Literal
 
-from agents import AgentConfig
+from agents import AgentConfig, UserMessage
 from .base import ScreenwritingAgent
 
 
@@ -33,8 +33,10 @@ class ScreamAnalyzer(ScreenwritingAgent):
         """Highlight screams and return an intensity classification."""
         intensity = self.classify_intensity(text)
         self.hist_add_user_message(
-            "Use available tools to analyze the following text for screams or intense emotional outbursts:\n"
-            + text
+            UserMessage(
+                "Use available tools to analyze the following text for screams or intense emotional outbursts:\n"
+                + text
+            )
         )
         details = await self.monologue()
         return f"Intensity: {intensity}\n\n{details}"

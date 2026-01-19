@@ -1,6 +1,6 @@
 """Agent that evaluates commercial potential and audience appeal."""
 
-from agents import AgentConfig
+from agents import AgentConfig, UserMessage
 from .base import ScreenwritingAgent
 
 
@@ -16,6 +16,10 @@ class Marketability(ScreenwritingAgent):
         Uses tools and instruments to support its assessment.
         """
         self.hist_add_user_message(
-            "Use available tools to evaluate marketability of:\n" + synopsis
+            UserMessage("Use available tools to evaluate marketability of:\n" + synopsis)
         )
         return await self.monologue()
+
+    async def analyze(self, text: str) -> str:
+        """Standard interface for pipeline integration."""
+        return await self.assess(text)
