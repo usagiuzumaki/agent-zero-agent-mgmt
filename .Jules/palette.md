@@ -9,3 +9,7 @@
 ## 2024-10-28 - State Persistence in Toggled Forms
 **Learning:** Toggling a form's visibility without resetting its state preserves "ghost data" from previous edits, confusing users who expect a fresh start on "Add New".
 **Action:** Bind "Cancel/Close" buttons to a handler that explicitly resets form state, rather than just toggling the boolean visibility flag.
+
+## 2025-01-26 - Async Button Feedback
+**Learning:** Users often double-click destructive actions if there's no immediate visual feedback during network requests, leading to errors or frustration.
+**Action:** Always implement a dedicated `isDeleting`/`isSaving` state that disables the button and replaces the icon/text with a spinner immediately upon interaction.
