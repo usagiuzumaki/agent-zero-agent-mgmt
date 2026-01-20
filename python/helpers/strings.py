@@ -17,6 +17,14 @@ def calculate_valid_match_lengths(first: bytes | str, second: bytes | str,
     first_length = len(first)
     second_length = len(second)
 
+    # Pre-compile patterns
+    compiled_patterns = []
+    for p in ignore_patterns:
+        if isinstance(p, (str, bytes)):
+            compiled_patterns.append(re.compile(p))
+        else:
+            compiled_patterns.append(p)
+
     i, j = 0, 0
     deviations = 0
     matched_since_deviation = 0
@@ -25,10 +33,10 @@ def calculate_valid_match_lengths(first: bytes | str, second: bytes | str,
     def skip_ignored_patterns(s, index):
         """Skip characters in `s` that match any pattern in `ignore_patterns` starting from `index`."""
         while index < len(s):
-            for pattern in ignore_patterns:
-                match = re.match(pattern, s[index:])
+            for pattern in compiled_patterns:
+                match = pattern.match(s, pos=index)
                 if match:
-                    index += len(match.group(0))
+                    index = match.end()
                     break
             else:
                 break
