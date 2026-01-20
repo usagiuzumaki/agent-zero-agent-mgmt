@@ -19,3 +19,7 @@ class Marketability(ScreenwritingAgent):
             "Use available tools to evaluate marketability of:\n" + synopsis
         )
         return await self.monologue()
+
+    async def analyze(self, text: str) -> str:
+        """Standardized analysis method for pipeline integration."""
+        return await self.assess(text)

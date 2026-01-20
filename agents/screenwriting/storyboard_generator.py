@@ -16,3 +16,7 @@ class StoryboardGenerator(ScreenwritingAgent):
             "Create a concise visual storyboard for the following script:\n" + script
         )
         return await self.monologue()
+
+    async def analyze(self, text: str) -> str:
+        """Standardized analysis method for pipeline integration."""
+        return await self.generate(text)
