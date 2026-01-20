@@ -1,5 +1,6 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { getTools } from '../plugins';
+import MessageList from './MessageList';
 
 /**
  * Chat panel with message list, input box and plugin action buttons.
@@ -20,26 +21,26 @@ export default function AgentChat({ onLog }) {
 
   // Scroll logic
   const containerRef = useRef(null);
-  const [isNearBottom, setIsNearBottom] = useState(true);
+  // Use useRef for tracking scroll state to avoid re-renders
+  const isNearBottomRef = useRef(true);
 
   // Check if user is near bottom on scroll
-  const handleScroll = () => {
+  const handleScroll = useCallback(() => {
     const container = containerRef.current;
     if (container) {
       const { scrollTop, scrollHeight, clientHeight } = container;
       // 50px threshold to determine if "near bottom"
       const bottom = scrollHeight - scrollTop - clientHeight < 50;
-      setIsNearBottom(bottom);
+      isNearBottomRef.current = bottom;
     }
-  };
+  }, []);
 
   // Scroll to bottom when messages change, IF we were already near bottom
   useEffect(() => {
-    if (isNearBottom && messagesEndRef.current) {
+    if (isNearBottomRef.current && messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages, isNearBottom]);
-
+  }, [messages]);
 
   const sendMessage = () => {
     if (!input.trim()) return;
@@ -51,7 +52,7 @@ export default function AgentChat({ onLog }) {
     onLog && onLog(`user: ${text}`);
     setInput('');
     // Ensure we scroll to bottom when user sends a message
-    setIsNearBottom(true);
+    isNearBottomRef.current = true;
   };
 
   const handleKeyDown = (e) => {
@@ -80,10 +81,7 @@ export default function AgentChat({ onLog }) {
         ref={containerRef}
         onScroll={handleScroll}
       >
-        {messages.map((m) => (
-          <div key={m.id} className={`msg msg-${m.sender}`}>{m.text}</div>
-        ))}
-        <div ref={messagesEndRef} />
+        <MessageList messages={messages} bottomRef={messagesEndRef} />
       </div>
       <div className="tool-bar">
         {tools.map((tool) => (
@@ -107,8 +105,23 @@ export default function AgentChat({ onLog }) {
           onClick={sendMessage}
           disabled={!input.trim()}
           aria-label="Send message"
+          title="Send message"
+          className="send-btn"
         >
-          Send
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
         </button>
       </div>
     </div>
