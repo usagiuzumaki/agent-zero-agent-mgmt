@@ -12,10 +12,6 @@ export default function AgentChat({ onLog }) {
   const textareaRef = useRef(null);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
-  useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
       textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
@@ -23,7 +19,6 @@ export default function AgentChat({ onLog }) {
   }, [input]);
 
   // Scroll logic
-  const messagesEndRef = useRef(null);
   const containerRef = useRef(null);
   const [isNearBottom, setIsNearBottom] = useState(true);
 
