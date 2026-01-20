@@ -1,5 +1,6 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { getTools } from '../plugins';
+import MessageList from './MessageList';
 
 /**
  * Chat panel with message list, input box and plugin action buttons.
@@ -20,25 +21,25 @@ export default function AgentChat({ onLog }) {
 
   // Scroll logic
   const containerRef = useRef(null);
-  const [isNearBottom, setIsNearBottom] = useState(true);
+  const isNearBottomRef = useRef(true);
 
   // Check if user is near bottom on scroll
-  const handleScroll = () => {
+  const handleScroll = useCallback(() => {
     const container = containerRef.current;
     if (container) {
       const { scrollTop, scrollHeight, clientHeight } = container;
       // 50px threshold to determine if "near bottom"
       const bottom = scrollHeight - scrollTop - clientHeight < 50;
-      setIsNearBottom(bottom);
+      isNearBottomRef.current = bottom;
     }
-  };
+  }, []);
 
   // Scroll to bottom when messages change, IF we were already near bottom
   useEffect(() => {
-    if (isNearBottom && messagesEndRef.current) {
+    if (isNearBottomRef.current && messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages, isNearBottom]);
+  }, [messages]);
 
 
   const sendMessage = () => {
@@ -51,7 +52,7 @@ export default function AgentChat({ onLog }) {
     onLog && onLog(`user: ${text}`);
     setInput('');
     // Ensure we scroll to bottom when user sends a message
-    setIsNearBottom(true);
+    isNearBottomRef.current = true;
   };
 
   const handleKeyDown = (e) => {
@@ -75,16 +76,16 @@ export default function AgentChat({ onLog }) {
 
   return (
     <div className="agent-chat">
-      <div
-        className="messages"
-        ref={containerRef}
+      {/*
+        Optimization: MessageList is memoized to prevent re-rendering the entire
+        message history on every keystroke (when 'input' state changes).
+      */}
+      <MessageList
+        messages={messages}
+        containerRef={containerRef}
+        messagesEndRef={messagesEndRef}
         onScroll={handleScroll}
-      >
-        {messages.map((m) => (
-          <div key={m.id} className={`msg msg-${m.sender}`}>{m.text}</div>
-        ))}
-        <div ref={messagesEndRef} />
-      </div>
+      />
       <div className="tool-bar">
         {tools.map((tool) => (
           <button key={tool.name} onClick={() => handleTool(tool)}>
