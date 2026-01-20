@@ -1,6 +1,6 @@
 """Agent that reviews and improves dialogue for natural flow."""
 
-from agents import AgentConfig
+from agents import AgentConfig, UserMessage
 from .base import ScreenwritingAgent
 
 
@@ -15,7 +15,8 @@ class DialogueEvaluator(ScreenwritingAgent):
 
         Leverages tools and instruments to refine suggestions.
         """
-        self.hist_add_user_message(
-            "Use available tools to critique this dialogue:\n" + dialogue
+        msg = UserMessage(
+            message="Use available tools to critique this dialogue:\n" + dialogue
         )
+        self.hist_add_user_message(msg)
         return await self.monologue()

@@ -1,6 +1,6 @@
 """Agent that evaluates character development and consistency."""
 
-from agents import AgentConfig
+from agents import AgentConfig, UserMessage
 from .base import ScreenwritingAgent
 
 
@@ -15,8 +15,8 @@ class CharacterAnalyzer(ScreenwritingAgent):
 
         The agent may invoke tools and instruments to support its reasoning.
         """
-        self.hist_add_user_message(
-            "Use tools like the script_analyzer instrument to analyze the characters in the following script:\n"
-            + script
+        msg = UserMessage(
+            message="Use tools like the script_analyzer instrument to analyze the characters in the following script:\n" + script
         )
+        self.hist_add_user_message(msg)
         return await self.monologue()

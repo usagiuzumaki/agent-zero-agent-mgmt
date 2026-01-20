@@ -1,6 +1,6 @@
 """Agent that produces a simple visual storyboard outline."""
 
-from agents import AgentConfig
+from agents import AgentConfig, UserMessage
 from .base import ScreenwritingAgent
 
 
@@ -12,7 +12,12 @@ class StoryboardGenerator(ScreenwritingAgent):
 
     async def generate(self, script: str) -> str:
         """Use tools to craft a visual storyboard from script text."""
-        self.hist_add_user_message(
-            "Create a concise visual storyboard for the following script:\n" + script
+        msg = UserMessage(
+            message="Create a concise visual storyboard for the following script:\n" + script
         )
+        self.hist_add_user_message(msg)
         return await self.monologue()
+
+    async def analyze(self, script: str) -> str:
+        """Alias for generate."""
+        return await self.generate(script)

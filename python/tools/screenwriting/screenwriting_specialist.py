@@ -57,10 +57,10 @@ class ScreenwritingSpecialist(Tool):
             "CharacterAnalyzer": (CharacterAnalyzer, "analyze"),
             "PacingMetrics": (PacingMetrics, "analyze"),
             "EmotionalTension": (EmotionalTension, "analyze"),
-            "Marketability": (Marketability, "assess"),
-            "MBTIEvaluator": (MBTIEvaluator, "evaluate"),
+            "Marketability": (Marketability, "analyze"),
+            "MBTIEvaluator": (MBTIEvaluator, "analyze"),
             "ScreamAnalyzer": (ScreamAnalyzer, "analyze"),
-            "StoryboardGenerator": (StoryboardGenerator, "generate"),
+            "StoryboardGenerator": (StoryboardGenerator, "analyze"),
             "WorldBuilder": (WorldBuilder, "build"),
         }
 
@@ -73,9 +73,6 @@ class ScreenwritingSpecialist(Tool):
         PrintStyle(font_color="#E67E22", bold=True).print(f"[{self.agent.agent_name}] Consulting Specialist: {specialist}")
 
         # Instantiate the agent
-        # We use a sub-number to indicate it's a child process, though for a direct tool call
-        # it might not be strictly necessary to be a subordinate in the full sense,
-        # but we follow the pattern to ensure context sharing if needed.
         sub_number = self.agent.number + 1
         sub_agent = AgentClass(sub_number, self.agent.config, self.agent.context)
 
