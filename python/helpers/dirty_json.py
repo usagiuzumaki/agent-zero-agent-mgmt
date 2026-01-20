@@ -28,6 +28,12 @@ class DirtyJson:
 
     @staticmethod
     def parse_string(json_string):
+        # Optimization: Try standard json.loads first for performance
+        try:
+            return json.loads(json_string)
+        except (json.JSONDecodeError, TypeError):
+            pass
+
         parser = DirtyJson()
         return parser.parse(json_string)
 
@@ -202,15 +208,16 @@ class DirtyJson:
             return self._parse_unquoted_key()
 
     def _parse_unquoted_key(self):
-        result = ""
+        # Optimization: use list join instead of string concatenation
+        result = []
         while (
             self.current_char is not None
             and not self.current_char.isspace()
             and self.current_char not in [":", ",", "}", "]"]
         ):
-            result += self.current_char
+            result.append(self.current_char)
             self._advance()
-        return result
+        return "".join(result)
 
     def _parse_array(self):
         arr = []
@@ -243,20 +250,21 @@ class DirtyJson:
                 return
 
     def _parse_string(self):
-        result = ""
+        # Optimization: use list join instead of string concatenation
+        result = []
         quote_char = self.current_char
         self._advance()  # Skip opening quote
         while self.current_char is not None and self.current_char != quote_char:
             if self.current_char == "\\":
                 self._advance()
                 if self.current_char in ['"', "'", "\\", "/", "b", "f", "n", "r", "t"]:
-                    result += {
+                    result.append({
                         "b": "\b",
                         "f": "\f",
                         "n": "\n",
                         "r": "\r",
                         "t": "\t",
-                    }.get(self.current_char, self.current_char)
+                    }.get(self.current_char, self.current_char))
                 elif self.current_char == "u":
                     self._advance()  # Skip 'u'
                     unicode_char = ""
@@ -264,21 +272,23 @@ class DirtyJson:
                     for _ in range(4):
                         if self.current_char is None or not self.current_char.isalnum():
                             # If we can't get 4 hex digits, treat it as a literal '\u' followed by whatever we got
-                            return result + "\\u" + unicode_char
+                            result.append("\\u" + unicode_char)
+                            break # break inner loop
                         unicode_char += self.current_char
                         self._advance()
-                    try:
-                        result += chr(int(unicode_char, 16))
-                    except ValueError:
-                        # If invalid hex value, treat as literal
-                        result += "\\u" + unicode_char
-                    continue
+                    else: # Executed if loop finished normally (found 4 chars)
+                        try:
+                            result.append(chr(int(unicode_char, 16)))
+                        except ValueError:
+                            # If invalid hex value, treat as literal
+                            result.append("\\u" + unicode_char)
+                    continue # Continue to next char in while loop
             else:
-                result += self.current_char
+                result.append(self.current_char)
             self._advance()
         if self.current_char == quote_char:
             self._advance()  # Skip closing quote
-        return result
+        return "".join(result)
 
     def _parse_multiline_string(self):
         result = ""
@@ -306,28 +316,31 @@ class DirtyJson:
             return float(number_str)
 
     def _parse_unquoted_string(self):
-        result = ""
+        # Optimization: use list join instead of string concatenation
+        result = []
         while self.current_char is not None and self.current_char not in [
             ":",
             ",",
             "}",
             "]",
         ]:
-            result += self.current_char
+            result.append(self.current_char)
             self._advance()
         self._advance()
-        return result.strip()
+        return "".join(result).strip()
 
     def _peek(self, n):
-        peek_index = self.index + 1
-        result = ""
-        for _ in range(n):
-            if peek_index < len(self.json_string):
-                result += self.json_string[peek_index]
-                peek_index += 1
-            else:
-                break
-        return result
+        # Optimization: avoid slicing for single char lookahead
+        if n == 1:
+            idx = self.index + 1
+            if idx < len(self.json_string):
+                return self.json_string[idx]
+            return ""
+
+        # Optimization: use slicing instead of loop
+        peek_start = self.index + 1
+        peek_end = peek_start + n
+        return self.json_string[peek_start:peek_end]
 
     def get_start_pos(self, input_str: str) -> int:
         chars = ["{", "[", '"']

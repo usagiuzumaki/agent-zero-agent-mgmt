@@ -7,3 +7,7 @@
 ## 2025-02-12 - [Optimizing simple_eval in Loops]
 **Learning:** The `simpleeval` library, like `eval()`, incurs significant overhead when parsing expression strings repeatedly. In `python/helpers/memory.py`, replacing per-item `simple_eval(condition)` with a pre-compiled code object (via `compile()`) and standard `eval()` yielded a massive ~200x speedup (10s -> 0.05s for 10k items).
 **Action:** For hot loops involving dynamic expression evaluation, prefer pre-compilation. Note that `eval()` on compiled code requires careful scoping (using empty globals `{}` and specific locals) to maintain safety similar to `simple_eval`, though `simple_eval` offers stronger sandboxing by default. The trade-off was deemed acceptable here to match `vector_db.py` patterns.
+
+## 2025-02-17 - [Eliminating Defensive DeepCopy in Logging]
+**Learning:** `copy.deepcopy()` was used in the hot path of logging (`python/helpers/log.py`) solely to prevent mutation during truncation. By rewriting the truncation logic to be functional (returning new objects instead of mutating in-place), we eliminated the expensive deepcopy step, resulting in a ~2x speedup for logging complex structures.
+**Action:** When working with data transformation where immutability is required, prefer creating new collections (copy-on-traverse) over `deepcopy` + in-place mutation.

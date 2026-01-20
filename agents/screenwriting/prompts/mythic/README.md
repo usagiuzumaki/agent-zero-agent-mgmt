@@ -16,4 +16,4 @@ Imported 13 specialty system prompts from `aria_screenwriter_suite` for use as s
 - narrative_stylist
 - final_cut_editor
 
-Pair these with the tool schemas in `agents/screenwriting/tools/screenwriting_agents.tools.md`. Load the matching `*.system.md` file as the system prompt for each tool invocation.
+Pair these with the tool schemas in `agents/screenwriting/examples/proposed_tools.md`. Load the matching `*.system.md` file as the system prompt for each tool invocation.

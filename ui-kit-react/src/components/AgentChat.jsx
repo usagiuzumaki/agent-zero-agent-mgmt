@@ -22,6 +22,30 @@ export default function AgentChat({ onLog }) {
     }
   }, [input]);
 
+  // Scroll logic
+  const messagesEndRef = useRef(null);
+  const containerRef = useRef(null);
+  const [isNearBottom, setIsNearBottom] = useState(true);
+
+  // Check if user is near bottom on scroll
+  const handleScroll = () => {
+    const container = containerRef.current;
+    if (container) {
+      const { scrollTop, scrollHeight, clientHeight } = container;
+      // 50px threshold to determine if "near bottom"
+      const bottom = scrollHeight - scrollTop - clientHeight < 50;
+      setIsNearBottom(bottom);
+    }
+  };
+
+  // Scroll to bottom when messages change, IF we were already near bottom
+  useEffect(() => {
+    if (isNearBottom && messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, isNearBottom]);
+
+
   const sendMessage = () => {
     if (!input.trim()) return;
     const text = input;
@@ -31,6 +55,8 @@ export default function AgentChat({ onLog }) {
     ]);
     onLog && onLog(`user: ${text}`);
     setInput('');
+    // Ensure we scroll to bottom when user sends a message
+    setIsNearBottom(true);
   };
 
   const handleKeyDown = (e) => {
@@ -54,7 +80,11 @@ export default function AgentChat({ onLog }) {
 
   return (
     <div className="agent-chat">
-      <div className="messages">
+      <div
+        className="messages"
+        ref={containerRef}
+        onScroll={handleScroll}
+      >
         {messages.map((m) => (
           <div key={m.id} className={`msg msg-${m.sender}`}>{m.text}</div>
         ))}

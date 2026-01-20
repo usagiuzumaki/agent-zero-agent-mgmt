@@ -1,11 +1,23 @@
 @import './components/common/utilities.css';
 
 :root {
+  /* Default Theme (Light) */
   --color-primary: #4f46e5;
-  --color-background: #ffffff;
-  --color-text: #000000;
+  --color-background: #f9fafb;
+  --color-surface: #ffffff;
+  --color-text: #111827;
+  --color-text-muted: #6b7280;
+  --color-border: #e5e7eb;
   --border-radius: 8px;
   --font-family: system-ui, sans-serif;
+  --glass-border: 1px solid transparent;
+  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+
+  /* Tension Colors Default */
+  --color-tension-low: #60a5fa;
+  --color-tension-med: #fbbf24;
+  --color-tension-high: #f87171;
+  --color-tension-climax: #ef4444;
 }
 
 [data-theme="dark"] {
@@ -66,19 +78,27 @@ body {
   padding: 1rem;
   width: 400px;
   max-height: 80vh;
-  overflow: auto;
-  transform: scale(0.95);
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border: var(--glass-border);
+  box-shadow: var(--shadow-card, 0 4px 6px rgba(0,0,0,0.1));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Prevent body scroll */
 }
 
-.agent-modal-overlay.open .agent-modal {
-  transform: scale(1);
+/* Agent Chat Flex Layout */
+.agent-chat {
+  display: flex;
+  flex-direction: column;
+  flex: 1; /* Take remaining space */
+  overflow: hidden; /* Prevent double scroll */
+  min-height: 0; /* Allow shrinking */
 }
 
 .agent-chat .messages {
-  min-height: 200px;
   margin-bottom: 0.5rem;
+  flex: 1; /* Take remaining space */
+  overflow-y: auto; /* Scrollable */
+  min-height: 0; /* Allow shrinking */
 }
 
 .agent-chat .msg {
@@ -94,30 +114,58 @@ body {
   display: flex;
   gap: 0.5rem;
   align-items: flex-end; /* Align button to bottom of textarea */
+  /* Sticky footer behavior achieved via flex layout */
+  flex-shrink: 0;
 }
 
 .agent-chat textarea {
   width: 100%;
   padding: 0.5rem;
   border-radius: var(--border-radius);
-  border: 1px solid #ccc;
+  border: 1px solid var(--color-border);
+  background: var(--color-background);
+  color: var(--color-text);
   font-family: inherit;
   resize: vertical;
 }
 
 .agent-log {
   margin-top: 1rem;
-  background: #f3f4f6;
+  background: var(--color-surface);
+  color: var(--color-text-muted);
   padding: 0.5rem;
   max-height: 150px;
   overflow: auto;
   font-size: 0.8rem;
+  border-radius: 4px;
+  border: var(--glass-border);
+  flex-shrink: 0; /* Don't shrink logs */
 }
 
 /* Custom UI section selector */
 .ui-select {
   width: 100%;
   margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--color-border);
+  background: var(--color-background);
+  color: var(--color-text);
+  font-family: var(--font-family);
+}
+
+.close {
+  float: right;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  line-height: 1;
+}
+
+.close:hover {
+  color: var(--color-text);
 }
 
 /* Screenwriting and E-girl headings */
@@ -131,11 +179,22 @@ body {
 }
 
 /* Aria / Egirl UI Customization */
+.egirl-ui {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
 .egirl-ui .aria-container {
   background: linear-gradient(135deg, #fce7f3 0%, #e0e7ff 100%);
   border-radius: var(--border-radius);
   padding: 1rem;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
 }
 
 .egirl-ui .aria-header {
@@ -143,6 +202,7 @@ body {
   flex-direction: column;
   align-items: center;
   margin-bottom: 1rem;
+  flex-shrink: 0;
 }
 
 .egirl-ui h2 {
@@ -165,6 +225,8 @@ body {
   background: rgba(255, 255, 255, 0.4);
   border-radius: 8px;
   padding: 0.5rem;
+  flex: 1;
+  overflow-y: auto;
 }
 
 .egirl-ui .agent-chat .msg {
@@ -250,6 +312,7 @@ body {
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
+  flex-shrink: 0;
 }
 
 .egirl-ui .agent-chat .tool-bar button {
@@ -267,4 +330,36 @@ body {
 .egirl-ui .agent-chat .tool-bar button:hover {
   background: #db2777;
   color: white;
+}
+
+/* Screenwriting UI fixes */
+.screenwriting-ui {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.screenwriting-header {
+  flex-shrink: 0;
+}
+
+.screenwriting-body {
+  flex: 1;
+  overflow: hidden; /* Children should handle scroll if needed */
+  display: flex;
+  flex-direction: column;
+}
+
+.screenwriting-body > [role="tabpanel"] {
+  flex: 1;
+  overflow-y: auto; /* Make panels scrollable */
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Specifically for Assistant tab inside Screenwriting, it should NOT scroll the panel, but let Chat scroll */
+#panel-assistant {
+  overflow: hidden;
 }

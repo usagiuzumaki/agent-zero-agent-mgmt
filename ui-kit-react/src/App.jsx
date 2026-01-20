@@ -11,6 +11,7 @@ export default function App() {
   const [open, setOpen] = useState(false);
   const [logs, setLogs] = useState([]);
   const [ui, setUI] = useState('default');
+  const [theme, setTheme] = useState(config.theme || 'light');
 
   const handleLog = (log) => {
     setLogs((prev) => [...prev, log]);
@@ -28,18 +29,33 @@ export default function App() {
   };
 
   return (
-    <div className="app-container" data-theme={config.theme || 'light'}>
+    <div className="app-container" data-theme={theme}>
       <AgentLauncher onOpen={() => setOpen(true)} />
       <AgentModal open={open} onClose={() => setOpen(false)}>
-        <select
-          className="ui-select"
-          value={ui}
-          onChange={(e) => setUI(e.target.value)}
-        >
-          <option value="default">Default</option>
-          <option value="screenwriting">Screenwriting</option>
-          <option value="egirl">Aria</option>
-        </select>
+        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
+          <select
+            className="ui-select"
+            value={ui}
+            onChange={(e) => setUI(e.target.value)}
+            style={{ flex: 1, marginBottom: 0 }}
+          >
+            <option value="default">Default</option>
+            <option value="screenwriting">Screenwriting</option>
+            <option value="egirl">Aria</option>
+          </select>
+          <select
+            className="ui-select"
+            value={theme}
+            onChange={(e) => setTheme(e.target.value)}
+            style={{ flex: 1, marginBottom: 0 }}
+          >
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+            <option value="casino">Story Casino</option>
+            <option value="storybook">Living Storybook</option>
+            <option value="terminal">Arcane Terminal</option>
+          </select>
+        </div>
         {renderUI()}
         <AgentLogView logs={logs} />
       </AgentModal>

@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Spinner from './common/Spinner';
+import CharacterCard from './CharacterCard';
 import './CharactersUI.css';
 
 export default function CharactersUI() {
@@ -9,22 +10,16 @@ export default function CharactersUI() {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
 
-  const initialCharState = {
+  const [newChar, setNewChar] = useState({
     name: '',
     role: 'Protagonist',
     archetype: '',
     motivation: '',
     flaw: '',
     bio: ''
-  };
+  });
 
-  const [newChar, setNewChar] = useState(initialCharState);
-
-  useEffect(() => {
-    fetchCharacters();
-  }, []);
-
-  const fetchCharacters = async () => {
+  const fetchCharacters = useCallback(async () => {
     try {
       const response = await fetch('/api/screenwriting/all');
       const data = await response.json();
@@ -36,9 +31,13 @@ export default function CharactersUI() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const handleEdit = (char) => {
+  useEffect(() => {
+    fetchCharacters();
+  }, [fetchCharacters]);
+
+  const handleEdit = useCallback((char) => {
     setNewChar({
       name: char.name || '',
       role: char.role || 'Protagonist',
@@ -51,15 +50,22 @@ export default function CharactersUI() {
     setShowForm(true);
     // Scroll to form
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  }, []);
 
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     setShowForm(false);
     setEditingId(null);
-    setNewChar(initialCharState);
-  };
+    setNewChar({
+      name: '',
+      role: 'Protagonist',
+      archetype: '',
+      motivation: '',
+      flaw: '',
+      bio: ''
+    });
+  }, []);
 
-  const handleDelete = async (charId) => {
+  const handleDelete = useCallback(async (charId) => {
     if (!window.confirm("Are you sure you want to delete this character?")) return;
 
     try {
@@ -79,7 +85,7 @@ export default function CharactersUI() {
     } catch (err) {
       console.error("Failed to delete character", err);
     }
-  };
+  }, [editingId, fetchCharacters, handleCancel]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -116,15 +122,6 @@ export default function CharactersUI() {
     }
   };
 
-  const getRoleColor = (role) => {
-    switch(role.toLowerCase()) {
-      case 'protagonist': return 'var(--color-primary)';
-      case 'antagonist': return '#ef4444';
-      case 'supporting': return '#10b981';
-      default: return '#6b7280';
-    }
-  };
-
   if (loading) return (
     <div className="loading-container">
       <Spinner size="lg" color="primary" />
@@ -137,8 +134,8 @@ export default function CharactersUI() {
       <div className="chars-header">
         <h3>Cast of Characters</h3>
         <button
-          className="btn-primary"
-          onClick={() => setShowForm(!showForm)}
+          className={showForm ? "btn-secondary" : "btn-primary"}
+          onClick={showForm ? handleCancel : () => setShowForm(true)}
           aria-expanded={showForm}
           aria-controls="char-form"
         >
@@ -162,6 +159,7 @@ export default function CharactersUI() {
                   required
                   aria-required="true"
                   placeholder="Character Name"
+                  autoFocus
                 />
               </div>
               <div className="form-group">
@@ -223,16 +221,26 @@ export default function CharactersUI() {
               />
             </div>
 
-            <button type="submit" className="btn-save" disabled={isSaving}>
-              {isSaving ? (
-                <div className="btn-save-content">
-                  <Spinner size="small" color="white" />
-                  <span>Saving...</span>
-                </div>
-              ) : (
-                'Save Character'
-              )}
-            </button>
+            <div className="form-actions">
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={handleCancel}
+                style={{ marginRight: '1rem' }}
+              >
+                Cancel
+              </button>
+              <button type="submit" className="btn-save" disabled={isSaving} style={{ marginTop: 0 }}>
+                {isSaving ? (
+                  <div className="btn-save-content">
+                    <Spinner size="small" color="white" />
+                    <span>Saving...</span>
+                  </div>
+                ) : (
+                  'Save Character'
+                )}
+              </button>
+            </div>
           </form>
         </div>
       )}
@@ -252,38 +260,12 @@ export default function CharactersUI() {
           </div>
         ) : (
           characters.map((char) => (
-            <div key={char.id} className="char-card" style={{borderTop: `4px solid ${getRoleColor(char.role)}`}}>
-              <div className="char-card-header">
-                <h5>{char.name}</h5>
-                <span className="char-role" style={{color: getRoleColor(char.role)}}>{char.role}</span>
-              </div>
-
-              <div className="char-attributes">
-                {char.archetype && <div className="char-attr"><strong>Archetype:</strong> {char.archetype}</div>}
-                {char.motivation && <div className="char-attr"><strong>Want:</strong> {char.motivation}</div>}
-                {char.flaw && <div className="char-attr"><strong>Flaw:</strong> {char.flaw}</div>}
-              </div>
-
-              {char.bio && <p className="char-bio">{char.bio}</p>}
-
-              <div className="char-actions">
-                <button
-                  className="btn-text"
-                  onClick={() => handleEdit(char)}
-                  aria-label={`Edit ${char.name}`}
-                >
-                  Edit
-                </button>
-                <button
-                  className="btn-text delete"
-                  onClick={() => handleDelete(char.id)}
-                  aria-label={`Delete ${char.name}`}
-                  style={{ color: '#ef4444' }}
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
+            <CharacterCard
+              key={char.id}
+              char={char}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
           ))
         )}
       </div>

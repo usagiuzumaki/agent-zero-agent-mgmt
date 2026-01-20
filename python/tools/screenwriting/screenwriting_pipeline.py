@@ -5,6 +5,8 @@ from agents.screenwriting.creative_ideas import CreativeIdeas
 from agents.screenwriting.co_writer import CoWriter
 from agents.screenwriting.dialogue_evaluator import DialogueEvaluator
 from agents.screenwriting.script_formatter import ScriptFormatter
+from agents.screenwriting.world_builder import WorldBuilder
+from agents.screenwriting.character_analyzer import CharacterAnalyzer
 import json
 from python.helpers.print_style import PrintStyle
 
@@ -12,20 +14,27 @@ class ScreenwritingPipeline(Tool):
     """
     Orchestrates a screenwriting pipeline by handing off tasks to specialized agents.
     Each agent handles a specific writing tool process:
-    1. PlotAnalyzer (Structure)
-    2. CreativeIdeas (Brainstorming)
-    3. CoWriter (Drafting)
-    4. DialogueEvaluator (Refinement)
-    5. ScriptFormatter (Formatting)
+    1. WorldBuilder (Setting/Lore) - Optional
+    2. CharacterAnalyzer (Characters) - Optional
+    3. PlotAnalyzer (Structure)
+    4. CreativeIdeas (Brainstorming)
+    5. CoWriter (Drafting)
+    6. DialogueEvaluator (Refinement)
+    7. ScriptFormatter (Formatting)
     """
 
-    async def execute(self, task: str = "", project_name: str = "", **kwargs):
+    def __init__(self, agent, name, method, args, message, loop_data, **kwargs):
+        super().__init__(agent, name, method, args, message, loop_data, **kwargs)
+
+    async def execute(self, task: str = "", project_name: str = "", include_world_building: bool = False, include_character_analysis: bool = False, **kwargs):
         """
         Executes a screenwriting task by passing it through a chain of specialized agents.
 
         Args:
             task (str): The writing task description.
             project_name (str): The name of the project.
+            include_world_building (bool): Whether to include a world building step.
+            include_character_analysis (bool): Whether to include a character analysis step.
         """
         if not task:
             return Response(message="Task description is required.", break_loop=False)
@@ -34,6 +43,16 @@ class ScreenwritingPipeline(Tool):
 
         current_input = f"Project: {project_name}\nTask: {task}"
         results = []
+
+        # Optional: World Building
+        if include_world_building:
+             results.append(await self._run_stage(WorldBuilder, "World Builder", "build", current_input))
+             current_input = results[-1]
+
+        # Optional: Character Analysis
+        if include_character_analysis:
+            results.append(await self._run_stage(CharacterAnalyzer, "Character Analyzer", "analyze", current_input))
+            current_input = results[-1]
 
         # 1. Structure / Plot Analysis
         # PlotAnalyzer improves or analyzes the structure of the request

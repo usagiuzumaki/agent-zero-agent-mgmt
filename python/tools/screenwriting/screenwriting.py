@@ -9,8 +9,8 @@ import json
 class Screenwriting(Tool):
     """Tool for managing screenwriting data and features"""
     
-    def __init__(self, agent):
-        super().__init__(agent)
+    def __init__(self, agent, name, method, args, message, loop_data, **kwargs):
+        super().__init__(agent, name, method, args, message, loop_data, **kwargs)
         self.manager = ScreenwritingManager()
     
     async def execute(self, **kwargs):
