@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 from typing import Dict, Tuple
 
-from agents import AgentConfig
+from agents import AgentConfig, UserMessage
 from .base import ScreenwritingAgent
 
 TRAITS: Tuple[Tuple[str, str, set[str], set[str]], ...] = (
@@ -31,3 +31,13 @@ class MBTIEvaluator(ScreenwritingAgent):
             scores[b] += sum(1 for w in words if w in set_b)
         mbti = "".join(a if scores[a] >= scores[b] else b for a, b, *_ in TRAITS)
         return {"type": mbti, "scores": scores}
+
+    async def analyze(self, text: str) -> str:
+        """Analyze the personality of characters in the text."""
+        result = self.evaluate(text)
+        msg = UserMessage(
+            message=f"Analyze the personality of the character(s) based on these MBTI scores: {result}.\n"
+                    f"Text snippet: {text[:1000]}..."
+        )
+        self.hist_add_user_message(msg)
+        return await self.monologue()
