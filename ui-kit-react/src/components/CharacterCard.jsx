@@ -1,4 +1,5 @@
 import React, { memo } from 'react';
+import Spinner from './common/Spinner';
 import './CharactersUI.css';
 
 const getRoleColor = (role) => {
@@ -10,7 +11,7 @@ const getRoleColor = (role) => {
   }
 };
 
-const CharacterCard = memo(({ char, onEdit, onDelete }) => {
+const CharacterCard = memo(({ char, onEdit, onDelete, isDeleting }) => {
   return (
     <div className="char-card" style={{borderTop: `4px solid ${getRoleColor(char.role)}`}}>
       <div className="char-card-header">
@@ -31,16 +32,18 @@ const CharacterCard = memo(({ char, onEdit, onDelete }) => {
           className="btn-text"
           onClick={() => onEdit(char)}
           aria-label={`Edit ${char.name}`}
+          disabled={isDeleting}
         >
           Edit
         </button>
         <button
           className="btn-text delete"
           onClick={() => onDelete(char.id)}
-          aria-label={`Delete ${char.name}`}
+          aria-label={isDeleting ? "Deleting..." : `Delete ${char.name}`}
+          disabled={isDeleting}
           style={{ color: '#ef4444' }}
         >
-          Delete
+          {isDeleting ? <Spinner size="small" color="danger" /> : "Delete"}
         </button>
       </div>
     </div>
