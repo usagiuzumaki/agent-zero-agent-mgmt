@@ -10,7 +10,7 @@ import inspect
 from functools import wraps
 import threading
 import signal
-from flask import Flask, request, Response, session, render_template_string
+from flask import Flask, request, Response, session, render_template_string, send_from_directory
 from flask_basicauth import BasicAuth
 import initialize
 from python.helpers import files, git, mcp_server
@@ -42,7 +42,11 @@ if hasattr(time, 'tzset'):
     time.tzset()
 
 # initialize the internal Flask server
-webapp = Flask("app", static_folder=get_abs_path("./webui"), static_url_path="/")
+static_folder_path = "./webui"
+if os.environ.get("USE_REACT_UI") == "true":
+    static_folder_path = "./ui-kit-react/dist"
+
+webapp = Flask("app", static_folder=get_abs_path(static_folder_path), static_url_path="/")
 webapp.secret_key = os.getenv("FLASK_SECRET_KEY") or secrets.token_hex(32)
 webapp.config.update(
     JSON_SORT_KEYS=False,
@@ -196,6 +200,10 @@ async def serve_index():
                 return redirect('/payment/required')
         except:
             pass
+
+    if os.environ.get("USE_REACT_UI") == "true":
+        return send_from_directory(get_abs_path("./ui-kit-react/dist"), "index.html")
+
     gitinfo = None
     try:
         gitinfo = git.get_git_info()

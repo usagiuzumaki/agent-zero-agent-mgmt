@@ -8,6 +8,19 @@ export default function AgentChat({ onLog }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const tools = getTools();
+  const messagesEndRef = useRef(null);
+  const textareaRef = useRef(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  }, [input]);
 
   // Scroll logic
   const messagesEndRef = useRef(null);
@@ -86,12 +99,14 @@ export default function AgentChat({ onLog }) {
       </div>
       <div className="input-row">
         <textarea
+          ref={textareaRef}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Type a message (Shift+Enter for new line)"
           aria-label="Message input"
-          rows={3}
+          rows={1}
+          style={{ overflow: 'hidden', resize: 'none' }}
         />
         <button
           onClick={sendMessage}
