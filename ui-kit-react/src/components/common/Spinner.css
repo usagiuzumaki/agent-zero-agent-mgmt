@@ -40,3 +40,10 @@
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+.spinner-danger {
+  border-top-color: #ef4444;
+  border-right-color: rgba(239, 68, 68, 0.2);
+  border-bottom-color: rgba(239, 68, 68, 0.2);
+  border-left-color: rgba(239, 68, 68, 0.2);
+}

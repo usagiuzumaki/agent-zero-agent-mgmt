@@ -9,3 +9,7 @@
 ## 2024-10-28 - State Persistence in Toggled Forms
 **Learning:** Toggling a form's visibility without resetting its state preserves "ghost data" from previous edits, confusing users who expect a fresh start on "Add New".
 **Action:** Bind "Cancel/Close" buttons to a handler that explicitly resets form state, rather than just toggling the boolean visibility flag.
+
+## 2024-10-29 - Contextual Feedback in Lists
+**Learning:** When performing async actions on list items (like delete), blocking the whole UI or showing a global spinner is intrusive. Users expect inline feedback on the specific item being acted upon.
+**Action:** Implement `deletingId` or `processingId` state in the parent list component to drive granular loading states (e.g., replacing a button with a spinner) for individual items.

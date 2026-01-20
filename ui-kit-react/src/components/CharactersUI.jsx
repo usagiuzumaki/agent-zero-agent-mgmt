@@ -9,6 +9,7 @@ export default function CharactersUI() {
   const [isSaving, setIsSaving] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
 
   const [newChar, setNewChar] = useState({
     name: '',
@@ -67,6 +68,7 @@ export default function CharactersUI() {
 
   const handleDelete = useCallback(async (charId) => {
     if (!window.confirm("Are you sure you want to delete this character?")) return;
+    setDeletingId(charId);
 
     try {
       const response = await fetch('/api/screenwriting/character/delete', {
@@ -84,6 +86,8 @@ export default function CharactersUI() {
       }
     } catch (err) {
       console.error("Failed to delete character", err);
+    } finally {
+      setDeletingId(null);
     }
   }, [editingId, fetchCharacters, handleCancel]);
 
@@ -265,6 +269,7 @@ export default function CharactersUI() {
               char={char}
               onEdit={handleEdit}
               onDelete={handleDelete}
+              isDeleting={deletingId === char.id}
             />
           ))
         )}
