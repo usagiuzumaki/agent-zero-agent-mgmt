@@ -166,7 +166,7 @@ def convert_out(settings: Settings) -> SettingsOutput:
         {
             "id": "chat_model_provider",
             "title": "Chat model provider",
-            "description": "Select provider for main chat model used by Agent Zero",
+            "description": "Select provider for main chat model used by Aria Bot",
             "type": "select",
             "value": settings["chat_model_provider"],
             "options": cast(list[FieldOption], get_providers("chat")),
@@ -268,7 +268,7 @@ def convert_out(settings: Settings) -> SettingsOutput:
     chat_model_section: SettingsSection = {
         "id": "chat_model",
         "title": "Chat Model",
-        "description": "Selection and settings for main chat model used by Agent Zero",
+        "description": "Selection and settings for main chat model used by Aria Bot",
         "fields": chat_model_fields,
         "tab": "agent",
     }
@@ -418,7 +418,7 @@ def convert_out(settings: Settings) -> SettingsOutput:
     embed_model_section: SettingsSection = {
         "id": "embed_model",
         "title": "Embedding Model",
-        "description": f"Settings for the embedding model used by Agent Zero.<br><h4>⚠️ No need to change</h4>The default HuggingFace model {default_settings['embed_model_name']} is preloaded and runs locally within the docker container and there's no need to change it unless you have a specific requirements for embedding.",
+        "description": f"Settings for the embedding model used by Aria Bot.<br><h4>⚠️ No need to change</h4>The default HuggingFace model {default_settings['embed_model_name']} is preloaded and runs locally within the docker container and there's no need to change it unless you have a specific requirements for embedding.",
         "fields": embed_model_fields,
         "tab": "agent",
     }
@@ -478,7 +478,7 @@ def convert_out(settings: Settings) -> SettingsOutput:
     browser_model_section: SettingsSection = {
         "id": "browser_model",
         "title": "Web Browser Model",
-        "description": "Settings for the web browser model. Agent Zero uses <a href='https://github.com/browser-use/browser-use' target='_blank'>browser-use</a> agentic framework to handle web interactions.",
+        "description": "Settings for the web browser model. Aria Bot uses <a href='https://github.com/browser-use/browser-use' target='_blank'>browser-use</a> agentic framework to handle web interactions.",
         "fields": browser_model_fields,
         "tab": "agent",
     }
@@ -525,7 +525,7 @@ def convert_out(settings: Settings) -> SettingsOutput:
     auth_section: SettingsSection = {
         "id": "auth",
         "title": "Authentication",
-        "description": "Settings for authentication to use Agent Zero Web UI.",
+        "description": "Settings for authentication to use Aria Bot Web UI.",
         "fields": auth_fields,
         "tab": "external",
     }
@@ -548,7 +548,7 @@ def convert_out(settings: Settings) -> SettingsOutput:
     api_keys_section: SettingsSection = {
         "id": "api_keys",
         "title": "API Keys",
-        "description": "API keys for model providers and services used by Agent Zero.",
+        "description": "API keys for model providers and services used by Aria Bot.",
         "fields": api_keys_fields,
         "tab": "external",
     }
@@ -964,7 +964,7 @@ def convert_out(settings: Settings) -> SettingsOutput:
     mcp_client_section: SettingsSection = {
         "id": "mcp_client",
         "title": "External MCP Servers",
-        "description": "Agent Zero can use external MCP servers, local or remote as tools.",
+        "description": "Aria Bot can use external MCP servers, local or remote as tools.",
         "fields": mcp_client_fields,
         "tab": "mcp",
     }
@@ -974,8 +974,8 @@ def convert_out(settings: Settings) -> SettingsOutput:
     mcp_server_fields.append(
         {
             "id": "mcp_server_enabled",
-            "title": "Enable A0 MCP Server",
-            "description": "Expose Agent Zero as an SSE MCP server. This will make this A0 instance available to MCP clients.",
+            "title": "Enable Aria Bot MCP Server",
+            "description": "Expose Aria Bot as an SSE MCP server. This will make this instance available to MCP clients.",
             "type": "switch",
             "value": settings["mcp_server_enabled"],
         }
@@ -994,8 +994,8 @@ def convert_out(settings: Settings) -> SettingsOutput:
 
     mcp_server_section: SettingsSection = {
         "id": "mcp_server",
-        "title": "A0 MCP Server",
-        "description": "Agent Zero can be exposed as an SSE MCP server. See <a href=\"javascript:openModal('settings/mcp/server/example.html')\">connection example</a>.",
+        "title": "Aria Bot MCP Server",
+        "description": "Aria Bot can be exposed as an SSE MCP server. See <a href=\"javascript:openModal('settings/mcp/server/example.html')\">connection example</a>.",
         "fields": mcp_server_fields,
         "tab": "mcp",
     }
@@ -1028,7 +1028,7 @@ def convert_out(settings: Settings) -> SettingsOutput:
     backup_section: SettingsSection = {
         "id": "backup_restore",
         "title": "Backup & Restore",
-        "description": "Backup and restore Agent Zero data and configurations "
+        "description": "Backup and restore Aria Bot data and configurations "
         "using glob pattern-based file selection.",
         "fields": backup_fields,
         "tab": "backup",
