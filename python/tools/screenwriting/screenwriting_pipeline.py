@@ -13,7 +13,6 @@ from agents.screenwriting.marketability import Marketability
 from agents.screenwriting.mbti_evaluator import MBTIEvaluator
 from agents.screenwriting.scream_analyzer import ScreamAnalyzer
 from agents.screenwriting.storyboard_generator import StoryboardGenerator
-import json
 from python.helpers.print_style import PrintStyle
 
 
@@ -30,13 +29,6 @@ class ScreenwritingPipeline(Tool):
     7. Analysis Agents (Pacing, Tension, MBTI, Scream) - Optional
     8. ScriptFormatter (Formatting)
     9. Post-Production Agents (Marketability, Storyboard) - Optional
-    7. PacingMetrics (Analysis) - Optional
-    8. EmotionalTension (Analysis) - Optional
-    9. MBTIEvaluator (Analysis) - Optional
-    10. ScreamAnalyzer (Analysis) - Optional
-    11. ScriptFormatter (Formatting)
-    12. Marketability (Analysis) - Optional
-    13. StoryboardGenerator (Analysis) - Optional
     """
 
     def __init__(
@@ -97,7 +89,7 @@ class ScreenwritingPipeline(Tool):
             results.append(await self._run_stage(CharacterAnalyzer, "Character Analyzer", "analyze", current_input))
             current_input = results[-1]
 
-            # MBTI is best run on character analysis output or raw description
+            # MBTI is best run on character analysis output or raw description if available here
             if include_mbti:
                 report = await self._run_stage(MBTIEvaluator, "MBTI Evaluator", "analyze", current_input)
                 analysis_reports.append(report)
@@ -115,35 +107,14 @@ class ScreenwritingPipeline(Tool):
         draft_result = await self._run_stage(CoWriter, "Co-Writer", "draft", current_input)
         results.append(draft_result)
         current_input = draft_result
-        current_script = current_input
-
-        # Optional Analysis Phase (Non-Transformative)
-        if include_pacing:
-             analysis_outputs.append(await self._run_stage(PacingMetrics, "Pacing Metrics", "analyze", current_script))
-
-        if include_tension:
-             analysis_outputs.append(await self._run_stage(EmotionalTension, "Emotional Tension", "analyze", current_script))
-
-        if include_scream:
-             analysis_outputs.append(await self._run_stage(ScreamAnalyzer, "Scream Analyzer", "analyze", current_script))
-
-        if include_mbti:
-             analysis_outputs.append(await self._run_stage(MBTIEvaluator, "MBTI Evaluator", "analyze", current_script))
-
-        if include_marketability:
-             analysis_outputs.append(await self._run_stage(Marketability, "Marketability", "analyze", current_script))
-
-        if include_storyboard:
-             analysis_outputs.append(await self._run_stage(StoryboardGenerator, "Storyboard Generator", "analyze", current_script))
 
         # 4. Dialogue Evaluation
         # DialogueEvaluator refines the dialogue
         results.append(await self._run_stage(DialogueEvaluator, "Dialogue Evaluator", "evaluate", current_input))
         current_input = results[-1]
-
-        # Intermediate Analysis (on the refined draft)
         draft_text = current_input
 
+        # Intermediate Analysis (on the refined draft)
         if include_pacing:
             report = await self._run_stage(PacingMetrics, "Pacing Metrics", "analyze", draft_text)
             analysis_reports.append(report)
@@ -155,6 +126,11 @@ class ScreenwritingPipeline(Tool):
         if include_scream:
             report = await self._run_stage(ScreamAnalyzer, "Scream Analyzer", "analyze", draft_text)
             analysis_reports.append(report)
+
+        # Optional MBTI on script if not run on characters (or run again on script)
+        if include_mbti and not include_character_analysis:
+             report = await self._run_stage(MBTIEvaluator, "MBTI Evaluator", "analyze", draft_text)
+             analysis_reports.append(report)
 
         # 5. Formatting
         results.append(await self._run_stage(ScriptFormatter, "Script Formatter", "format", current_input))

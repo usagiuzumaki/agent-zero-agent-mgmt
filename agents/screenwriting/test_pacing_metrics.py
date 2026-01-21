@@ -20,7 +20,7 @@ def dummy_config():
 async def test_analyze_basic():
     agent = PacingMetrics(0, dummy_config())
     metrics_str = await agent.analyze("Run! Jump. Stop?")
-    assert "Sentences" in metrics_str
+    assert "sentences" in metrics_str
     assert "3" in metrics_str
-    assert "Exclamations" in metrics_str
+    assert "exclamations" in metrics_str
     assert "1" in metrics_str
