@@ -5,8 +5,9 @@ from __future__ import annotations
 import re
 import json
 from typing import Dict
+import json
 
-from agents import AgentConfig
+from agents import AgentConfig, UserMessage
 from .base import ScreenwritingAgent
 
 

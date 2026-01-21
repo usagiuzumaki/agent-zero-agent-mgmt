@@ -1,6 +1,6 @@
 """Agent that proposes plot twists, themes and creative concepts."""
 
-from agents import AgentConfig
+from agents import AgentConfig, UserMessage
 from .base import ScreenwritingAgent
 
 
@@ -15,7 +15,8 @@ class CreativeIdeas(ScreenwritingAgent):
 
         May use external instruments to broaden its suggestions.
         """
-        self.hist_add_user_message(
-            "Use tools and instruments to brainstorm around:\n" + topic
+        msg = UserMessage(
+            message="Use tools and instruments to brainstorm around:\n" + topic
         )
+        self.hist_add_user_message(msg)
         return await self.monologue()

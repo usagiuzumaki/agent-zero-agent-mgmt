@@ -9,3 +9,7 @@
 ## 2024-10-28 - State Persistence in Toggled Forms
 **Learning:** Toggling a form's visibility without resetting its state preserves "ghost data" from previous edits, confusing users who expect a fresh start on "Add New".
 **Action:** Bind "Cancel/Close" buttons to a handler that explicitly resets form state, rather than just toggling the boolean visibility flag.
+
+## 2026-01-20 - Actionable Empty States
+**Learning:** Empty states ("No documents found") are often dead ends. They are prime opportunities to guide the user towards the primary action (e.g., "Create Document").
+**Action:** Replace text-only empty states with "Hero" empty states: Icon + Title + Description + Primary Action Button.

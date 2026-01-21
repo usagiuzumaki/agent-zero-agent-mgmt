@@ -41,6 +41,13 @@ body {
   border: none;
   border-radius: var(--border-radius);
   padding: 0.75rem 1rem;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+
+.agent-launcher:hover {
+  transform: scale(1.05);
 }
 
 .agent-modal-overlay {
@@ -53,6 +60,15 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 9999;
+}
+
+.agent-modal-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .agent-modal {
@@ -87,6 +103,7 @@ body {
 
 .agent-chat .msg {
   margin: 0.25rem 0;
+  animation: slideIn 0.3s ease-out forwards;
 }
 
 .agent-chat .tool-bar button {
@@ -345,4 +362,24 @@ body {
 /* Specifically for Assistant tab inside Screenwriting, it should NOT scroll the panel, but let Chat scroll */
 #panel-assistant {
   overflow: hidden;
+}
+
+/* Send Button Icon Style */
+.agent-chat .input-row .send-btn {
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex-shrink: 0;
+}
+
+/* Ensure specificity for egirl-ui override if needed */
+.egirl-ui .agent-chat .input-row .send-btn {
+  padding: 0.5rem;
+  border-radius: 50%;
+  width: 2.5rem;
+  height: 2.5rem;
 }

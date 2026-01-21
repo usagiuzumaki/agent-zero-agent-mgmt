@@ -1,6 +1,6 @@
 <div align="center">
 
-# `Agent Zero`
+# `Aria Bot` (formerly Agent Zero)
 
 
 [![Agent Zero Website](https://img.shields.io/badge/Website-agent--zero.ai-0A192F?style=for-the-badge&logo=vercel&logoColor=white)](https://agent-zero.ai) [![Thanks to Sponsors](https://img.shields.io/badge/GitHub%20Sponsors-Thanks%20to%20Sponsors-FF69B4?style=for-the-badge&logo=githubsponsors&logoColor=white)](https://github.com/sponsors/agent0ai) [![Follow on X](https://img.shields.io/badge/X-Follow-000000?style=for-the-badge&logo=x&logoColor=white)](https://x.com/Agent0ai) [![Join our Discord](https://img.shields.io/badge/Discord-Join%20our%20server-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/B8KZKNsPpj) [![Subscribe on YouTube](https://img.shields.io/badge/YouTube-Subscribe-red?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/@AgentZeroFW) [![Connect on LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/jan-tomasek/) [![Follow on Warpcast](https://img.shields.io/badge/Warpcast-Follow-5A32F3?style=for-the-badge)](https://warpcast.com/agent-zero) 
@@ -45,32 +45,32 @@ From now on, please use this name for both `git clone` and `docker pull` command
 
 
 
-- Agent Zero is not a predefined agentic framework. It is designed to be dynamic, organically growing, and learning as you use it.
-- Agent Zero is fully transparent, readable, comprehensible, customizable, and interactive.
-- Agent Zero uses the computer as a tool to accomplish its (your) tasks.
+- Aria Bot (Agent Zero) is not a predefined agentic framework. It is designed to be dynamic, organically growing, and learning as you use it.
+- Aria Bot is fully transparent, readable, comprehensible, customizable, and interactive.
+- Aria Bot uses the computer as a tool to accomplish its (your) tasks.
 
 # 💡 Key Features
 
 1. **General-purpose Assistant**
 
-- Agent Zero is not pre-programmed for specific tasks (but can be). It is meant to be a general-purpose personal assistant. Give it a task, and it will gather information, execute commands and code, cooperate with other agent instances, and do its best to accomplish it.
+- Aria Bot is not pre-programmed for specific tasks (but can be). It is meant to be a general-purpose personal assistant. Give it a task, and it will gather information, execute commands and code, cooperate with other agent instances, and do its best to accomplish it.
 - It has a persistent memory, allowing it to memorize previous solutions, code, facts, instructions, etc., to solve tasks faster and more reliably in the future.
 
 ![Agent 0 Working](/docs/res/ui-screen-2.png)
 
 2. **Computer as a Tool**
 
-- Agent Zero uses the operating system as a tool to accomplish its tasks. It has no single-purpose tools pre-programmed. Instead, it can write its own code and use the terminal to create and use its own tools as needed.
+- Aria Bot uses the operating system as a tool to accomplish its tasks. It has no single-purpose tools pre-programmed. Instead, it can write its own code and use the terminal to create and use its own tools as needed.
 - The only default tools in its arsenal are online search, memory features, communication (with the user and other agents), and code/terminal execution. Everything else is created by the agent itself or can be extended by the user.
 - Tool usage functionality has been developed from scratch to be the most compatible and reliable, even with very small models.
-- **Default Tools:** Agent Zero includes tools like knowledge, code execution, and communication.
-- **Creating Custom Tools:** Extend Agent Zero's functionality by creating your own custom tools.
-- **Instruments:** Instruments are a new type of tool that allow you to create custom functions and procedures that can be called by Agent Zero.
+- **Default Tools:** Aria Bot includes tools like knowledge, code execution, and communication.
+- **Creating Custom Tools:** Extend Aria Bot's functionality by creating your own custom tools.
+- **Instruments:** Instruments are a new type of tool that allow you to create custom functions and procedures that can be called by Aria Bot.
 
 3. **Multi-agent Cooperation**
 
 - Every agent has a superior agent giving it tasks and instructions. Every agent then reports back to its superior.
-- In the case of the first agent in the chain (Agent 0), the superior is the human user; the agent sees no difference.
+- In the case of the first agent in the chain (Aria Bot), the superior is the human user; the agent sees no difference.
 - Every agent can create its subordinate agent to help break down and solve subtasks. This helps all agents keep their context clean and focused.
 
 ![Multi-agent](docs/res/physics.png)
@@ -93,7 +93,7 @@ From now on, please use this name for both `git clone` and `docker pull` command
 - The terminal interface is real-time streamed and interactive. You can stop and intervene at any point. If you see your agent heading in the wrong direction, just stop and tell it right away.
 - There is a lot of freedom in this framework. You can instruct your agents to regularly report back to superiors asking for permission to continue. You can instruct them to use point-scoring systems when deciding when to delegate subtasks. Superiors can double-check subordinates' results and dispute. The possibilities are endless.
 
-## 🚀 Things you can build with Agent Zero
+## 🚀 Things you can build with Aria Bot
 
 - **Development Projects** - `"Create a React dashboard with real-time data visualization"`
 
@@ -109,7 +109,7 @@ From now on, please use this name for both `git clone` and `docker pull` command
 
 # ⚙️ Installation
 
-Click to open a video to learn how to install Agent Zero:
+Click to open a video to learn how to install Agent Zero (Aria Bot):
 
 [![Easy Installation guide](/docs/res/easy_ins_vid.png)](https://www.youtube.com/watch?v=w5v5Kjx51hs)
 
@@ -143,11 +143,11 @@ docker run -p 50001:80 agent0ai/agent-zero
 
 ## 👀 Keep in Mind
 
-1. **Agent Zero Can Be Dangerous!**
+1. **Aria Bot Can Be Dangerous!**
 
-- With proper instruction, Agent Zero is capable of many things, even potentially dangerous actions concerning your computer, data, or accounts. Always run Agent Zero in an isolated environment (like Docker) and be careful what you wish for.
+- With proper instruction, Aria Bot is capable of many things, even potentially dangerous actions concerning your computer, data, or accounts. Always run Aria Bot in an isolated environment (like Docker) and be careful what you wish for.
 
-2. **Agent Zero Is Prompt-based.**
+2. **Aria Bot Is Prompt-based.**
 
 - The whole framework is guided by the **prompts/** folder. Agent guidelines, tool instructions, messages, utility AI functions, it's all there.
 
