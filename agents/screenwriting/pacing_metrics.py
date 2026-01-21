@@ -25,9 +25,10 @@ class PacingMetrics(ScreenwritingAgent):
                 script) if s.strip()]
         word_counts = [len(s.split()) for s in sentences]
         avg_len = sum(word_counts) / len(word_counts) if word_counts else 0.0
-        return {
+
+        metrics = {
             "sentences": len(sentences),
-            "avg_sentence_length": avg_len,
+            "avg_sentence_length": round(avg_len, 2),
             "exclamations": script.count("!"),
         }
 

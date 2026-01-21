@@ -57,7 +57,7 @@ class ScreenwritingSpecialist(Tool):
             "CharacterAnalyzer": (CharacterAnalyzer, "analyze"),
             "PacingMetrics": (PacingMetrics, "analyze"),
             "EmotionalTension": (EmotionalTension, "analyze"),
-            "Marketability": (Marketability, "analyze"),
+            "Marketability": (Marketability, "assess"),
             "MBTIEvaluator": (MBTIEvaluator, "analyze"),
             "ScreamAnalyzer": (ScreamAnalyzer, "analyze"),
             "StoryboardGenerator": (StoryboardGenerator, "analyze"),
