@@ -7,6 +7,12 @@ from agents.screenwriting.dialogue_evaluator import DialogueEvaluator
 from agents.screenwriting.script_formatter import ScriptFormatter
 from agents.screenwriting.world_builder import WorldBuilder
 from agents.screenwriting.character_analyzer import CharacterAnalyzer
+from agents.screenwriting.pacing_metrics import PacingMetrics
+from agents.screenwriting.emotional_tension import EmotionalTension
+from agents.screenwriting.mbti_evaluator import MBTIEvaluator
+from agents.screenwriting.scream_analyzer import ScreamAnalyzer
+from agents.screenwriting.marketability import Marketability
+from agents.screenwriting.storyboard_generator import StoryboardGenerator
 import json
 from python.helpers.print_style import PrintStyle
 
@@ -20,13 +26,28 @@ class ScreenwritingPipeline(Tool):
     4. CreativeIdeas (Brainstorming)
     5. CoWriter (Drafting)
     6. DialogueEvaluator (Refinement)
-    7. ScriptFormatter (Formatting)
+    7. PacingMetrics (Analysis) - Optional
+    8. EmotionalTension (Analysis) - Optional
+    9. MBTIEvaluator (Analysis) - Optional
+    10. ScreamAnalyzer (Analysis) - Optional
+    11. ScriptFormatter (Formatting)
+    12. Marketability (Analysis) - Optional
+    13. StoryboardGenerator (Analysis) - Optional
     """
 
     def __init__(self, agent, name, method, args, message, loop_data, **kwargs):
         super().__init__(agent, name, method, args, message, loop_data, **kwargs)
 
-    async def execute(self, task: str = "", project_name: str = "", include_world_building: bool = False, include_character_analysis: bool = False, **kwargs):
+    async def execute(self, task: str = "", project_name: str = "",
+                      include_world_building: bool = False,
+                      include_character_analysis: bool = False,
+                      include_pacing: bool = False,
+                      include_emotional_tension: bool = False,
+                      include_mbti_evaluator: bool = False,
+                      include_scream_analysis: bool = False,
+                      include_marketability: bool = False,
+                      include_storyboard_generator: bool = False,
+                      **kwargs):
         """
         Executes a screenwriting task by passing it through a chain of specialized agents.
 
@@ -35,6 +56,12 @@ class ScreenwritingPipeline(Tool):
             project_name (str): The name of the project.
             include_world_building (bool): Whether to include a world building step.
             include_character_analysis (bool): Whether to include a character analysis step.
+            include_pacing (bool): Include pacing metrics analysis.
+            include_emotional_tension (bool): Include emotional tension analysis.
+            include_mbti_evaluator (bool): Include MBTI personality evaluation.
+            include_scream_analysis (bool): Include scream/intensity analysis.
+            include_marketability (bool): Include marketability assessment.
+            include_storyboard_generator (bool): Include storyboard generation.
         """
         if not task:
             return Response(message="Task description is required.", break_loop=False)
@@ -43,6 +70,7 @@ class ScreenwritingPipeline(Tool):
 
         current_input = f"Project: {project_name}\nTask: {task}"
         results = []
+        analysis_outputs = []
 
         # Optional: World Building
         if include_world_building:
@@ -66,19 +94,61 @@ class ScreenwritingPipeline(Tool):
 
         # 3. Drafting
         # CoWriter drafts the actual content
-        results.append(await self._run_stage(CoWriter, "Co-Writer", "draft", current_input))
-        current_input = results[-1]
+        draft_result = await self._run_stage(CoWriter, "Co-Writer", "draft", current_input)
+        results.append(draft_result)
+        current_input = draft_result
+        current_script = current_input
 
-        # 4. Dialogue Evaluation (Optional if not a full script, but we include it in the pipeline)
+        # Optional Analysis Phase (Non-Transformative)
+        if include_pacing:
+             analysis_outputs.append(await self._run_stage(PacingMetrics, "Pacing Metrics", "analyze", current_script))
+
+        if include_tension:
+             analysis_outputs.append(await self._run_stage(EmotionalTension, "Emotional Tension", "analyze", current_script))
+
+        if include_scream:
+             analysis_outputs.append(await self._run_stage(ScreamAnalyzer, "Scream Analyzer", "analyze", current_script))
+
+        if include_mbti:
+             analysis_outputs.append(await self._run_stage(MBTIEvaluator, "MBTI Evaluator", "analyze", current_script))
+
+        if include_marketability:
+             analysis_outputs.append(await self._run_stage(Marketability, "Marketability", "analyze", current_script))
+
+        if include_storyboard:
+             analysis_outputs.append(await self._run_stage(StoryboardGenerator, "Storyboard Generator", "analyze", current_script))
+
+        # 4. Dialogue Evaluation (Transformative)
         # DialogueEvaluator refines the dialogue
         results.append(await self._run_stage(DialogueEvaluator, "Dialogue Evaluator", "evaluate", current_input))
         current_input = results[-1]
 
+        # Analysis stages (Do not update current_input)
+        if include_pacing:
+            results.append(await self._run_stage(PacingMetrics, "Pacing Metrics", "analyze", current_input))
+
+        if include_emotional_tension:
+            results.append(await self._run_stage(EmotionalTension, "Emotional Tension", "analyze", current_input))
+
+        if include_mbti_evaluator:
+            results.append(await self._run_stage(MBTIEvaluator, "MBTI Evaluator", "analyze", current_input))
+
+        if include_scream_analysis:
+            results.append(await self._run_stage(ScreamAnalyzer, "Scream Analyzer", "analyze", current_input))
+
         # 5. Formatting
         # ScriptFormatter ensures it is in correct format (HTML/Fountain)
         results.append(await self._run_stage(ScriptFormatter, "Script Formatter", "format", current_input))
+        current_input = results[-1] # Update to formatted script
 
-        final_output = f"## Production Line Result\n\n{results[-1]}"
+        # Post-Formatting Analysis
+        if include_marketability:
+            results.append(await self._run_stage(Marketability, "Marketability", "analyze", current_input))
+
+        if include_storyboard_generator:
+            results.append(await self._run_stage(StoryboardGenerator, "Storyboard Generator", "analyze", current_input))
+
+        final_output = f"## Production Line Result\n\n" + "\n\n---\n\n".join(results)
         return Response(message=final_output, break_loop=True)
 
     async def _run_stage(self, AgentClass, stage_name: str, method_name: str, input_text: str) -> str:
@@ -99,7 +169,6 @@ class ScreenwritingPipeline(Tool):
         sub_agent.config.profile = "screenwriting"
 
         # Call the specific method on the agent
-        # We rely on the fact that the agent class has the specific method
         method = getattr(sub_agent, method_name)
 
         # The methods usually call hist_add_user_message and then monologue

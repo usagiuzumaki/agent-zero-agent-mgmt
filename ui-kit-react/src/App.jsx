@@ -38,6 +38,8 @@ export default function App() {
             value={ui}
             onChange={(e) => setUI(e.target.value)}
             style={{ flex: 1, marginBottom: 0 }}
+            aria-label="Select Interface Mode"
+            title="Select Interface Mode"
           >
             <option value="default">Default</option>
             <option value="screenwriting">Screenwriting</option>
@@ -48,6 +50,8 @@ export default function App() {
             value={theme}
             onChange={(e) => setTheme(e.target.value)}
             style={{ flex: 1, marginBottom: 0 }}
+            aria-label="Select Theme"
+            title="Select Theme"
           >
             <option value="light">Light</option>
             <option value="dark">Dark</option>

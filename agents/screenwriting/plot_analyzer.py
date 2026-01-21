@@ -1,6 +1,6 @@
 """Agent that inspects plot structure and pacing."""
 
-from agents import AgentConfig
+from agents import AgentConfig, UserMessage
 from .base import ScreenwritingAgent
 
 
@@ -15,8 +15,9 @@ class PlotAnalyzer(ScreenwritingAgent):
 
         Makes use of tools and instruments for deeper inspection.
         """
-        self.hist_add_user_message(
-            "Use tools such as the script_analyzer instrument to analyze the plot structure of:\n"
+        msg = UserMessage(
+            message="Use tools such as the script_analyzer instrument to analyze the plot structure of:\n"
             + outline
         )
+        self.hist_add_user_message(msg)
         return await self.monologue()
