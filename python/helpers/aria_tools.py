@@ -2,6 +2,8 @@ import json
 import os
 from typing import Any, List, Dict, Tuple
 from python.helpers.stable_diffusion import generate_image as _sd_generate
+from python.helpers.tunnel_manager import TunnelManager
+from python.helpers.egirl import instagram
 
 try:
     from openai import OpenAI
@@ -253,8 +255,26 @@ def _eleven_tts(text: str) -> str:
 
 
 def _post_to_instagram(image_path: str, caption: str) -> str:
-    """Placeholder for posting to Instagram."""
-    return f"posted {image_path} with caption {caption}"
+    """Post to Instagram using the public tunnel URL."""
+    # Get public tunnel URL
+    tunnel_url = TunnelManager.get_instance().get_tunnel_url()
+    if not tunnel_url:
+        return "Error: No public tunnel active. Instagram requires a public URL. Please ask to 'start tunnel' first."
+
+    # Construct public URL for the image
+    filename = os.path.basename(image_path)
+    # The public_image endpoint (python/api/public_image.py) serves files from outputs/
+    image_url = f"{tunnel_url}/public_image?filename={filename}"
+
+    try:
+        # Call the actual Instagram helper
+        res = instagram.post_image(image_url, caption)
+        if res and "id" in res:
+            return f"Success! Posted to Instagram. Media ID: {res['id']}"
+        else:
+            return f"Failed to post to Instagram. Response: {res}"
+    except Exception as e:
+        return f"Error posting to Instagram: {str(e)}"
 
 
 def _stripe_checkout(price_id: str, success_url: str | None = None, cancel_url: str | None = None) -> str:
