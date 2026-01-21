@@ -10,7 +10,7 @@ class Marketability(ScreenwritingAgent):
     def __init__(self, number: int, config: AgentConfig, context=None):
         super().__init__(number, config, context)
 
-    async def assess(self, synopsis: str) -> str:
+    async def analyze(self, synopsis: str) -> str:
         """Return marketability analysis for the given synopsis.
 
         Uses tools and instruments to support its assessment.
@@ -18,8 +18,12 @@ class Marketability(ScreenwritingAgent):
         self.hist_add_user_message(
             UserMessage("Use available tools to evaluate marketability of:\n" + synopsis)
         )
+        self.hist_add_user_message(msg)
         return await self.monologue()
 
     async def analyze(self, text: str) -> str:
         """Standard interface for pipeline integration."""
         return await self.assess(text)
+    async def assess(self, synopsis: str) -> str:
+        """Alias for analyze."""
+        return await self.analyze(synopsis)

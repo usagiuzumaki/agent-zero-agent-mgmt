@@ -70,6 +70,7 @@ class ScreenwritingPipeline(Tool):
 
         current_input = f"Project: {project_name}\nTask: {task}"
         results = []
+        analysis_outputs = []
 
         # Optional: World Building
         if include_world_building:
@@ -93,10 +94,31 @@ class ScreenwritingPipeline(Tool):
 
         # 3. Drafting
         # CoWriter drafts the actual content
-        results.append(await self._run_stage(CoWriter, "Co-Writer", "draft", current_input))
-        current_input = results[-1]
+        draft_result = await self._run_stage(CoWriter, "Co-Writer", "draft", current_input)
+        results.append(draft_result)
+        current_input = draft_result
+        current_script = current_input
 
-        # 4. Dialogue Evaluation (Optional if not a full script, but we include it in the pipeline)
+        # Optional Analysis Phase (Non-Transformative)
+        if include_pacing:
+             analysis_outputs.append(await self._run_stage(PacingMetrics, "Pacing Metrics", "analyze", current_script))
+
+        if include_tension:
+             analysis_outputs.append(await self._run_stage(EmotionalTension, "Emotional Tension", "analyze", current_script))
+
+        if include_scream:
+             analysis_outputs.append(await self._run_stage(ScreamAnalyzer, "Scream Analyzer", "analyze", current_script))
+
+        if include_mbti:
+             analysis_outputs.append(await self._run_stage(MBTIEvaluator, "MBTI Evaluator", "analyze", current_script))
+
+        if include_marketability:
+             analysis_outputs.append(await self._run_stage(Marketability, "Marketability", "analyze", current_script))
+
+        if include_storyboard:
+             analysis_outputs.append(await self._run_stage(StoryboardGenerator, "Storyboard Generator", "analyze", current_script))
+
+        # 4. Dialogue Evaluation (Transformative)
         # DialogueEvaluator refines the dialogue
         results.append(await self._run_stage(DialogueEvaluator, "Dialogue Evaluator", "evaluate", current_input))
         current_input = results[-1]
@@ -147,7 +169,6 @@ class ScreenwritingPipeline(Tool):
         sub_agent.config.profile = "screenwriting"
 
         # Call the specific method on the agent
-        # We rely on the fact that the agent class has the specific method
         method = getattr(sub_agent, method_name)
 
         # The methods usually call hist_add_user_message and then monologue

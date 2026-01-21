@@ -10,7 +10,7 @@ class EmotionalTension(ScreenwritingAgent):
     def __init__(self, number: int, config: AgentConfig, context=None):
         super().__init__(number, config, context)
 
-    async def gauge(self, script: str) -> str:
+    async def analyze(self, script: str) -> str:
         """Assess emotional tension across the script.
 
         Employs tools and instruments to map intensity levels.
@@ -18,8 +18,12 @@ class EmotionalTension(ScreenwritingAgent):
         self.hist_add_user_message(
             UserMessage("Use tools and instruments to assess emotional tension in:\n" + script)
         )
+        self.hist_add_user_message(msg)
         return await self.monologue()
 
     async def analyze(self, text: str) -> str:
         """Standard interface for pipeline integration."""
         return await self.gauge(text)
+    async def gauge(self, script: str) -> str:
+        """Alias for analyze."""
+        return await self.analyze(script)

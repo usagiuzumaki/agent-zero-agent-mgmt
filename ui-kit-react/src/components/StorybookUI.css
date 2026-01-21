@@ -406,3 +406,54 @@
   justify-content: flex-end;
   margin-top: 1rem;
 }
+
+/* Empty State Styles */
+.empty-state-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  text-align: center;
+  background: var(--color-surface-alt, rgba(0,0,0,0.02));
+  border: 2px dashed var(--color-border);
+  border-radius: var(--border-radius);
+  grid-column: 1 / -1;
+  min-height: 200px;
+}
+
+.empty-state-icon {
+  color: var(--color-primary);
+  opacity: 0.8;
+  margin-bottom: 1.5rem;
+  background: var(--color-background);
+  padding: 1.5rem;
+  border-radius: 50%;
+  box-shadow: var(--shadow-sm, 0 1px 2px rgba(0,0,0,0.05));
+}
+
+.empty-state-title {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+  color: var(--color-text);
+}
+
+.empty-state-text {
+  color: var(--color-text-muted);
+  margin-bottom: 2rem;
+  max-width: 400px;
+  line-height: 1.5;
+}
+
+.btn-empty-state {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: transform 0.2s;
+}
+
+.btn-empty-state:hover {
+  transform: translateY(-2px);
+}

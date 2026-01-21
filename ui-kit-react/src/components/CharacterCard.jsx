@@ -10,7 +10,7 @@ const getRoleColor = (role) => {
   }
 };
 
-const CharacterCard = memo(({ char, onEdit, onDelete }) => {
+const CharacterCard = memo(({ char, onEdit, onDelete, isDeleting }) => {
   return (
     <div className="char-card" style={{borderTop: `4px solid ${getRoleColor(char.role)}`}}>
       <div className="char-card-header">
@@ -31,6 +31,8 @@ const CharacterCard = memo(({ char, onEdit, onDelete }) => {
           className="btn-text"
           onClick={() => onEdit(char)}
           aria-label={`Edit ${char.name}`}
+          title="Edit Character"
+          disabled={isDeleting}
         >
           Edit
         </button>
@@ -38,9 +40,11 @@ const CharacterCard = memo(({ char, onEdit, onDelete }) => {
           className="btn-text delete"
           onClick={() => onDelete(char.id)}
           aria-label={`Delete ${char.name}`}
+          title="Delete Character"
+          disabled={isDeleting}
           style={{ color: '#ef4444' }}
         >
-          Delete
+          {isDeleting ? <Spinner size="small" /> : 'Delete'}
         </button>
       </div>
     </div>

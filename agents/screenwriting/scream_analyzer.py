@@ -38,5 +38,6 @@ class ScreamAnalyzer(ScreenwritingAgent):
                 + text
             )
         )
+        self.hist_add_user_message(msg)
         details = await self.monologue()
         return f"Intensity: {intensity}\n\n{details}"

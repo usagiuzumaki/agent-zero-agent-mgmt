@@ -1,14 +1,14 @@
 <html>
 
 <head>
-    <title>Connection to A0 MCP Server</title>
+    <title>Connection to Aria Bot MCP Server</title>
 
 </head>
 
 <body>
     <div x-data>
-        <p>Agent Zero MCP Server is an SSE MCP running on the same URL and port as the Web UI + /mcp/sse path.</p>
-        <p>The same applies if you run A0 on a public URL using a tunnel.</p>
+        <p>Aria Bot MCP Server is an SSE MCP running on the same URL and port as the Web UI + /mcp/sse path.</p>
+        <p>The same applies if you run Aria Bot on a public URL using a tunnel.</p>
 
         <h3>Example MCP Server Configuration JSON</h3>
         <div id="mcp-server-example"></div>
@@ -20,7 +20,7 @@
                 const jsonExample = JSON.stringify({
                     "mcpServers":
                     {
-                        "agent-zero": {
+                        "aria-bot": {
                             "type": "sse",
                             "serverUrl": `${url}/mcp/t-${token}/sse`
                         }

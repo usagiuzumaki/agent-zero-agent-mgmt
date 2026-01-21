@@ -6,7 +6,7 @@ import re
 from typing import Dict
 import json
 
-from agents import AgentConfig
+from agents import AgentConfig, UserMessage
 from .base import ScreenwritingAgent
 
 
