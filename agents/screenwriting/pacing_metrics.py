@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import re
+import json
 from typing import Dict
+import json
 
-from agents import AgentConfig
+from agents import AgentConfig, UserMessage
 from .base import ScreenwritingAgent
 
 
@@ -15,9 +17,12 @@ class PacingMetrics(ScreenwritingAgent):
     def __init__(self, number: int, config: AgentConfig, context=None):
         super().__init__(number, config, context)
 
-    async def analyze(self, script: str) -> str:
-        """Return counts of sentences and average sentence length as a formatted string."""
-        sentences = [s.strip() for s in re.split(r"[.!?]+", script) if s.strip()]
+    def compute(self, script: str) -> Dict[str, float]:
+        """Return counts of sentences and average sentence length."""
+        sentences = [
+            s.strip() for s in re.split(
+                r"[.!?]+",
+                script) if s.strip()]
         word_counts = [len(s.split()) for s in sentences]
         avg_len = sum(word_counts) / len(word_counts) if word_counts else 0.0
 
@@ -27,4 +32,8 @@ class PacingMetrics(ScreenwritingAgent):
             "exclamations": script.count("!"),
         }
 
-        return f"## Pacing Metrics\n\n- **Sentences**: {metrics['sentences']}\n- **Avg Sentence Length**: {metrics['avg_sentence_length']} words\n- **Exclamations**: {metrics['exclamations']}"
+    async def analyze(self, text: str) -> str:
+        """Run pacing analysis and return a formatted string."""
+        metrics = self.compute(text)
+        json_output = json.dumps(metrics, indent=2)
+        return f"**Pacing Metrics**\n```json\n{json_output}\n```"

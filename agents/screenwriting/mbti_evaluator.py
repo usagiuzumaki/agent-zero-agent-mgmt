@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import re
+import json
 from typing import Dict, Tuple
+import json
 
-from agents import AgentConfig
+from agents import AgentConfig, UserMessage
 from .base import ScreenwritingAgent
 
 TRAITS: Tuple[Tuple[str, str, set[str], set[str]], ...] = (
@@ -25,13 +27,17 @@ class MBTIEvaluator(ScreenwritingAgent):
     async def analyze(self, text: str) -> str:
         """Return raw trait scores and a best-guess type as a formatted string."""
         words = re.findall(r"\w+", text.lower())
-        scores: Dict[str, int] = {trait: 0 for pair in TRAITS for trait in pair[:2]}
+        scores: Dict[str, int] = {
+            trait: 0 for pair in TRAITS for trait in pair[:2]}
         for a, b, set_a, set_b in TRAITS:
             scores[a] += sum(1 for w in words if w in set_a)
             scores[b] += sum(1 for w in words if w in set_b)
+        mbti = "".join(a if scores[a] >= scores[b]
+                       else b for a, b, *_ in TRAITS)
+        return {"type": mbti, "scores": scores}
 
-        mbti = "".join(a if scores[a] >= scores[b] else b for a, b, *_ in TRAITS)
-
-        formatted_scores = ", ".join([f"{k}: {v}" for k, v in scores.items()])
-
-        return f"## MBTI Analysis\n\n**Estimated Type**: {mbti}\n**Scores**: {formatted_scores}"
+    async def analyze(self, text: str) -> str:
+        """Run MBTI evaluation and return a formatted string."""
+        result = self.evaluate(text)
+        json_output = json.dumps(result['scores'], indent=2)
+        return f"**MBTI Evaluation**\nType: {result['type']}\n```json\n{json_output}\n```"

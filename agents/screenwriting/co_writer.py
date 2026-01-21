@@ -1,6 +1,6 @@
 """Agent that collaborates on drafting and editing scenes."""
 
-from agents import AgentConfig
+from agents import AgentConfig, UserMessage
 from .base import ScreenwritingAgent
 
 
@@ -15,7 +15,8 @@ class CoWriter(ScreenwritingAgent):
 
         Utilizes tools and instruments to enhance creative output.
         """
-        self.hist_add_user_message(
-            "Use available tools to collaborate on the following request:\n" + prompt
+        msg = UserMessage(
+            message="Use available tools to collaborate on the following request:\n" + prompt
         )
+        self.hist_add_user_message(msg)
         return await self.monologue()

@@ -22,13 +22,19 @@ def calculate_valid_match_lengths(first: bytes | str, second: bytes | str,
     matched_since_deviation = 0
     last_matched_i, last_matched_j = 0, 0  # Track the last matched index
 
+    # Pre-compile patterns to avoid recompilation and enable usage of match(pos=...)
+    # This avoids O(N) string slicing in the inner loop
+    compiled_patterns = [re.compile(p) for p in ignore_patterns]
+
     def skip_ignored_patterns(s, index):
         """Skip characters in `s` that match any pattern in `ignore_patterns` starting from `index`."""
         while index < len(s):
-            for pattern in ignore_patterns:
-                match = re.match(pattern, s[index:])
+            for pattern in compiled_patterns:
+                # Use pattern.match(s, pos=index) to avoid slicing the string
+                match = pattern.match(s, pos=index)
                 if match:
-                    index += len(match.group(0))
+                    # match.end() returns the absolute end index in the original string
+                    index = match.end()
                     break
             else:
                 break
