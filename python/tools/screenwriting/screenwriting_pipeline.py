@@ -1,4 +1,4 @@
-from agents import Agent, UserMessage
+from agents import Agent
 from python.helpers.tool import Tool, Response
 from agents.screenwriting.plot_analyzer import PlotAnalyzer
 from agents.screenwriting.creative_ideas import CreativeIdeas
@@ -11,10 +11,10 @@ from agents.screenwriting.pacing_metrics import PacingMetrics
 from agents.screenwriting.emotional_tension import EmotionalTension
 from agents.screenwriting.mbti_evaluator import MBTIEvaluator
 from agents.screenwriting.scream_analyzer import ScreamAnalyzer
-from agents.screenwriting.marketability import Marketability
 from agents.screenwriting.storyboard_generator import StoryboardGenerator
-import json
+from agents.screenwriting.marketability import Marketability
 from python.helpers.print_style import PrintStyle
+
 
 class ScreenwritingPipeline(Tool):
     """
@@ -26,6 +26,9 @@ class ScreenwritingPipeline(Tool):
     4. CreativeIdeas (Brainstorming)
     5. CoWriter (Drafting)
     6. DialogueEvaluator (Refinement)
+    7. Analysis Agents (Pacing, Tension, MBTI, Scream) - Optional
+    8. ScriptFormatter (Formatting)
+    9. Post-Production Agents (Marketability, Storyboard) - Optional
     7. PacingMetrics (Analysis) - Optional
     8. EmotionalTension (Analysis) - Optional
     9. MBTIEvaluator (Analysis) - Optional
@@ -35,7 +38,15 @@ class ScreenwritingPipeline(Tool):
     13. StoryboardGenerator (Analysis) - Optional
     """
 
-    def __init__(self, agent, name, method, args, message, loop_data, **kwargs):
+    def __init__(
+            self,
+            agent,
+            name,
+            method,
+            args,
+            message,
+            loop_data,
+            **kwargs):
         super().__init__(agent, name, method, args, message, loop_data, **kwargs)
 
     async def execute(self, task: str = "", project_name: str = "",
@@ -64,9 +75,12 @@ class ScreenwritingPipeline(Tool):
             include_storyboard_generator (bool): Include storyboard generation.
         """
         if not task:
-            return Response(message="Task description is required.", break_loop=False)
+            return Response(
+                message="Task description is required.",
+                break_loop=False)
 
-        PrintStyle(font_color="#8E44AD", bold=True).print(f"[{self.agent.agent_name}] Starting production line for project: {project_name}")
+        PrintStyle(font_color="#8E44AD", bold=True).print(
+            f"[{self.agent.agent_name}] Starting production line for project: {project_name}")
 
         current_input = f"Project: {project_name}\nTask: {task}"
         results = []
@@ -74,8 +88,8 @@ class ScreenwritingPipeline(Tool):
 
         # Optional: World Building
         if include_world_building:
-             results.append(await self._run_stage(WorldBuilder, "World Builder", "build", current_input))
-             current_input = results[-1]
+            results.append(await self._run_stage(WorldBuilder, "World Builder", "build", current_input))
+            current_input = results[-1]
 
         # Optional: Character Analysis
         if include_character_analysis:
@@ -83,12 +97,10 @@ class ScreenwritingPipeline(Tool):
             current_input = results[-1]
 
         # 1. Structure / Plot Analysis
-        # PlotAnalyzer improves or analyzes the structure of the request
         results.append(await self._run_stage(PlotAnalyzer, "Plot Analyzer", "analyze", current_input))
-        current_input = results[-1] # Pass output to next stage
+        current_input = results[-1]  # Pass output to next stage
 
         # 2. Creative Ideas
-        # CreativeIdeas adds twists or brainstorms based on the analysis
         results.append(await self._run_stage(CreativeIdeas, "Creative Ideas", "brainstorm", current_input))
         current_input = results[-1]
 
@@ -130,42 +142,57 @@ class ScreenwritingPipeline(Tool):
         if include_emotional_tension:
             results.append(await self._run_stage(EmotionalTension, "Emotional Tension", "analyze", current_input))
 
-        if include_mbti_evaluator:
+        if include_mbti:
             results.append(await self._run_stage(MBTIEvaluator, "MBTI Evaluator", "analyze", current_input))
 
         if include_scream_analysis:
             results.append(await self._run_stage(ScreamAnalyzer, "Scream Analyzer", "analyze", current_input))
 
         # 5. Formatting
-        # ScriptFormatter ensures it is in correct format (HTML/Fountain)
         results.append(await self._run_stage(ScriptFormatter, "Script Formatter", "format", current_input))
-        current_input = results[-1] # Update to formatted script
+        # Note: We update current_input here, though formatting might be the
+        # final text form we want for marketability too.
+        current_input = results[-1]
 
-        # Post-Formatting Analysis
+        # --- Optional Post-Production Analysis ---
+
         if include_marketability:
             results.append(await self._run_stage(Marketability, "Marketability", "analyze", current_input))
 
-        if include_storyboard_generator:
+        if include_storyboard:
             results.append(await self._run_stage(StoryboardGenerator, "Storyboard Generator", "analyze", current_input))
 
-        final_output = f"## Production Line Result\n\n" + "\n\n---\n\n".join(results)
-        return Response(message=final_output, break_loop=True)
+        # Return full report containing all steps
+        full_report = "\n\n---\n\n".join(results)
+        return Response(
+            message=f"## Production Line Complete\n\n{full_report}",
+            break_loop=True)
 
-    async def _run_stage(self, AgentClass, stage_name: str, method_name: str, input_text: str) -> str:
+    async def _run_stage(
+            self,
+            AgentClass,
+            stage_name: str,
+            method_name: str,
+            input_text: str) -> str:
         """
         Runs a specific agent stage.
         """
-        PrintStyle(font_color="#3498DB").print(f"[{self.agent.agent_name}] Handoff to: {stage_name}")
+        PrintStyle(font_color="#3498DB").print(
+            f"[{self.agent.agent_name}] Handoff to: {stage_name}")
 
         # Instantiate the agent
         sub_number = self.agent.number + 1
-        sub_agent = AgentClass(sub_number, self.agent.config, self.agent.context)
+        sub_agent = AgentClass(
+            sub_number,
+            self.agent.config,
+            self.agent.context)
 
         # Setup the relationship
         sub_agent.set_data(Agent.DATA_NAME_SUPERIOR, self.agent)
         self.agent.set_data(Agent.DATA_NAME_SUBORDINATE, sub_agent)
 
-        # Ensure the profile is set correctly (folder name matching the agent type usually)
+        # Ensure the profile is set correctly (folder name matching the agent
+        # type usually)
         sub_agent.config.profile = "screenwriting"
 
         # Call the specific method on the agent
