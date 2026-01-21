@@ -1,6 +1,6 @@
 <div align="center">
 
-# `Aria Bot` (formerly Agent Zero)
+# Aria Bot (formerly Agent Zero)
 
 
 [![Agent Zero Website](https://img.shields.io/badge/Website-agent--zero.ai-0A192F?style=for-the-badge&logo=vercel&logoColor=white)](https://agent-zero.ai) [![Thanks to Sponsors](https://img.shields.io/badge/GitHub%20Sponsors-Thanks%20to%20Sponsors-FF69B4?style=for-the-badge&logo=githubsponsors&logoColor=white)](https://github.com/sponsors/agent0ai) [![Follow on X](https://img.shields.io/badge/X-Follow-000000?style=for-the-badge&logo=x&logoColor=white)](https://x.com/Agent0ai) [![Join our Discord](https://img.shields.io/badge/Discord-Join%20our%20server-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/B8KZKNsPpj) [![Subscribe on YouTube](https://img.shields.io/badge/YouTube-Subscribe-red?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/@AgentZeroFW) [![Connect on LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/jan-tomasek/) [![Follow on Warpcast](https://img.shields.io/badge/Warpcast-Follow-5A32F3?style=for-the-badge)](https://warpcast.com/agent-zero) 
@@ -45,7 +45,7 @@ From now on, please use this name for both `git clone` and `docker pull` command
 
 
 
-- Aria Bot (Agent Zero) is not a predefined agentic framework. It is designed to be dynamic, organically growing, and learning as you use it.
+- Aria Bot is not a predefined agentic framework. It is designed to be dynamic, organically growing, and learning as you use it.
 - Aria Bot is fully transparent, readable, comprehensible, customizable, and interactive.
 - Aria Bot uses the computer as a tool to accomplish its (your) tasks.
 
@@ -213,8 +213,8 @@ docker run -p 50001:80 agent0ai/agent-zero
 ### v0.8.5 - **MCP Server + Client**
 [Release video](https://youtu.be/pM5f4Vz3_IQ)
 
-- Agent Zero can now act as MCP Server
-- Agent Zero can use external MCP servers as tools
+- Aria Bot can now act as MCP Server
+- Aria Bot can use external MCP servers as tools
 
 ### v0.8.4.1 - 2
 Default models set to gpt-4.1

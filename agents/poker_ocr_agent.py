@@ -32,7 +32,7 @@ class PokerOcrAgent(Agent):
 
         Args:
             number: Identifier of this agent instance.
-            config: Standard :class:`AgentConfig` used by Agent Zero.
+            config: Standard :class:`AgentConfig` used by Aria Bot (formerly Agent Zero).
             region: ``mss``-style region dictionary describing the screen
                 area containing the poker table.
             context: Optional pre-existing :class:`AgentContext`.
