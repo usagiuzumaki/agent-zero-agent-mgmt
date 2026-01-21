@@ -21,6 +21,5 @@ async def test_analyze_mbti():
     agent = MBTIEvaluator(0, dummy_config())
     # "Alone" -> I, "Analysis" -> T, "Plan" -> J
     result = await agent.analyze("I like being alone and doing analysis. I plan everything.")
-    assert "MBTI Analysis" in result
-    assert "Estimated Type" in result
-    assert "Scores" in result
+    assert "MBTI Evaluation" in result
+    assert "Type: ISTJ" in result

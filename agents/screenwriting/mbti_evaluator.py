@@ -5,7 +5,6 @@ from __future__ import annotations
 import re
 import json
 from typing import Dict, Tuple
-import json
 
 from agents import AgentConfig, UserMessage
 from .base import ScreenwritingAgent
@@ -24,8 +23,8 @@ class MBTIEvaluator(ScreenwritingAgent):
     def __init__(self, number: int, config: AgentConfig, context=None):
         super().__init__(number, config, context)
 
-    async def analyze(self, text: str) -> str:
-        """Return raw trait scores and a best-guess type as a formatted string."""
+    def evaluate(self, text: str) -> Dict:
+        """Return raw trait scores and a best-guess type as a dictionary."""
         words = re.findall(r"\w+", text.lower())
         scores: Dict[str, int] = {
             trait: 0 for pair in TRAITS for trait in pair[:2]}

@@ -31,6 +31,7 @@ class PacingMetrics(ScreenwritingAgent):
             "avg_sentence_length": round(avg_len, 2),
             "exclamations": script.count("!"),
         }
+        return metrics
 
     async def analyze(self, text: str) -> str:
         """Run pacing analysis and return a formatted string."""
