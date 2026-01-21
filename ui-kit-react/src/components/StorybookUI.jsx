@@ -173,15 +173,16 @@ export default function StorybookUI() {
           <div className="document-list">
             {documents.length === 0 ? (
               <div className="empty-state-container">
-                <div className="empty-state-icon">
-                  <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <path d="M12 6.25278V19.2528M12 6.25278C10.8321 5.4392 9.24649 5 7.5 5C5.75351 5 4.16789 5.4392 3 6.25278V19.2528C4.16789 18.4392 5.75351 18 7.5 18C9.24649 18 10.8321 18.4392 12 19.2528M12 6.25278C13.1679 5.4392 14.7535 5 16.5 5C18.2465 5 19.8321 5.4392 21 6.25278V19.2528C19.8321 18.4392 18.2465 18 16.5 18C14.7535 18 13.1679 18.4392 12 19.2528" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </div>
-                <h3 className="empty-state-title">No Storybooks Yet</h3>
-                <p className="empty-state-text">Create your first screenwriting document to begin your journey.</p>
+                <svg className="empty-state-icon" width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M14 2V8H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M16 13H8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M16 17H8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M10 9H8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                <p className="empty-state-text">No documents found. Start your story by creating or uploading a new document.</p>
                 <button
-                  className="btn-primary btn-empty-state"
+                  className="btn-primary"
                   onClick={() => setShowUpload(true)}
                 >
                   Create First Document
