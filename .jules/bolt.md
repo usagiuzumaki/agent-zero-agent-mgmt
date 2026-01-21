@@ -11,3 +11,7 @@
 ## 2025-02-17 - [Eliminating Defensive DeepCopy in Logging]
 **Learning:** `copy.deepcopy()` was used in the hot path of logging (`python/helpers/log.py`) solely to prevent mutation during truncation. By rewriting the truncation logic to be functional (returning new objects instead of mutating in-place), we eliminated the expensive deepcopy step, resulting in a ~2x speedup for logging complex structures.
 **Action:** When working with data transformation where immutability is required, prefer creating new collections (copy-on-traverse) over `deepcopy` + in-place mutation.
+
+## 2025-02-24 - [Pre-compiling Regex in Helper Functions]
+**Learning:** Pre-compiling regex patterns in frequently called helper functions (like `replace_placeholders_dict` which is recursive) yields significant speedups (1.4x), whereas for simple operations on long strings (`remove_code_fences`) the gain is marginal (1.01x) but improves code cleanliness.
+**Action:** Prioritize regex pre-compilation for recursive or tight-loop functions.
