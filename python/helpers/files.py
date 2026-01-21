@@ -15,6 +15,14 @@ import inspect
 import glob
 
 
+# Pre-compile regex patterns for performance
+_CODE_FENCE_PATTERN = re.compile(r"(```|~~~)(.*?\n)(.*?)(\1)", re.DOTALL)
+_JSON_TEMPLATE_PATTERN = re.compile(r"^\s*(```|~~~)\s*json\s*\n(.*?)\n\1\s*$", re.DOTALL)
+_INCLUDE_PATTERN = re.compile(r"{{\s*include\s*['\"](.*?)['\"]\s*}}")
+_PLACEHOLDER_PATTERN = re.compile(r"{{(\w+)}}")
+_SAFE_FILENAME_PATTERN = re.compile(r'[^a-zA-Z0-9-._]')
+
+
 class VariablesPlugin(ABC):
     @abstractmethod
     def get_variables(
@@ -175,7 +183,7 @@ def replace_placeholders_json(_content: str, **kwargs):
 def replace_placeholders_dict(_content: dict, **kwargs):
     def replace_value(value):
         if isinstance(value, str):
-            placeholders = re.findall(r"{{(\w+)}}", value)
+            placeholders = _PLACEHOLDER_PATTERN.findall(value)
             if placeholders:
                 for placeholder in placeholders:
                     if placeholder in kwargs:
@@ -203,7 +211,6 @@ def replace_placeholders_dict(_content: dict, **kwargs):
 
 def process_includes(_content, _base_path, _backup_dirs, **kwargs):
     # Regex to find {{ include 'path' }} or {{include'path'}}
-    include_pattern = re.compile(r"{{\s*include\s*['\"](.*?)['\"]\s*}}")
 
     def replace_include(match):
         include_path = match.group(1)
@@ -217,7 +224,7 @@ def process_includes(_content, _base_path, _backup_dirs, **kwargs):
         return included_content
 
     # Replace all includes with the file content
-    return re.sub(include_pattern, replace_include, _content)
+    return _INCLUDE_PATTERN.sub(replace_include, _content)
 
 
 def find_file_in_dirs(file_path, backup_dirs):
@@ -271,16 +278,14 @@ def remove_code_fences(text: str) -> str:
         content.
     """
 
-    pattern = re.compile(r"(```|~~~)(.*?\n)(.*?)(\1)", re.DOTALL)
     # Inline replacer removes the opening and closing fence markers
-    return pattern.sub(lambda match: match.group(3), text)
+    return _CODE_FENCE_PATTERN.sub(lambda match: match.group(3), text)
 
 
 def is_full_json_template(text):
     # Pattern to match the entire text enclosed in ```json or ~~~json fences
-    pattern = r"^\s*(```|~~~)\s*json\s*\n(.*?)\n\1\s*$"
     # Use re.DOTALL to make '.' match newlines
-    match = re.fullmatch(pattern, text.strip(), flags=re.DOTALL)
+    match = _JSON_TEMPLATE_PATTERN.fullmatch(text.strip())
     return bool(match)
 
 
@@ -435,4 +440,4 @@ def move_file(relative_path: str, new_path: str):
 
 def safe_file_name(filename: str) -> str:
     # Replace any character that's not alphanumeric, dash, underscore, or dot with underscore
-    return re.sub(r'[^a-zA-Z0-9-._]', '_', filename)
+    return _SAFE_FILENAME_PATTERN.sub('_', filename)
