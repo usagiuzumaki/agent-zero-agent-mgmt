@@ -32,9 +32,11 @@ class ScreamAnalyzer(ScreenwritingAgent):
     async def analyze(self, text: str) -> str:
         """Highlight screams and return an intensity classification."""
         intensity = self.classify_intensity(text)
-        msg = UserMessage(
-            message="Use available tools to analyze the following text for screams or intense emotional outbursts:\n"
-            + text
+        self.hist_add_user_message(
+            UserMessage(
+                "Use available tools to analyze the following text for screams or intense emotional outbursts:\n"
+                + text
+            )
         )
         self.hist_add_user_message(msg)
         details = await self.monologue()

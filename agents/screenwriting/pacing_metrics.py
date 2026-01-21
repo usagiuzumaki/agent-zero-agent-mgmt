@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 from typing import Dict
+import json
 
 from agents import AgentConfig, UserMessage
 from .base import ScreenwritingAgent
@@ -26,11 +27,7 @@ class PacingMetrics(ScreenwritingAgent):
             "exclamations": script.count("!"),
         }
 
-    async def analyze(self, script: str) -> str:
-        """Analyze the pacing of the script and return a report."""
-        metrics = self.compute(script)
-        msg = UserMessage(
-            message=f"Generate a pacing analysis report for the script based on these metrics: {metrics}.\n"
-        )
-        self.hist_add_user_message(msg)
-        return await self.monologue()
+    async def analyze(self, text: str) -> str:
+        """Run standard analysis returning a string report."""
+        metrics = self.compute(text)
+        return f"Pacing Metrics:\n{json.dumps(metrics, indent=2)}"
