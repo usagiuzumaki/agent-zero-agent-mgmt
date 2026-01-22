@@ -69,5 +69,94 @@ class TestScreenwritingManager(unittest.TestCase):
     def test_delete_nonexistent_character(self):
         self.assertFalse(self.manager.delete_character("fake_id"))
 
+    def test_add_quote(self):
+        quote = "I'll be back."
+        character = "Terminator"
+        self.assertTrue(self.manager.add_quote(quote, character=character, category="Action"))
+
+        quotes_data = self.manager.load_data('sick_quotes')
+        self.assertEqual(len(quotes_data['quotes']), 1)
+        self.assertEqual(quotes_data['quotes'][0]['quote'], quote)
+        self.assertEqual(quotes_data['categories'], ["Action"])
+
+    def test_search_quotes(self):
+        self.manager.add_quote("I'll be back.", character="Terminator")
+        self.manager.add_quote("Hasta la vista, baby.", character="Terminator")
+        self.manager.add_quote("May the Force be with you.", character="Yoda")
+
+        results = self.manager.search_quotes("back")
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['quote'], "I'll be back.")
+
+        results = self.manager.search_quotes("Terminator")
+        self.assertEqual(len(results), 2)
+
+    def test_add_scene(self):
+        scene_data = {"title": "Opening Scene", "description": "Fade in..."}
+        self.assertTrue(self.manager.add_scene(scene_data))
+
+        outline = self.manager.load_data('book_outline')
+        self.assertEqual(len(outline['scenes']), 1)
+        self.assertEqual(outline['scenes'][0]['title'], "Opening Scene")
+        self.assertTrue('id' in outline['scenes'][0])
+
+    def test_add_sketch(self):
+        sketch_data = {"title": "Hero Design", "type": "sketch"}
+        self.assertTrue(self.manager.add_sketch(sketch_data))
+
+        imagery = self.manager.load_data('sketches_imagery')
+        self.assertEqual(len(imagery['sketches']), 1)
+
+        mood_board_data = {"title": "Dark Mood", "type": "mood_board"}
+        self.assertTrue(self.manager.add_sketch(mood_board_data))
+
+        imagery = self.manager.load_data('sketches_imagery')
+        self.assertEqual(len(imagery['mood_boards']), 1)
+
+    def test_create_project(self):
+        project_name = "New Sci-Fi"
+        self.assertTrue(self.manager.create_project(project_name, "Sci-Fi", "In a world..."))
+
+        projects = self.manager.load_data('projects')
+        self.assertEqual(len(projects['projects']), 1)
+        self.assertEqual(projects['active_project'], projects['projects'][0]['id'])
+
+        # Verify it resets other data (since create_project initializes new empty structures)
+        # Assuming load_data reads from the file system which create_project has just overwritten
+        outline = self.manager.load_data('book_outline')
+        self.assertEqual(len(outline['scenes']), 0)
+
+    def test_ingest_story_document(self):
+        content = "Chapter One\n\nIt was a dark and stormy night. Suddenly, a shot rang out.\n\nChapter Two\n\nThe detective arrived."
+        doc = self.manager.ingest_story_document("My Novel", content)
+
+        self.assertIsNotNone(doc)
+        self.assertEqual(doc['name'], "My Novel")
+        # Depending on how regex split works, check expectations.
+        # "Chapter One\n\n..." should split into roughly 2 chunks if \n\n is the separator.
+        self.assertTrue(len(doc['chapters']) >= 1)
+
+        storybook = self.manager.load_data('storybook')
+        self.assertEqual(len(storybook['documents']), 1)
+        self.assertEqual(storybook['documents'][0]['id'], doc['id'])
+
+    def test_delete_document(self):
+        doc = self.manager.ingest_story_document("Doc to Delete", "Some content")
+        doc_id = doc['id']
+
+        self.assertTrue(self.manager.delete_document(doc_id))
+
+        storybook = self.manager.load_data('storybook')
+        self.assertEqual(len(storybook['documents']), 0)
+
+    def test_ingest_story_document_edge_cases(self):
+        # Empty content should return None
+        self.assertIsNone(self.manager.ingest_story_document("Empty", ""))
+
+        # Whitespace only content should return None (after we fix it)
+        # Currently it might return a document with no chapters.
+        # let's assert what we WANT: None
+        self.assertIsNone(self.manager.ingest_story_document("Whitespace", "   "))
+
 if __name__ == '__main__':
     unittest.main()
