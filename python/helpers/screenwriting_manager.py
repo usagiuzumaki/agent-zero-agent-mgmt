@@ -280,9 +280,9 @@ class ScreenwritingManager:
             search_lower = search_term.lower()
             
             for quote in quotes_data['quotes']:
-                if (search_lower in quote.get('quote', '').lower() or
-                    search_lower in quote.get('character', '').lower() or
-                    search_lower in quote.get('context', '').lower()):
+                if (search_lower in (quote.get('quote') or '').lower() or
+                    search_lower in (quote.get('character') or '').lower() or
+                    search_lower in (quote.get('context') or '').lower()):
                     results.append(quote)
             
             return results
@@ -324,7 +324,7 @@ class ScreenwritingManager:
         tags: Optional[List[str]] = None,
     ) -> Optional[Dict[str, Any]]:
         """Convert uploaded text into a storybook entry with chapters and beats."""
-        if not content:
+        if not content or not content.strip():
             return None
 
         storybook = self.load_data('storybook') or self._get_default_structure('storybook')
