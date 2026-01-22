@@ -99,22 +99,6 @@
   gap: 1.5rem;
 }
 
-.empty-state-container {
-  grid-column: 1 / -1;
-  text-align: center;
-  padding: 3rem;
-  background: var(--color-surface);
-  color: var(--color-text);
-  border-radius: var(--border-radius);
-  border: 1px dashed var(--color-border);
-}
-
-.empty-state-text {
-  color: var(--color-text-muted);
-  margin-bottom: 1rem;
-  font-size: 1.1rem;
-}
-
 .char-card {
   background: var(--color-surface);
   color: var(--color-text);
