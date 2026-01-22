@@ -18,12 +18,8 @@ class Marketability(ScreenwritingAgent):
         self.hist_add_user_message(
             UserMessage("Use available tools to evaluate marketability of:\n" + synopsis)
         )
-        self.hist_add_user_message(msg)
         return await self.monologue()
 
-    async def analyze(self, text: str) -> str:
-        """Standard interface for pipeline integration."""
-        return await self.assess(text)
     async def assess(self, synopsis: str) -> str:
         """Alias for analyze."""
         return await self.analyze(synopsis)
