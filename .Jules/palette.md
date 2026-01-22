@@ -13,3 +13,7 @@
 ## 2026-01-20 - Actionable Empty States
 **Learning:** Empty states ("No documents found") are often dead ends. They are prime opportunities to guide the user towards the primary action (e.g., "Create Document").
 **Action:** Replace text-only empty states with "Hero" empty states: Icon + Title + Description + Primary Action Button.
+
+## 2026-02-12 - Component-Level Style Isolation
+**Learning:** CSS classes defined in one component's CSS file (e.g. `StorybookUI.css`) are not available to others unless global, leading to inconsistent UI patterns when similar components are built in isolation.
+**Action:** specific component styles should be consolidated into shared utility classes (e.g., `utilities.css`) when a pattern like "Hero Empty State" emerges across multiple views.
