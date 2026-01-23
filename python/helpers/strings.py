@@ -8,6 +8,9 @@ def sanitize_string(s: str, encoding: str = "utf-8") -> str:
         s = str(s)
     return s.encode(encoding, 'replace').decode(encoding, 'replace')
 
+_CAMEL_CASE_PATTERN = re.compile(r'(?<=[a-z])(?=[A-Z])')
+_NON_ALPHANUM_PATTERN = re.compile(r'[\W_]')
+
 def calculate_valid_match_lengths(first: bytes | str, second: bytes | str, 
                                   deviation_threshold: int = 5, 
                                   deviation_reset: int = 5, 
@@ -105,18 +108,13 @@ def format_key(key: str) -> str:
     """Format a key string to be more readable.
     Converts camelCase and snake_case to Title Case with spaces."""
     # First replace non-alphanumeric with spaces
-    result = ''.join(' ' if not c.isalnum() else c for c in key)
+    key = _NON_ALPHANUM_PATTERN.sub(' ', key)
     
     # Handle camelCase
-    formatted = ''
-    for i, c in enumerate(result):
-        if i > 0 and c.isupper() and result[i-1].islower():
-            formatted += ' ' + c
-        else:
-            formatted += c
+    key = _CAMEL_CASE_PATTERN.sub(' ', key)
             
     # Split on spaces and capitalize each word
-    return ' '.join(word.capitalize() for word in formatted.split())
+    return ' '.join(word.capitalize() for word in key.split())
 
 def dict_to_text(d: dict) -> str:
     parts = []
