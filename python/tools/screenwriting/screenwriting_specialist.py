@@ -18,6 +18,8 @@ from python.helpers.print_style import PrintStyle
 class ScreenwritingSpecialist(Tool):
     """
     Allows direct access to specialized screenwriting agents for specific tasks.
+    See `prompts/agent.system.tool.screenwriting_specialist.md` for usage instructions.
+
     Available Specialists:
     - PlotAnalyzer: Analyzes plot structure and beats
     - CreativeIdeas: Brainstorms twists and concepts
