@@ -1,7 +1,34 @@
 import unittest
-from python.helpers.strings import calculate_valid_match_lengths
+from python.helpers.strings import calculate_valid_match_lengths, format_key
 
 class TestStrings(unittest.TestCase):
+    def test_format_key(self):
+        # Basic cases
+        self.assertEqual(format_key("simple_key"), "Simple Key")
+        self.assertEqual(format_key("camelCaseKey"), "Camel Case Key")
+        self.assertEqual(format_key("UPPERCASE_KEY"), "Uppercase Key")
+
+        # Mixed and special cases
+        self.assertEqual(format_key("mixed_Case_Key_With_Numbers_123"), "Mixed Case Key With Numbers 123")
+        self.assertEqual(format_key("__private_key__"), "Private Key")
+        self.assertEqual(format_key("key.with.dots"), "Key With Dots")
+        self.assertEqual(format_key("key-with-dashes"), "Key With Dashes")
+
+        # Complex camelCase
+        self.assertEqual(format_key("XMLHttpRequest"), "Xmlhttp Request")
+        self.assertEqual(format_key("parseJSON"), "Parse Json")
+        self.assertEqual(format_key("innerHTML"), "Inner Html")
+
+        # Edge cases
+        self.assertEqual(format_key(""), "")
+        self.assertEqual(format_key("   "), "")
+        self.assertEqual(format_key("123"), "123")
+        self.assertEqual(format_key("a"), "A")
+
+        # Unicode cases
+        self.assertEqual(format_key("crème_brulée"), "Crème Brulée")
+        self.assertEqual(format_key("élan"), "Élan")
+
     def test_calculate_valid_match_lengths_basic(self):
         s1 = "hello world"
         s2 = "hello world"
