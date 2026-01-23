@@ -1,5 +1,5 @@
 """
-Direct image generation API endpoint for Agent Zero
+Direct image generation API endpoint for Aria Bot
 """
 from flask import jsonify, request
 import os
