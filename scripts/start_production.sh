@@ -1,7 +1,7 @@
 #!/bin/bash
-# Production startup script for Agent Zero (Aria)
+# Production startup script for Aria Bot
 
-echo "[STARTUP] Agent Zero (Aria) Production Deployment"
+echo "[STARTUP] Aria Bot Production Deployment"
 echo "[STARTUP] Environment: ${DEPLOYMENT_ID:-development}"
 echo "[STARTUP] Port: ${PORT:-5000}"
 
@@ -13,7 +13,7 @@ python scripts/migrate.py
 COMMIT_HASH=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
 
 # Start the application
-echo "[STARTUP] Starting Agent Zero on port ${PORT:-5000} (commit: $COMMIT_HASH)"
+echo "[STARTUP] Starting Aria Bot on port ${PORT:-5000} (commit: $COMMIT_HASH)"
 
 # Use gunicorn for production if available, otherwise fallback to Flask
 if command -v gunicorn &> /dev/null; then
