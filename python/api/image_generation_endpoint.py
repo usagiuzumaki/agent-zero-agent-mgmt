@@ -1,5 +1,5 @@
 """
-Direct image generation API endpoint for Agent Zero
+Direct image generation API endpoint for Aria Bot
 """
 from flask import jsonify, request
 import os
@@ -22,7 +22,10 @@ def register_image_routes(app):
                 return jsonify({"error": "No prompt provided"}), 400
             
             # API configuration
-            api_token = os.getenv("REPLICATE_API_TOKEN", "r8_IamCkTsQVQVc4C98QySJXkub1HXoIQn4YT5E9")
+            api_token = os.getenv("REPLICATE_API_TOKEN")
+            if not api_token:
+                return jsonify({"error": "REPLICATE_API_TOKEN not set"}), 500
+
             model_version = "39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b"
             
             # Create prediction
