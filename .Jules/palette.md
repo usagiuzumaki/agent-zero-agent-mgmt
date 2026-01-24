@@ -13,3 +13,7 @@
 ## 2026-01-20 - Actionable Empty States
 **Learning:** Empty states ("No documents found") are often dead ends. They are prime opportunities to guide the user towards the primary action (e.g., "Create Document").
 **Action:** Replace text-only empty states with "Hero" empty states: Icon + Title + Description + Primary Action Button.
+
+## 2026-01-24 - Immediate Feedback in Chat Interfaces
+**Learning:** In chat interfaces, users expect immediate acknowledgement of commands (like "Reset Chat"). If the system takes time to process, the lack of feedback feels like broken UI.
+**Action:** Use inline loading indicators directly on the action trigger (the button) to confirm the command was received, even if the result appears elsewhere (in the chat log).
