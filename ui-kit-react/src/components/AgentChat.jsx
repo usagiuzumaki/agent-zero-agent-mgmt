@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import Spinner from './common/Spinner';
 import { getTools } from '../plugins';
 import MessageList from './MessageList';
 
@@ -8,6 +9,7 @@ import MessageList from './MessageList';
 export default function AgentChat({ onLog }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
+  const [loadingTool, setLoadingTool] = useState(null);
   const tools = getTools();
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
@@ -64,14 +66,20 @@ export default function AgentChat({ onLog }) {
     }
   };
 
-  const handleTool = (tool) => {
-    tool.action((msg) => {
-      setMessages((prev) => [
-        ...prev,
-        { id: crypto.randomUUID(), sender: 'agent', text: msg },
-      ]);
-      onLog && onLog(`agent: ${msg}`);
-    });
+  const handleTool = async (tool) => {
+    if (loadingTool) return;
+    setLoadingTool(tool.name);
+    try {
+      await tool.action((msg) => {
+        setMessages((prev) => [
+          ...prev,
+          { id: crypto.randomUUID(), sender: 'agent', text: msg },
+        ]);
+        onLog && onLog(`agent: ${msg}`);
+      });
+    } finally {
+      setLoadingTool(null);
+    }
   };
 
   return (
@@ -85,7 +93,12 @@ export default function AgentChat({ onLog }) {
       </div>
       <div className="tool-bar">
         {tools.map((tool) => (
-          <button key={tool.name} onClick={() => handleTool(tool)}>
+          <button
+            key={tool.name}
+            onClick={() => handleTool(tool)}
+            disabled={loadingTool !== null}
+          >
+            {loadingTool === tool.name && <Spinner size="small" color="primary" />}
             {tool.label}
           </button>
         ))}
