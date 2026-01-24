@@ -291,16 +291,17 @@ class DirtyJson:
         return "".join(result)
 
     def _parse_multiline_string(self):
-        result = ""
+        # Optimization: use list join instead of string concatenation
+        result = []
         quote_char = self.current_char
         self._advance(3)  # Skip first quote
         while self.current_char is not None:
             if self.current_char == quote_char and self._peek(2) == quote_char * 2:  # type: ignore
                 self._advance(3)  # Skip first quote
                 break
-            result += self.current_char
+            result.append(self.current_char)
             self._advance()
-        return result.strip()
+        return "".join(result).strip()
 
     def _parse_number(self):
         number_str = ""
@@ -343,6 +344,9 @@ class DirtyJson:
         return self.json_string[peek_start:peek_end]
 
     def get_start_pos(self, input_str: str) -> int:
-        chars = ["{", "[", '"']
-        indices = [input_str.find(char) for char in chars if input_str.find(char) != -1]
+        indices = []
+        for char in ["{", "[", '"']:
+            idx = input_str.find(char)
+            if idx != -1:
+                indices.append(idx)
         return min(indices) if indices else 0

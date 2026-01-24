@@ -15,3 +15,7 @@
 ## 2025-02-24 - [Pre-compiling Regex in Helper Functions]
 **Learning:** Pre-compiling regex patterns in frequently called helper functions (like `replace_placeholders_dict` which is recursive) yields significant speedups (1.4x), whereas for simple operations on long strings (`remove_code_fences`) the gain is marginal (1.01x) but improves code cleanliness.
 **Action:** Prioritize regex pre-compilation for recursive or tight-loop functions.
+
+## 2025-03-01 - [Optimizing Manual String Concatenation in Parsing]
+**Learning:** In `python/helpers/dirty_json.py`, manual string concatenation `+=` in a loop (used for parsing multiline strings) was replaced with list accumulation and `"".join()`. This yielded a ~13-15% speedup for large strings (100k+ chars) and improved code clarity.
+**Action:** Always prefer `list.append` + `"".join()` over repeated string concatenation in loops, especially when parsing potentially large inputs.
