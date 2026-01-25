@@ -15,3 +15,7 @@
 ## 2025-02-24 - [Pre-compiling Regex in Helper Functions]
 **Learning:** Pre-compiling regex patterns in frequently called helper functions (like `replace_placeholders_dict` which is recursive) yields significant speedups (1.4x), whereas for simple operations on long strings (`remove_code_fences`) the gain is marginal (1.01x) but improves code cleanliness.
 **Action:** Prioritize regex pre-compilation for recursive or tight-loop functions.
+
+## 2025-03-01 - [Unicode-Aware Non-Alphanumeric Regex]
+**Learning:** `[^a-zA-Z0-9]` is not a safe replacement for `not c.isalnum()` as it strips Unicode characters. The correct Regex equivalent is `[\W_]`, which matches all non-word characters and underscores, leaving Unicode letters and digits intact.
+**Action:** Use `re.compile(r'[\W_]')` when optimizing alphanumeric filters to preserve internationalization support.
