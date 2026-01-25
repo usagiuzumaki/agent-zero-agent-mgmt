@@ -1,7 +1,27 @@
 import unittest
-from python.helpers.strings import calculate_valid_match_lengths
+from python.helpers.strings import calculate_valid_match_lengths, format_key
 
 class TestStrings(unittest.TestCase):
+    def test_format_key(self):
+        cases = {
+            "simple_key": "Simple Key",
+            "camelCaseKey": "Camel Case Key",
+            "UPPER_CASE_KEY": "Upper Case Key",
+            "mixed_CASE_keyWithCamel": "Mixed Case Key With Camel",
+            "PascalCase": "Pascal Case",
+            "snake_case": "Snake Case",
+            "kebab-case": "Kebab Case",
+            "123_numbers": "123 Numbers",
+            "special$char": "Special Char",
+            "  spaces  ": "Spaces",
+            "": "",
+            "___": "",
+            "café_id": "Café Id",
+            "überCool": "Über Cool"
+        }
+        for input_str, expected in cases.items():
+            self.assertEqual(format_key(input_str), expected, f"Failed for input: {input_str}")
+
     def test_calculate_valid_match_lengths_basic(self):
         s1 = "hello world"
         s2 = "hello world"
