@@ -2,6 +2,10 @@ import re
 import sys
 import time
 
+# Pre-compile regex patterns for format_key
+_NON_ALPHANUM_PATTERN = re.compile(r'[\W_]+')
+_CAMEL_CASE_PATTERN = re.compile(r'(?<=[a-z])(?=[A-Z])')
+
 def sanitize_string(s: str, encoding: str = "utf-8") -> str:
     # Replace surrogates and invalid unicode with replacement character
     if not isinstance(s, str):
@@ -104,19 +108,14 @@ def calculate_valid_match_lengths(first: bytes | str, second: bytes | str,
 def format_key(key: str) -> str:
     """Format a key string to be more readable.
     Converts camelCase and snake_case to Title Case with spaces."""
-    # First replace non-alphanumeric with spaces
-    result = ''.join(' ' if not c.isalnum() else c for c in key)
+    # Replace non-alphanumeric with space (matches non-word chars or underscore)
+    s = _NON_ALPHANUM_PATTERN.sub(' ', key)
     
-    # Handle camelCase
-    formatted = ''
-    for i, c in enumerate(result):
-        if i > 0 and c.isupper() and result[i-1].islower():
-            formatted += ' ' + c
-        else:
-            formatted += c
+    # Insert space for camelCase (between lower and upper case letters)
+    s = _CAMEL_CASE_PATTERN.sub(' ', s)
             
     # Split on spaces and capitalize each word
-    return ' '.join(word.capitalize() for word in formatted.split())
+    return ' '.join(word.capitalize() for word in s.split())
 
 def dict_to_text(d: dict) -> str:
     parts = []
