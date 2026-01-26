@@ -67,3 +67,6 @@ websockets
 openai-whisper
 playwright
 browser-use
+elevenlabs
+diffusers
+torch

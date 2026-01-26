@@ -1,34 +1,34 @@
-![Agent Zero Logo](res/header.png)
-# Agent Zero Documentation
-To begin with Agent Zero, follow the links below for detailed guides on various topics:
+![Aria - Creative Companion Logo](res/header.png)
+# Aria - Creative Companion Documentation
+To begin with Aria - Creative Companion, follow the links below for detailed guides on various topics:
 
-- **[Installation](installation.md):** Set up (or [update](installation.md#how-to-update-agent-zero)) Agent Zero on your system.
+- **[Installation](installation.md):** Set up (or [update](installation.md#how-to-update-aria---creative-companion)) Aria - Creative Companion on your system.
 - **[Usage Guide](usage.md):** Explore GUI features and usage scenarios.
-- **[Development](development.md):** Set up a development environment for Agent Zero.
-- **[Extensibility](extensibility.md):** Learn how to create custom extensions for Agent Zero.
+- **[Development](development.md):** Set up a development environment for Aria - Creative Companion.
+- **[Extensibility](extensibility.md):** Learn how to create custom extensions for Aria - Creative Companion.
 - **[Architecture Overview](architecture.md):** Understand the internal workings of the framework.
-- **[Contributing](contribution.md):** Learn how to contribute to the Agent Zero project.
+- **[Contributing](contribution.md):** Learn how to contribute to the Aria - Creative Companion project.
 - **[Troubleshooting and FAQ](troubleshooting.md):** Find answers to common issues and questions.
 
-### Your experience with Agent Zero starts now!
+### Your experience with Aria - Creative Companion starts now!
 
-- **Download Agent Zero:** Follow the [installation guide](installation.md) to download and run Agent Zero.
-- **Join the Community:** Join the Agent Zero [Skool](https://www.skool.com/agent-zero) or [Discord](https://discord.gg/B8KZKNsPpj) community to discuss ideas, ask questions, and collaborate with other contributors.
-- **Share your Work:** Share your Agent Zero creations, workflows and discoverings on our [Show and Tell](https://github.com/agent0ai/agent-zero/discussions/categories/show-and-tell) area on GitHub.
+- **Download Aria - Creative Companion:** Follow the [installation guide](installation.md) to download and run Aria - Creative Companion.
+- **Join the Community:** Join the Aria - Creative Companion [Skool](https://www.skool.com/agent-zero) or [Discord](https://discord.gg/B8KZKNsPpj) community to discuss ideas, ask questions, and collaborate with other contributors.
+- **Share your Work:** Share your Aria - Creative Companion creations, workflows and discoverings on our [Show and Tell](https://github.com/agent0ai/agent-zero/discussions/categories/show-and-tell) area on GitHub.
 - **Report Issues:** Use the [GitHub issue tracker](https://github.com/agent0ai/agent-zero/issues) to report framework-relative bugs or suggest new features.
 
 ## Table of Contents
 
-- [Welcome to the Agent Zero Documentation](#agent-zero-documentation)
-  - [Your Experience with Agent Zero](#your-experience-with-agent-zero-starts-now)
+- [Welcome to the Aria - Creative Companion Documentation](#aria---creative-companion-documentation)
+  - [Your Experience with Aria - Creative Companion](#your-experience-with-aria---creative-companion-starts-now)
   - [Table of Contents](#table-of-contents)
 - [Installation Guide](installation.md)
   - [Windows, macOS and Linux Setup](installation.md#windows-macos-and-linux-setup-guide)
   - [Settings Configuration](installation.md#settings-configuration)
   - [Choosing Your LLMs](installation.md#choosing-your-llms)
   - [Installing and Using Ollama](installation.md#installing-and-using-ollama-local-models)
-  - [Using Agent Zero on Mobile](installation.md#using-agent-zero-on-your-mobile-device)
-  - [How to Update Agent Zero](installation.md#how-to-update-agent-zero)
+  - [Using Aria - Creative Companion on Mobile](installation.md#using-aria---creative-companion-on-your-mobile-device)
+  - [How to Update Aria - Creative Companion](installation.md#how-to-update-aria---creative-companion)
   - [Full Binaries Installation](installation.md#in-depth-guide-for-full-binaries-installation)
 - [Usage Guide](usage.md)
   - [Basic Operations](usage.md#basic-operations)
