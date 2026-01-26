@@ -19,6 +19,9 @@ from python.helpers.print_style import PrintStyle
 class ScreenwritingPipeline(Tool):
     """
     Orchestrates a screenwriting pipeline by handing off tasks to specialized agents.
+    This serves as the subordinate agent process that hands the writing down from one agent
+    to the next in charge of each writing tool process.
+
     Each agent handles a specific writing tool process:
     1. WorldBuilder (Setting/Lore) - Optional
     2. CharacterAnalyzer (Characters) - Optional
@@ -89,7 +92,8 @@ class ScreenwritingPipeline(Tool):
             results.append(await self._run_stage(CharacterAnalyzer, "Character Analyzer", "analyze", current_input))
             current_input = results[-1]
 
-            # MBTI is best run on character analysis output or raw description if available here
+            # MBTI is best run on character analysis output or raw description
+            # if available here
             if include_mbti:
                 report = await self._run_stage(MBTIEvaluator, "MBTI Evaluator", "analyze", current_input)
                 analysis_reports.append(report)
@@ -127,10 +131,11 @@ class ScreenwritingPipeline(Tool):
             report = await self._run_stage(ScreamAnalyzer, "Scream Analyzer", "analyze", draft_text)
             analysis_reports.append(report)
 
-        # Optional MBTI on script if not run on characters (or run again on script)
+        # Optional MBTI on script if not run on characters (or run again on
+        # script)
         if include_mbti and not include_character_analysis:
-             report = await self._run_stage(MBTIEvaluator, "MBTI Evaluator", "analyze", draft_text)
-             analysis_reports.append(report)
+            report = await self._run_stage(MBTIEvaluator, "MBTI Evaluator", "analyze", draft_text)
+            analysis_reports.append(report)
 
         # 5. Formatting
         results.append(await self._run_stage(ScriptFormatter, "Script Formatter", "format", current_input))
@@ -148,7 +153,8 @@ class ScreenwritingPipeline(Tool):
         final_output = f"## Production Line Result\n\n{formatted_script}"
 
         if analysis_reports:
-            final_output += "\n\n---\n\n## Analysis & Extras\n\n" + "\n\n".join(analysis_reports)
+            final_output += "\n\n---\n\n## Analysis & Extras\n\n" + \
+                "\n\n".join(analysis_reports)
 
         return Response(message=final_output, break_loop=True)
 
