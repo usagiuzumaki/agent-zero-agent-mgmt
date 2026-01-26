@@ -1,8 +1,22 @@
 from datetime import datetime
 from typing import Any, List, Sequence
 from langchain_core.stores import InMemoryByteStore
-from langchain.storage import LocalFileStore
-from langchain.embeddings import CacheBackedEmbeddings
+
+# Fallback for missing langchain dependencies to allow UI execution
+try:
+    from langchain.storage import LocalFileStore
+except ImportError:
+    class LocalFileStore:
+        def __init__(self, *args, **kwargs):
+            pass
+
+try:
+    from langchain.embeddings import CacheBackedEmbeddings
+except ImportError:
+    class CacheBackedEmbeddings:
+        @staticmethod
+        def from_bytes_store(*args, **kwargs):
+            pass
 
 # from langchain_chroma import Chroma
 from python.helpers.faiss_loader import faiss
