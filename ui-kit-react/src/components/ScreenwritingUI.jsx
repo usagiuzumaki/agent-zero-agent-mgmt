@@ -2,23 +2,28 @@ import React, { useState } from 'react';
 import AgentChat from './AgentChat';
 import StorybookUI from './StorybookUI';
 import CharactersUI from './CharactersUI';
+import './ScreenwritingUI.css';
 
 export default function ScreenwritingUI({ onLog }) {
   const [activeTab, setActiveTab] = useState('assistant');
 
   return (
     <div className="screenwriting-ui">
-      <div className="screenwriting-header">
-        <h2>Screenwriting Studio</h2>
-        <div className="tab-nav" role="tablist" aria-label="Screenwriting sections">
+      <nav className="studio-sidebar">
+        <div className="studio-brand">
+          <h2>Aria Studio</h2>
+        </div>
+
+        <div className="studio-nav" role="tablist" aria-label="Screenwriting sections">
           <button
             id="tab-assistant"
             role="tab"
             aria-selected={activeTab === 'assistant'}
             aria-controls="panel-assistant"
-            className={`tab-btn ${activeTab === 'assistant' ? 'active' : ''}`}
+            className={`nav-item ${activeTab === 'assistant' ? 'active' : ''}`}
             onClick={() => setActiveTab('assistant')}
           >
+            <span className="nav-icon">✨</span>
             Assistant
           </button>
           <button
@@ -26,9 +31,10 @@ export default function ScreenwritingUI({ onLog }) {
             role="tab"
             aria-selected={activeTab === 'storybook'}
             aria-controls="panel-storybook"
-            className={`tab-btn ${activeTab === 'storybook' ? 'active' : ''}`}
+            className={`nav-item ${activeTab === 'storybook' ? 'active' : ''}`}
             onClick={() => setActiveTab('storybook')}
           >
+            <span className="nav-icon">📖</span>
             Storybook
           </button>
           <button
@@ -36,15 +42,21 @@ export default function ScreenwritingUI({ onLog }) {
             role="tab"
             aria-selected={activeTab === 'characters'}
             aria-controls="panel-characters"
-            className={`tab-btn ${activeTab === 'characters' ? 'active' : ''}`}
+            className={`nav-item ${activeTab === 'characters' ? 'active' : ''}`}
             onClick={() => setActiveTab('characters')}
           >
+            <span className="nav-icon">👥</span>
             Characters
           </button>
         </div>
-      </div>
 
-      <div className="screenwriting-body">
+        <div className="studio-footer" style={{ marginTop: 'auto', fontSize: '0.8rem', color: 'var(--studio-text-muted)' }}>
+          <p>Project: Untitled</p>
+          <p>Status: Draft</p>
+        </div>
+      </nav>
+
+      <main className="studio-content">
         {activeTab === 'assistant' && (
           <div role="tabpanel" id="panel-assistant" aria-labelledby="tab-assistant" tabIndex={0}>
             <AgentChat onLog={onLog} />
@@ -60,7 +72,7 @@ export default function ScreenwritingUI({ onLog }) {
             <CharactersUI />
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 }

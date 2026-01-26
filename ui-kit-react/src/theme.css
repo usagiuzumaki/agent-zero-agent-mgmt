@@ -83,6 +83,14 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden; /* Prevent body scroll */
+  transition: width 0.3s ease, height 0.3s ease, max-height 0.3s ease;
+}
+
+.agent-modal.full-screen {
+  width: 95vw;
+  height: 90vh;
+  max-height: 95vh;
+  max-width: 1600px;
 }
 
 /* Agent Chat Flex Layout */

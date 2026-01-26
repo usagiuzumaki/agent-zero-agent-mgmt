@@ -98,58 +98,57 @@ export default function StorybookUI() {
   const calculateTensionColor = (beatIndex, totalBeats) => {
     // Simple visualizer: start low, rise, dip, rise high
     const progress = beatIndex / totalBeats;
-    if (progress < 0.25) return 'var(--color-tension-low)';
-    if (progress < 0.5) return 'var(--color-tension-med)';
-    if (progress < 0.75) return 'var(--color-tension-high)';
-    return 'var(--color-tension-climax)';
+    if (progress < 0.25) return '#60a5fa'; // Blue
+    if (progress < 0.5) return '#fbbf24'; // Amber
+    if (progress < 0.75) return '#f87171'; // Red-400
+    return '#ef4444'; // Red-500
   };
 
   if (loading && !documents.length) {
     return (
-      <div className="storybook-ui loading-container">
+      <div className="loading-container">
          <Spinner size="large" />
-         <p>Loading Storybook...</p>
+         <p style={{marginTop: '1rem'}}>Loading Storybook...</p>
       </div>
     );
   }
 
   return (
     <div className="storybook-ui">
-      <div className="storybook-header">
-        <h3>Storybook</h3>
-        <button
-          className="btn-secondary"
-          onClick={() => setShowUpload(!showUpload)}
-          aria-expanded={showUpload}
-          aria-controls="upload-panel"
-        >
-          {showUpload ? 'Cancel' : 'New Document'}
-        </button>
-      </div>
+      {!selectedDoc && (
+        <div className="storybook-header">
+            <h3>Storybook Documents</h3>
+            <button
+            className="btn-studio-primary"
+            onClick={() => setShowUpload(!showUpload)}
+            >
+            {showUpload ? 'Cancel' : '+ New Document'}
+            </button>
+        </div>
+      )}
 
       {error && (
         <div className="error-message" role="alert">
           <span>{error}</span>
-          <button className="btn-close-error" onClick={() => setError(null)} aria-label="Dismiss error">×</button>
+          <button className="btn-close-error" onClick={() => setError(null)}>×</button>
         </div>
       )}
 
       {showUpload && (
-        <div id="upload-panel" className="storybook-upload">
+        <div className="storybook-upload">
           <h4>Ingest New Document</h4>
           <form onSubmit={handleUpload}>
-            <label htmlFor="doc-title" className="input-label">Document Title</label>
+            <label className="input-label">Document Title</label>
             <input
-              id="doc-title"
               type="text"
               placeholder="e.g. My Screenplay Draft"
               value={uploadName}
               onChange={(e) => setUploadName(e.target.value)}
               className="input-field"
+              autoFocus
             />
-            <label htmlFor="doc-content" className="input-label">Paste Text Content</label>
+            <label className="input-label">Paste Text Content</label>
             <textarea
-              id="doc-content"
               placeholder="Paste text content here to generate beats..."
               value={uploadContent}
               onChange={(e) => setUploadContent(e.target.value)}
@@ -157,7 +156,7 @@ export default function StorybookUI() {
               rows={10}
             />
             <div className="form-actions">
-              <button type="submit" className="btn-primary" disabled={isUploading || !uploadContent.trim()}>
+              <button type="submit" className="btn-studio-primary" disabled={isUploading || !uploadContent.trim()}>
                 {isUploading ? (
                   <span className="flex-center gap-2">
                     <Spinner size="small" color="white" /> Ingesting...
@@ -174,19 +173,11 @@ export default function StorybookUI() {
           <div className="document-list">
             {documents.length === 0 ? (
               <EmptyState
-                icon={
-                  <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M14 2V8H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M16 13H8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M16 17H8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M10 9H8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                }
+                icon={<span>📖</span>}
                 description="No documents found. Start your story by creating or uploading a new document."
                 action={
                   <button
-                    className="btn-primary"
+                    className="btn-studio-primary"
                     onClick={() => setShowUpload(true)}
                   >
                     Create First Document
@@ -202,30 +193,23 @@ export default function StorybookUI() {
                     type="button"
                   >
                     <h4>{doc.name}</h4>
-                    <p>{doc.description}</p>
+                    <p>{doc.description || 'No description'}</p>
                     <span className="doc-meta">Uploaded: {new Date(doc.uploaded_at).toLocaleDateString()}</span>
                     <div className="tags">
-                      {doc.tags.map((tag, i) => <span key={i} className="tag">{tag}</span>)}
+                      {doc.tags && doc.tags.map((tag, i) => <span key={i} className="tag">{tag}</span>)}
                     </div>
                   </button>
                   <div className="doc-actions">
                     <button
                       className="btn-icon delete-doc-btn"
                       onClick={() => handleDelete(doc.id)}
-                      aria-label={`Delete ${doc.name}`}
                       title="Delete Document"
                       disabled={deletingId === doc.id}
                     >
                       {deletingId === doc.id ? (
                         <Spinner size="small" />
                       ) : (
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                          <path d="M4 7H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                          <path d="M10 11V17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                          <path d="M14 11V17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                          <path d="M5 7L6 19C6 20.1046 6.89543 21 8 21H16C17.1046 21 18 20.1046 18 19L19 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                          <path d="M9 7V4C9 3.44772 9.44772 3 10 3H14C14.5523 3 15 3.44772 15 4V7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
+                        <span>🗑️</span>
                       )}
                     </button>
                   </div>
@@ -235,64 +219,45 @@ export default function StorybookUI() {
           </div>
         ) : (
           <div className="document-view">
-            <button className="btn-back" onClick={() => setSelectedDoc(null)}>← Back to List</button>
-            <div className="doc-header">
-              <h3>{selectedDoc.name}</h3>
-              {selectedDoc.suggestions && selectedDoc.suggestions.length > 0 && (
-                <div className="doc-suggestions">
-                  <strong>AI Suggestions:</strong>
-                  <ul>
-                    {selectedDoc.suggestions.map((s, i) => <li key={i}>{s}</li>)}
-                  </ul>
-                </div>
-              )}
+             <div className="doc-header-row">
+                <button className="btn-back" onClick={() => setSelectedDoc(null)}>
+                    <span>←</span> Back to Library
+                </button>
+                <h3 style={{margin:0}}>{selectedDoc.name}</h3>
+                <div style={{width: 60}}></div> {/* Spacer */}
             </div>
 
-            <div className="chapters-list">
+            <div className="chapters-container">
               {selectedDoc.chapters.map((chapter, cIndex) => (
-                <div key={chapter.id} className="chapter-item">
-                  <div className="chapter-header-row">
-                    <h5>{chapter.title}</h5>
-                    <span className="structure-tag">Act {cIndex + 1}</span>
-                  </div>
-                  <p className="chapter-summary">{chapter.summary}</p>
-
-                  <div className="beats-timeline" aria-hidden="true">
-                     {/* Visual Timeline Bar */}
-                     <div className="timeline-track">
-                       {chapter.beats.map((beat, i) => (
-                         <div
-                           key={i}
-                           className="timeline-dot"
-                           style={{
-                             left: `${(i / (chapter.beats.length - 1 || 1)) * 100}%`,
-                             backgroundColor: calculateTensionColor(i, chapter.beats.length)
-                           }}
-                           title={beat.label}
-                         />
-                       ))}
-                     </div>
+                <div key={chapter.id} className="chapter-section">
+                  <div className="chapter-title">
+                     <span className="act-badge">Act {cIndex + 1}</span>
+                     <span>{chapter.title}</span>
                   </div>
 
-                  <div className="beats-grid">
+                  <div className="beats-scroller">
                     {chapter.beats.map((beat, bIndex) => (
                       <div
                         key={beat.id}
                         className="beat-card"
-                        style={{borderLeft: `3px solid ${calculateTensionColor(bIndex, chapter.beats.length)}`}}
+                        style={{borderTopColor: calculateTensionColor(bIndex, chapter.beats.length)}}
                       >
-                        <div className="beat-header">
-                          <span className="beat-label">{beat.label}</span>
-                          <button
-                            className="btn-icon"
-                            title="Draft Dialogue"
-                            aria-label={`Draft Dialogue for ${beat.label}`}
-                          >
-                            📝
-                          </button>
+                        <div className="beat-card-header">
+                            <span className="beat-type" style={{color: calculateTensionColor(bIndex, chapter.beats.length)}}>
+                                {beat.label}
+                            </span>
+                            <span className="visual-hint" title={beat.visual_prompt}>
+                                {bIndex % 2 === 0 ? '🎬' : '👁️'}
+                            </span>
                         </div>
-                        <p>{beat.summary}</p>
-                        <small className="visual-prompt">🎨 {beat.visual_prompt}</small>
+                        <div className="beat-content">
+                            {beat.summary}
+                        </div>
+                        <div className="beat-footer">
+                             <button className="btn-draft">
+                                ✍️ Draft Scene
+                             </button>
+                        </div>
                       </div>
                     ))}
                   </div>
