@@ -15,6 +15,7 @@ from agents.screenwriting.storyboard_generator import StoryboardGenerator
 from agents.screenwriting.world_builder import WorldBuilder
 from python.helpers.print_style import PrintStyle
 
+
 class ScreenwritingSpecialist(Tool):
     """
     Allows direct access to specialized screenwriting agents for specific tasks.
@@ -32,7 +33,8 @@ class ScreenwritingSpecialist(Tool):
     - WorldBuilder: Develops setting and lore
     """
 
-    def __init__(self, agent, name, method, args, message, loop_data, **kwargs):
+    def __init__(self, agent, name, method, args,
+                 message, loop_data, **kwargs):
         super().__init__(agent, name, method, args, message, loop_data, **kwargs)
 
     async def execute(self, specialist: str = "", task: str = "", **kwargs):
@@ -44,9 +46,11 @@ class ScreenwritingSpecialist(Tool):
             task (str): The task for the specialist.
         """
         if not specialist:
-            return Response(message="Specialist name is required.", break_loop=False)
+            return Response(
+                message="Specialist name is required.", break_loop=False)
         if not task:
-            return Response(message="Task description is required.", break_loop=False)
+            return Response(
+                message="Task description is required.", break_loop=False)
 
         specialist_map = {
             "PlotAnalyzer": (PlotAnalyzer, "analyze"),
@@ -60,21 +64,26 @@ class ScreenwritingSpecialist(Tool):
             "Marketability": (Marketability, "assess"),
             "MBTIEvaluator": (MBTIEvaluator, "analyze"),
             "ScreamAnalyzer": (ScreamAnalyzer, "analyze"),
-            "StoryboardGenerator": (StoryboardGenerator, "analyze"),
+            "StoryboardGenerator": (StoryboardGenerator, "generate"),
             "WorldBuilder": (WorldBuilder, "build"),
         }
 
         if specialist not in specialist_map:
             available = ", ".join(specialist_map.keys())
-            return Response(message=f"Unknown specialist '{specialist}'. Available: {available}", break_loop=False)
+            return Response(
+                message=f"Unknown specialist '{specialist}'. Available: {available}", break_loop=False)
 
         AgentClass, method_name = specialist_map[specialist]
 
-        PrintStyle(font_color="#E67E22", bold=True).print(f"[{self.agent.agent_name}] Consulting Specialist: {specialist}")
+        PrintStyle(font_color="#E67E22", bold=True).print(
+            f"[{self.agent.agent_name}] Consulting Specialist: {specialist}")
 
         # Instantiate the agent
         sub_number = self.agent.number + 1
-        sub_agent = AgentClass(sub_number, self.agent.config, self.agent.context)
+        sub_agent = AgentClass(
+            sub_number,
+            self.agent.config,
+            self.agent.context)
 
         # Setup the relationship
         sub_agent.set_data(Agent.DATA_NAME_SUPERIOR, self.agent)
@@ -86,8 +95,10 @@ class ScreenwritingSpecialist(Tool):
         # Call the specific method on the agent
         method = getattr(sub_agent, method_name, None)
         if not method:
-             return Response(message=f"Method '{method_name}' not found on {specialist}.", break_loop=False)
+            return Response(
+                message=f"Method '{method_name}' not found on {specialist}.", break_loop=False)
 
         response = await method(task)
 
-        return Response(message=f"## {specialist} Report\n\n{response}", break_loop=True)
+        return Response(
+            message=f"## {specialist} Report\n\n{response}", break_loop=True)

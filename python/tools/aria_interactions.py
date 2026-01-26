@@ -10,8 +10,8 @@ from python.helpers.aria_personality import AriaEnhancementSystem
 class AriaEnhancedInteraction(Tool):
     """Handle Aria's personality-enhanced interactions"""
     
-    def __init__(self, agent, args: dict, message: str, loop_data: dict):
-        super().__init__(agent, args, message, loop_data)
+    def __init__(self, agent, **kwargs):
+        super().__init__(agent, **kwargs)
         # Load or create enhancement system
         self.enhancement_system = self._load_enhancement_system()
     

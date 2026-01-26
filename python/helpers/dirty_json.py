@@ -291,16 +291,30 @@ class DirtyJson:
         return "".join(result)
 
     def _parse_multiline_string(self):
-        result = ""
+        # Optimization: use find and slicing instead of character-by-character loop
+        # This provides O(1) loop overhead vs O(N)
         quote_char = self.current_char
+        closing_marker = quote_char * 3
+
         self._advance(3)  # Skip first quote
-        while self.current_char is not None:
-            if self.current_char == quote_char and self._peek(2) == quote_char * 2:  # type: ignore
-                self._advance(3)  # Skip first quote
-                break
-            result += self.current_char
-            self._advance()
-        return result.strip()
+
+        start_index = self.index
+        end_index = self.json_string.find(closing_marker, start_index)
+
+        if end_index != -1:
+            result = self.json_string[start_index:end_index]
+            # Advance to the character after the closing marker
+            # We need to update index to end_index + 3 (skip closing quotes)
+            # But _advance updates relative to current index.
+            # Current index is start_index (because we called _advance(3) before)
+            # So we need to advance by (end_index - start_index) + 3
+            self._advance(end_index - start_index + 3)
+            return result.strip()
+        else:
+            # If no closing marker found, consume the rest of the string
+            result = self.json_string[start_index:]
+            self._advance(len(self.json_string) - start_index)
+            return result.strip()
 
     def _parse_number(self):
         number_str = ""

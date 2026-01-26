@@ -9,8 +9,8 @@ from python.helpers.aria_story_games import AriaGameSystem
 class AriaGames(Tool):
     """Interactive story games and role-play scenarios"""
     
-    def __init__(self, agent, args: dict, message: str, loop_data: dict):
-        super().__init__(agent, args, message, loop_data)
+    def __init__(self, agent, **kwargs):
+        super().__init__(agent, **kwargs)
         self.game_system = AriaGameSystem()
     
     async def execute(self, **kwargs):

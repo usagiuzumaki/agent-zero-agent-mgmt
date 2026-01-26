@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { getTools } from '../plugins';
+import Spinner from './common/Spinner';
 import MessageList from './MessageList';
-import EmptyState from './common/EmptyState';
+import Spinner from './common/Spinner';
 
 /**
  * Chat panel with message list, input box and plugin action buttons.
@@ -9,6 +10,7 @@ import EmptyState from './common/EmptyState';
 export default function AgentChat({ onLog }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
+  const [activeTool, setActiveTool] = useState(null);
   const tools = getTools();
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
@@ -65,14 +67,20 @@ export default function AgentChat({ onLog }) {
     }
   };
 
-  const handleTool = (tool) => {
-    tool.action((msg) => {
-      setMessages((prev) => [
-        ...prev,
-        { id: crypto.randomUUID(), sender: 'agent', text: msg },
-      ]);
-      onLog && onLog(`agent: ${msg}`);
-    });
+  const handleTool = async (tool) => {
+    if (activeTool) return;
+    setActiveTool(tool.name);
+    try {
+      await tool.action((msg) => {
+        setMessages((prev) => [
+          ...prev,
+          { id: crypto.randomUUID(), sender: 'agent', text: msg },
+        ]);
+        onLog && onLog(`agent: ${msg}`);
+      });
+    } finally {
+      setActiveTool(null);
+    }
   };
 
   return (
@@ -86,20 +94,21 @@ export default function AgentChat({ onLog }) {
           <EmptyState
             icon={
               <svg
+                xmlns="http://www.w3.org/2000/svg"
                 width="64"
                 height="64"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="2"
+                strokeWidth="1.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               >
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
               </svg>
             }
-            title="Welcome to Aria Bot"
-            description="I'm here to help. Type a message below to start chatting."
+            title="Aria"
+            description="I'm here to help with your screenwriting tasks. Type a message or select a tool to get started."
           />
         ) : (
           <MessageList messages={messages} bottomRef={messagesEndRef} />
@@ -107,7 +116,14 @@ export default function AgentChat({ onLog }) {
       </div>
       <div className="tool-bar">
         {tools.map((tool) => (
-          <button key={tool.name} onClick={() => handleTool(tool)}>
+          <button
+            key={tool.name}
+            onClick={() => handleTool(tool)}
+            disabled={!!activeTool}
+            aria-busy={activeTool === tool.name}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
+          >
+            {activeTool === tool.name && <Spinner size="small" />}
             {tool.label}
           </button>
         ))}

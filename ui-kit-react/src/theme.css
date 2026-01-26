@@ -108,6 +108,9 @@ body {
 
 .agent-chat .tool-bar button {
   margin-right: 0.25rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .agent-chat .input-row {

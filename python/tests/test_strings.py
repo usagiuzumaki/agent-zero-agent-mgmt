@@ -1,7 +1,28 @@
 import unittest
-from python.helpers.strings import calculate_valid_match_lengths
+from python.helpers.strings import calculate_valid_match_lengths, format_key
 
 class TestStrings(unittest.TestCase):
+    def test_format_key(self):
+        # Basic cases
+        self.assertEqual(format_key("camelCase"), "Camel Case")
+        self.assertEqual(format_key("snake_case"), "Snake Case")
+        self.assertEqual(format_key("kebab-case"), "Kebab Case")
+        self.assertEqual(format_key("Mixed_Case-Key"), "Mixed Case Key")
+
+        # Edge cases
+        self.assertEqual(format_key("simple"), "Simple")
+        self.assertEqual(format_key("UPPERCASE"), "Uppercase")
+        self.assertEqual(format_key("key123WithNumbers"), "Key123with Numbers")
+
+        # Non-alphanumeric handling
+        self.assertEqual(format_key("foo..bar"), "Foo Bar")
+        self.assertEqual(format_key("foo__bar"), "Foo Bar")
+
+        # Unicode (limited support but ensuring stability)
+        # Note: behavior for 'caféCase' is "Cafécase" (no split) with current regex,
+        # which is acceptable for 'key' usage.
+        self.assertEqual(format_key("café_latte"), "Café Latte")
+
     def test_calculate_valid_match_lengths_basic(self):
         s1 = "hello world"
         s2 = "hello world"

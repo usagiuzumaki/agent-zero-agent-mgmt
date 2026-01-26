@@ -9,8 +9,8 @@ from python.helpers.aria_personality import AriaEnhancementSystem
 class AriaMoodGift(Tool):
     """Generate mood-based images and virtual gifts for Aria"""
     
-    def __init__(self, agent, args: dict, message: str, loop_data: dict):
-        super().__init__(agent, args, message, loop_data)
+    def __init__(self, agent, **kwargs):
+        super().__init__(agent, **kwargs)
         self.enhancement_system = AriaEnhancementSystem()
     
     async def execute(self, **kwargs):
