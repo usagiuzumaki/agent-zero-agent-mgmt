@@ -1,5 +1,7 @@
 ### script_analyzer:
 Validate plot progression using beat sheets.
+- Validate plot progression using beat sheets.
+- Use with `act`, `beat`, and `tension_level`.
 
 **Example usage**:
 ~~~json

@@ -1,5 +1,6 @@
 ### fountain_to_html:
-Converts Fountain scripts into shareable HTML.
+- Converts Fountain script content or files into HTML.
+- Use with `script` (the content or file path).
 
 **Example usage**:
 ~~~json
