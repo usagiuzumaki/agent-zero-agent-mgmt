@@ -19,6 +19,9 @@ from python.helpers.print_style import PrintStyle
 class ScreenwritingPipeline(Tool):
     """
     Orchestrates a screenwriting pipeline by handing off tasks to specialized agents.
+    This serves as the subordinate agent process that hands the writing down from one agent
+    to the next in charge of each writing tool process.
+
     Each agent handles a specific writing tool process:
     1. WorldBuilder (Setting/Lore) - Optional
     2. CharacterAnalyzer (Characters) - Optional

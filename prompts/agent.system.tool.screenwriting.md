@@ -1,4 +1,7 @@
 ### screenwriting:
+Tool for managing screenwriting data and features (CRUD).
+Operations: view, add_character, add_quote, add_scene, add_sketch, create_project, update_outline, search_quotes, ingest_storybook.
+Data types for view: all, book_outline, story_bible, character_profiles, sick_quotes, sketches_imagery, storybook.
 - Use `operation: view` with `data_type` (all, book_outline, story_bible, character_profiles, sick_quotes, sketches_imagery, storybook) to view data.
 - Use `operation: add_character` with `name`, `role`, `backstory`, `personality`, `goals`, `conflicts`, `arc`, `appearance` to add a character.
 - Use `operation: add_quote` with `quote`, `character`, `context`, `category` to add a quote.
@@ -12,13 +15,16 @@
 **Example usage**:
 ~~~json
 {
-    "thoughts": ["I need to add a new character."],
+    "thoughts": [
+        "I need to add a new character."
+    ],
+    "headline": "Adding a new character",
     "tool_name": "screenwriting",
     "tool_args": {
         "operation": "add_character",
-        "name": "Jules",
+        "name": "John Doe",
         "role": "Protagonist",
-        "personality": "Stoic but kind"
+        "backstory": "..."
     }
 }
 ~~~

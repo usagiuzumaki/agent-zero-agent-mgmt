@@ -1,4 +1,6 @@
 ### screenwriting_pipeline:
+Orchestrates a screenwriting pipeline by handing off tasks to specialized agents.
+Supported flags: include_world_building, include_character_analysis, include_pacing, include_tension, include_marketability, include_mbti, include_scream, include_storyboard.
 - Orchestrates a complete screenwriting production line using specialized agents.
 - Use `task` to describe the overall goal.
 - Use `project_name` to identify the project.

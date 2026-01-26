@@ -5,10 +5,13 @@
 **Example usage**:
 ~~~json
 {
-    "thoughts": ["I need advice on horror tropes."],
+    "thoughts": [
+        "I need guidance on the narrative structure."
+    ],
+    "headline": "Getting narrative insights",
     "tool_name": "narrative_knowledge",
     "tool_args": {
-        "query": "Common tropes in psychological horror",
+        "query": "How to structure the third act?",
         "genre": "Horror",
         "tone": "Dark"
     }
