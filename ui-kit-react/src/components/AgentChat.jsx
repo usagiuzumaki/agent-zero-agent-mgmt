@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { getTools } from '../plugins';
 import Spinner from './common/Spinner';
 import MessageList from './MessageList';
-import EmptyState from './common/EmptyState';
+import Spinner from './common/Spinner';
 
 /**
  * Chat panel with message list, input box and plugin action buttons.
@@ -10,7 +10,7 @@ import EmptyState from './common/EmptyState';
 export default function AgentChat({ onLog }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
-  const [loadingTool, setLoadingTool] = useState(null);
+  const [activeTool, setActiveTool] = useState(null);
   const tools = getTools();
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
@@ -68,8 +68,8 @@ export default function AgentChat({ onLog }) {
   };
 
   const handleTool = async (tool) => {
-    if (loadingTool) return;
-    setLoadingTool(tool.name);
+    if (activeTool) return;
+    setActiveTool(tool.name);
     try {
       await tool.action((msg) => {
         setMessages((prev) => [
@@ -78,11 +78,8 @@ export default function AgentChat({ onLog }) {
         ]);
         onLog && onLog(`agent: ${msg}`);
       });
-    } catch (e) {
-      console.error(e);
-      onLog && onLog(`agent error: ${e.message}`);
     } finally {
-      setLoadingTool(null);
+      setActiveTool(null);
     }
   };
 
@@ -122,10 +119,11 @@ export default function AgentChat({ onLog }) {
           <button
             key={tool.name}
             onClick={() => handleTool(tool)}
-            disabled={!!loadingTool}
-            aria-busy={loadingTool === tool.name}
+            disabled={!!activeTool}
+            aria-busy={activeTool === tool.name}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
           >
-            {loadingTool === tool.name && <Spinner size="small" />}
+            {activeTool === tool.name && <Spinner size="small" />}
             {tool.label}
           </button>
         ))}
