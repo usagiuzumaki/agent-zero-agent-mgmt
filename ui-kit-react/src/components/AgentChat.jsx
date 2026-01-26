@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { getTools } from '../plugins';
 import MessageList from './MessageList';
+import Spinner from './common/Spinner';
 
 /**
  * Chat panel with message list, input box and plugin action buttons.
@@ -8,6 +9,7 @@ import MessageList from './MessageList';
 export default function AgentChat({ onLog }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
+  const [activeTool, setActiveTool] = useState(null);
   const tools = getTools();
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
@@ -64,14 +66,20 @@ export default function AgentChat({ onLog }) {
     }
   };
 
-  const handleTool = (tool) => {
-    tool.action((msg) => {
-      setMessages((prev) => [
-        ...prev,
-        { id: crypto.randomUUID(), sender: 'agent', text: msg },
-      ]);
-      onLog && onLog(`agent: ${msg}`);
-    });
+  const handleTool = async (tool) => {
+    if (activeTool) return;
+    setActiveTool(tool.name);
+    try {
+      await tool.action((msg) => {
+        setMessages((prev) => [
+          ...prev,
+          { id: crypto.randomUUID(), sender: 'agent', text: msg },
+        ]);
+        onLog && onLog(`agent: ${msg}`);
+      });
+    } finally {
+      setActiveTool(null);
+    }
   };
 
   return (
@@ -85,7 +93,14 @@ export default function AgentChat({ onLog }) {
       </div>
       <div className="tool-bar">
         {tools.map((tool) => (
-          <button key={tool.name} onClick={() => handleTool(tool)}>
+          <button
+            key={tool.name}
+            onClick={() => handleTool(tool)}
+            disabled={!!activeTool}
+            aria-busy={activeTool === tool.name}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
+          >
+            {activeTool === tool.name && <Spinner size="small" />}
             {tool.label}
           </button>
         ))}
