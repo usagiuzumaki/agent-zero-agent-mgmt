@@ -1,6 +1,6 @@
 ### screenwriting_pipeline:
 Orchestrates a screenwriting pipeline by handing off tasks to specialized agents.
-Supported flags: include_world_building, include_character_analysis, include_pacing, include_tension, include_marketability, include_mbti, include_scream, include_storyboard.
+Supported flags: include_world_building, include_character_analysis, include_pacing, include_tension, include_marketability, include_mbti, include_scream, include_storyboard, include_version_history.
 - Orchestrates a complete screenwriting production line using specialized agents.
 - Use `task` to describe the overall goal.
 - Use `project_name` to identify the project.
@@ -13,6 +13,7 @@ Supported flags: include_world_building, include_character_analysis, include_pac
     - `include_mbti`: MBTI Evaluator
     - `include_scream`: Scream/Intensity Analyzer
     - `include_storyboard`: Storyboard Generator
+    - `include_version_history`: Version Tracker
 
 **Example usage**:
 ~~~json
@@ -23,7 +24,8 @@ Supported flags: include_world_building, include_character_analysis, include_pac
         "task": "Write a screenplay about an AI that learns to love.",
         "project_name": "AI Love Story",
         "include_world_building": true,
-        "include_character_analysis": true
+        "include_character_analysis": true,
+        "include_version_history": true
     }
 }
 ~~~

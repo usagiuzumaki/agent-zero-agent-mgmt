@@ -1,8 +1,8 @@
 ### screenwriting_specialist:
 Allows direct access to specialized screenwriting agents for specific tasks.
-Available Specialists: PlotAnalyzer, CreativeIdeas, CoWriter, DialogueEvaluator, ScriptFormatter, CharacterAnalyzer, PacingMetrics, EmotionalTension, Marketability, MBTIEvaluator, ScreamAnalyzer, StoryboardGenerator, WorldBuilder.
+Available Specialists: PlotAnalyzer, CreativeIdeas, CoWriter, DialogueEvaluator, ScriptFormatter, CharacterAnalyzer, PacingMetrics, EmotionalTension, Marketability, MBTIEvaluator, ScreamAnalyzer, StoryboardGenerator, WorldBuilder, VersionTracker.
 - Consults a specific screenwriting specialist agent for a focused task.
-- Use `specialist` to select the agent (PlotAnalyzer, CreativeIdeas, CoWriter, DialogueEvaluator, ScriptFormatter, CharacterAnalyzer, PacingMetrics, EmotionalTension, Marketability, MBTIEvaluator, ScreamAnalyzer, StoryboardGenerator, WorldBuilder).
+- Use `specialist` to select the agent (PlotAnalyzer, CreativeIdeas, CoWriter, DialogueEvaluator, ScriptFormatter, CharacterAnalyzer, PacingMetrics, EmotionalTension, Marketability, MBTIEvaluator, ScreamAnalyzer, StoryboardGenerator, WorldBuilder, VersionTracker).
 - Use `task` to describe the work needed.
 
 **Example usage**:
