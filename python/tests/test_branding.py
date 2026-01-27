@@ -50,3 +50,17 @@ def test_branding_in_docs():
 
                 # Fail
                 assert False, f"Found 'Agent Zero' in {filename}:{i+1}: {line.strip()}"
+
+def test_branding_in_backup_create():
+    path = "python/api/backup_create.py"
+    if not os.path.exists(path):
+        if os.path.exists("../../" + path):
+            path = "../../" + path
+        else:
+            return
+
+    with open(path, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    assert 'backup_name = input.get("backup_name", "aria-bot-backup")' in content, "Default backup name should be 'aria-bot-backup'"
+    assert 'agent-zero-backup' not in content, "Should not contain 'agent-zero-backup'"
