@@ -1,5 +1,5 @@
 """
-Package installation tool for Agent Zero
+Package installation tool for Aria Bot
 Works around sandboxing issues in deployed environments
 """
 import subprocess
