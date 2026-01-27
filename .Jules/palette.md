@@ -13,3 +13,7 @@
 ## 2026-01-20 - Actionable Empty States
 **Learning:** Empty states ("No documents found") are often dead ends. They are prime opportunities to guide the user towards the primary action (e.g., "Create Document").
 **Action:** Replace text-only empty states with "Hero" empty states: Icon + Title + Description + Primary Action Button.
+
+## 2024-05-28 - Global Focus Visibility
+**Learning:** Custom CSS themes often reset browser defaults (like `outline: none`) but fail to provide a `:focus-visible` replacement, leaving keyboard users lost.
+**Action:** Always include a global `:focus-visible` rule in the theme root to ensure all interactive elements have a visible focus indicator, using `outline` with `var(--color-primary)`.

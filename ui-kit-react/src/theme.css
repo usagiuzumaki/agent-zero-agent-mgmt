@@ -394,3 +394,9 @@ body {
   width: 2.5rem;
   height: 2.5rem;
 }
+
+/* Accessibility: Global focus styles for keyboard users */
+:is(button, input, textarea, select, a, [role="button"], [role="tab"]):focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
