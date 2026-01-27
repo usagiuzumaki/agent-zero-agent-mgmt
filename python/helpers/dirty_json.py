@@ -265,6 +265,7 @@ class DirtyJson:
                         "r": "\r",
                         "t": "\t",
                     }.get(self.current_char, self.current_char))
+                    self._advance()
                 elif self.current_char == "u":
                     self._advance()  # Skip 'u'
                     unicode_char = ""
@@ -282,10 +283,25 @@ class DirtyJson:
                         except ValueError:
                             # If invalid hex value, treat as literal
                             result.append("\\u" + unicode_char)
-                    continue # Continue to next char in while loop
+                else:
+                    self._advance()
             else:
-                result.append(self.current_char)
-            self._advance()
+                # Optimization: Scan ahead using find() instead of iterating char by char
+                # This significantly speeds up parsing of long strings
+                next_quote = self.json_string.find(quote_char, self.index)
+                next_slash = self.json_string.find('\\', self.index)
+
+                # Handle not found (-1)
+                if next_quote == -1: next_quote = len(self.json_string)
+                if next_slash == -1: next_slash = len(self.json_string)
+
+                nearest = min(next_quote, next_slash)
+
+                if nearest > self.index:
+                    chunk = self.json_string[self.index:nearest]
+                    result.append(chunk)
+                    self._advance(len(chunk))
+
         if self.current_char == quote_char:
             self._advance()  # Skip closing quote
         return "".join(result)
