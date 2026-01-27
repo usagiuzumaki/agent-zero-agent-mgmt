@@ -13,6 +13,7 @@ from agents.screenwriting.marketability import Marketability
 from agents.screenwriting.mbti_evaluator import MBTIEvaluator
 from agents.screenwriting.scream_analyzer import ScreamAnalyzer
 from agents.screenwriting.storyboard_generator import StoryboardGenerator
+from agents.screenwriting.version_tracker import VersionTracker
 from python.helpers.print_style import PrintStyle
 
 
@@ -54,6 +55,7 @@ class ScreenwritingPipeline(Tool):
                       include_mbti: bool = False,
                       include_scream: bool = False,
                       include_storyboard: bool = False,
+                      include_version_history: bool = False,
                       **kwargs):
         """
         Executes a screenwriting task by passing it through a chain of specialized agents.
@@ -69,6 +71,7 @@ class ScreenwritingPipeline(Tool):
             include_mbti (bool): Whether to include MBTI evaluation.
             include_scream (bool): Whether to include scream/intensity analysis.
             include_storyboard (bool): Whether to include storyboard generation.
+            include_version_history (bool): Whether to include version tracking.
         """
         if not task:
             return Response(
@@ -148,6 +151,11 @@ class ScreenwritingPipeline(Tool):
 
         if include_storyboard:
             report = await self._run_stage(StoryboardGenerator, "Storyboard Generator", "generate", draft_text)
+            analysis_reports.append(report)
+
+        if include_version_history:
+            note = f"Pipeline execution for project '{project_name}' completed."
+            report = await self._run_stage(VersionTracker, "Version Tracker", "record", note)
             analysis_reports.append(report)
 
         final_output = f"## Production Line Result\n\n{formatted_script}"
