@@ -2,9 +2,40 @@
 import unittest
 import shutil
 import os
+import sys
 import json
 from datetime import datetime
-from python.helpers.screenwriting_manager import ScreenwritingManager
+from unittest.mock import MagicMock
+
+# Mock dependencies to avoid importing the heavy Agent stack
+sys.modules["nest_asyncio"] = MagicMock()
+sys.modules["models"] = MagicMock()
+sys.modules["litellm"] = MagicMock()
+sys.modules["langchain_core"] = MagicMock()
+sys.modules["langchain_core.language_models"] = MagicMock()
+sys.modules["langchain_core.language_models.chat_models"] = MagicMock()
+sys.modules["langchain_core.language_models.llms"] = MagicMock()
+sys.modules["langchain_core.messages"] = MagicMock()
+sys.modules["langchain_core.prompts"] = MagicMock()
+sys.modules["cryptography"] = MagicMock()
+sys.modules["cryptography.hazmat"] = MagicMock()
+sys.modules["cryptography.hazmat.primitives"] = MagicMock()
+sys.modules["cryptography.hazmat.primitives.asymmetric"] = MagicMock()
+sys.modules["cryptography.hazmat.primitives.hashes"] = MagicMock()
+sys.modules["cryptography.hazmat.primitives.serialization"] = MagicMock()
+sys.modules["aiohttp"] = MagicMock()
+sys.modules["paramiko"] = MagicMock()
+sys.modules["git"] = MagicMock()
+sys.modules["psutil"] = MagicMock()
+sys.modules["diskcache"] = MagicMock()
+sys.modules["crontab"] = MagicMock()
+sys.modules["webcolors"] = MagicMock()
+sys.modules["sentence_transformers"] = MagicMock()
+sys.modules["faiss"] = MagicMock()
+sys.modules["numpy"] = MagicMock()
+
+# Now import the manager
+from agents.screenwriting.manager import ScreenwritingManager
 
 class TestScreenwritingManager(unittest.TestCase):
     def setUp(self):
