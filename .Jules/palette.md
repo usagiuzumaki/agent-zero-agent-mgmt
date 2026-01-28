@@ -13,3 +13,7 @@
 ## 2026-01-20 - Actionable Empty States
 **Learning:** Empty states ("No documents found") are often dead ends. They are prime opportunities to guide the user towards the primary action (e.g., "Create Document").
 **Action:** Replace text-only empty states with "Hero" empty states: Icon + Title + Description + Primary Action Button.
+
+## 2024-10-24 - Empty State Quick Actions
+**Learning:** Empty states are prime real estate for feature discovery. Moving tools from a toolbar to the empty state canvas reduces friction for first-time users.
+**Action:** Look for other lists (like character cards) that start empty and could offer "Create New" or "Load Preset" actions directly in the center.
