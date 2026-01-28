@@ -251,6 +251,7 @@ class DirtyJson:
 
     def _parse_string(self):
         # Optimization: use list join instead of string concatenation
+        # Optimization: Use str.find to skip non-special characters
         result = []
         quote_char = self.current_char
         self._advance()  # Skip opening quote
@@ -283,9 +284,37 @@ class DirtyJson:
                             # If invalid hex value, treat as literal
                             result.append("\\u" + unicode_char)
                     continue # Continue to next char in while loop
+
+                # Advance for non-unicode escapes (and the ignored ones)
+                self._advance()
             else:
-                result.append(self.current_char)
-            self._advance()
+                # Optimized block: use find to skip multiple characters
+                chunk_start = self.index
+                next_quote = self.json_string.find(quote_char, chunk_start)
+                next_escape = self.json_string.find('\\', chunk_start)
+
+                target = -1
+                if next_quote != -1 and next_escape != -1:
+                    target = min(next_quote, next_escape)
+                elif next_quote != -1:
+                    target = next_quote
+                elif next_escape != -1:
+                    target = next_escape
+
+                if target == -1:
+                    # Consume rest
+                    result.append(self.json_string[chunk_start:])
+                    self._advance(len(self.json_string) - chunk_start)
+                    break
+
+                if target > chunk_start:
+                    result.append(self.json_string[chunk_start:target])
+                    self._advance(target - chunk_start)
+
+                # Now at target (either \ or quote)
+                # If quote, loop condition will handle it in next iter
+                # If \, next iteration will handle it
+
         if self.current_char == quote_char:
             self._advance()  # Skip closing quote
         return "".join(result)
