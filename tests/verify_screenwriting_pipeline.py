@@ -3,10 +3,64 @@ import os
 import asyncio
 from unittest.mock import MagicMock, AsyncMock
 
+# Mock modules BEFORE importing from repo
+sys.modules["nest_asyncio"] = MagicMock()
+sys.modules["litellm"] = MagicMock()
+sys.modules["regex"] = MagicMock()
+sys.modules["tiktoken"] = MagicMock()
+sys.modules["git"] = MagicMock()
+sys.modules["psutil"] = MagicMock()
+sys.modules["diskcache"] = MagicMock()
+sys.modules["crontab"] = MagicMock()
+sys.modules["yaml"] = MagicMock()
+sys.modules["pytz"] = MagicMock()
+sys.modules["paramiko"] = MagicMock()
+sys.modules["dotenv"] = MagicMock()
+sys.modules["aiohttp"] = MagicMock()
+sys.modules["webcolors"] = MagicMock()
+sys.modules["sentence_transformers"] = MagicMock()
+sys.modules["cryptography"] = MagicMock()
+sys.modules["cryptography.hazmat"] = MagicMock()
+sys.modules["cryptography.hazmat.primitives"] = MagicMock()
+sys.modules["cryptography.hazmat.primitives.asymmetric"] = MagicMock()
+sys.modules["cryptography.hazmat.primitives.hashes"] = MagicMock()
+sys.modules["cryptography.hazmat.primitives.serialization"] = MagicMock()
+sys.modules["langchain"] = MagicMock()
+sys.modules["langchain_community"] = MagicMock()
+sys.modules["langchain_core"] = MagicMock()
+sys.modules["langchain_core.prompts"] = MagicMock()
+sys.modules["langchain_core.messages"] = MagicMock()
+sys.modules["langchain_core.language_models"] = MagicMock()
+sys.modules["langchain_core.language_models.chat_models"] = MagicMock()
+sys.modules["langchain_core.language_models.llms"] = MagicMock()
+sys.modules["langchain_core.outputs"] = MagicMock()
+sys.modules["langchain_core.outputs.chat_generation"] = MagicMock()
+sys.modules["langchain_core.callbacks"] = MagicMock()
+sys.modules["langchain_core.callbacks.manager"] = MagicMock()
+sys.modules["flask"] = MagicMock()
+sys.modules["flask_basicauth"] = MagicMock()
+sys.modules["flask_login"] = MagicMock()
+sys.modules["flask_sqlalchemy"] = MagicMock()
+sys.modules["simpleeval"] = MagicMock()
+sys.modules["flaredantic"] = MagicMock()
+sys.modules["pathspec"] = MagicMock()
+sys.modules["python-crontab"] = MagicMock()
+sys.modules["a2wsgi"] = MagicMock()
+sys.modules["flask_cors"] = MagicMock()
+sys.modules["faiss-cpu"] = MagicMock()
+sys.modules["numpy"] = MagicMock()
+sys.modules["elevenlabs"] = MagicMock()
+sys.modules["diffusers"] = MagicMock()
+sys.modules["torch"] = MagicMock()
+sys.modules["browser-use"] = MagicMock()
+sys.modules["fastmcp"] = MagicMock()
+sys.modules["models"] = MagicMock()
+
 # Adjust path to import from repo root
 sys.path.append(os.getcwd())
 
-from python.tools.screenwriting.screenwriting_pipeline import ScreenwritingPipeline
+# Import after mocking
+from agents.screenwriting.tools.screenwriting_pipeline import ScreenwritingPipeline
 
 async def test_pipeline():
     # Mock the main agent
@@ -30,16 +84,17 @@ async def test_pipeline():
     pipeline._run_stage = AsyncMock(return_value="[Stage Output]")
 
     print("Running pipeline with all flags...")
+    # Corrected arguments based on ScreenwritingPipeline definition
     response = await pipeline.execute(
         task="Test Task",
         project_name="Test Project",
         include_world_building=True,
         include_character_analysis=True,
         include_pacing=True,
-        include_emotional_tension=True,
+        include_tension=True,      # Fixed name
         include_marketability=True,
         include_mbti=True,
-        include_scream_analysis=True,
+        include_scream=True,       # Fixed name
         include_storyboard=True
     )
 
@@ -49,18 +104,31 @@ async def test_pipeline():
     expected_stages = [
         "World Builder",
         "Character Analyzer",
+        "MBTI Evaluator", # Called inside character analysis block if include_character_analysis and include_mbti
         "Plot Analyzer",
         "Creative Ideas",
         "Co-Writer",
         "Dialogue Evaluator",
         "Pacing Metrics",
         "Emotional Tension",
-        "MBTI Evaluator",
         "Scream Analyzer",
+        # MBTI might be called again if include_character_analysis is False, but here it is True.
+        # Wait, let's check code logic for MBTI.
         "Script Formatter",
         "Marketability",
         "Storyboard Generator"
     ]
+
+    # Let's double check MBTI logic in code:
+    # if include_character_analysis:
+    #     results.append(await self._run_stage(CharacterAnalyzer, ...))
+    #     if include_mbti:
+    #         report = await self._run_stage(MBTIEvaluator, ...)
+    # ...
+    # if include_mbti and not include_character_analysis:
+    #      report = await self._run_stage(MBTIEvaluator, ...)
+
+    # So if both are True, it runs ONCE after Character Analyzer.
 
     calls = pipeline._run_stage.call_args_list
 

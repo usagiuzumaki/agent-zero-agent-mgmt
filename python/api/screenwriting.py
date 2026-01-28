@@ -3,7 +3,7 @@ API endpoints for screenwriting tools
 Handles persistence and retrieval of screenwriting data
 """
 from flask import Blueprint, request, jsonify
-from python.helpers.screenwriting_manager import ScreenwritingManager
+from agents.screenwriting.manager import ScreenwritingManager
 import json
 
 # Create Flask blueprint for screenwriting API

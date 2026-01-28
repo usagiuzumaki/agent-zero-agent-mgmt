@@ -2,7 +2,7 @@
 Screenwriting Tool - Allows the agent to interact with screenwriting features
 """
 from python.helpers.tool import Tool, Response
-from python.helpers.screenwriting_manager import ScreenwritingManager
+from agents.screenwriting.manager import ScreenwritingManager
 from python.helpers.print_style import PrintStyle
 import json
 
