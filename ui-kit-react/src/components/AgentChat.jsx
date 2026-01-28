@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { getTools } from '../plugins';
+import EmptyState from './common/EmptyState';
 import Spinner from './common/Spinner';
 import MessageList from './MessageList';
-import Spinner from './common/Spinner';
 
 /**
  * Chat panel with message list, input box and plugin action buttons.
@@ -109,6 +109,39 @@ export default function AgentChat({ onLog }) {
             }
             title="Aria"
             description="I'm here to help with your screenwriting tasks. Type a message or select a tool to get started."
+            action={
+              <div
+                style={{
+                  display: 'flex',
+                  gap: '0.5rem',
+                  flexWrap: 'wrap',
+                  justifyContent: 'center',
+                }}
+              >
+                {tools.map((tool) => (
+                  <button
+                    key={tool.name}
+                    onClick={() => handleTool(tool)}
+                    disabled={!!activeTool}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      padding: '0.5rem 1rem',
+                      border: '1px solid var(--color-border)',
+                      borderRadius: '20px',
+                      background: 'var(--color-surface)',
+                      color: 'var(--color-text)',
+                      cursor: 'pointer',
+                      fontSize: '0.9rem',
+                      transition: 'all 0.2s',
+                    }}
+                  >
+                    {tool.label}
+                  </button>
+                ))}
+              </div>
+            }
           />
         ) : (
           <MessageList messages={messages} bottomRef={messagesEndRef} />
