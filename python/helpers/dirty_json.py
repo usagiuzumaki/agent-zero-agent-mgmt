@@ -283,9 +283,30 @@ class DirtyJson:
                             # If invalid hex value, treat as literal
                             result.append("\\u" + unicode_char)
                     continue # Continue to next char in while loop
+                self._advance()
             else:
-                result.append(self.current_char)
-            self._advance()
+                # Optimization: Scan for next backslash or quote to avoid character-by-character loop
+                start_index = self.index
+                next_escape = self.json_string.find("\\", start_index)
+                next_quote = self.json_string.find(quote_char, start_index)
+
+                if next_escape == -1:
+                    target = next_quote
+                elif next_quote == -1:
+                    target = next_escape
+                else:
+                    target = min(next_escape, next_quote)
+
+                if target == -1:
+                    # End of string, consume all
+                    chunk = self.json_string[start_index:]
+                    result.append(chunk)
+                    self._advance(len(chunk))
+                else:
+                    chunk = self.json_string[start_index:target]
+                    result.append(chunk)
+                    self._advance(len(chunk))
+
         if self.current_char == quote_char:
             self._advance()  # Skip closing quote
         return "".join(result)
