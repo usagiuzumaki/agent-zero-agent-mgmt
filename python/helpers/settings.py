@@ -1392,9 +1392,10 @@ async def _apply_settings(previous: Settings | None):
             await update_mcp_settings(config.mcp_servers)
 
         # update token in mcp server
-        current_token = (
-            create_auth_token()
-        )  # TODO - ugly, token in settings is generated from dotenv and does not always correspond
+        current_token = create_auth_token(
+            username=_settings.get("auth_login"),
+            password=_settings.get("auth_password"),
+        )
         if not previous or current_token != previous["mcp_server_token"]:
 
             async def update_mcp_token(token: str):

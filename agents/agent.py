@@ -569,9 +569,43 @@ class Agent:
         return self.hist_add_message(False, content=content)
 
     def concat_messages(
-        self, messages
-    ):  # TODO add param for message range, topic, history
-        return self.history.output_text(human_label="user", ai_label="assistant")
+        self,
+        messages=None,
+        start_index: int | None = None,
+        end_index: int | None = None,
+        topic_index: int | None = None,
+    ):
+        msgs = []
+
+        # Default to self.history if messages is None
+        if messages is None:
+            messages = self.history
+
+        # If messages is a History object, we need to extract messages from it
+        if isinstance(messages, history.History):
+            if topic_index is not None:
+                # Select specific topic
+                # -1 means current topic
+                if topic_index == -1:
+                    msgs = messages.current.output()
+                elif 0 <= topic_index < len(messages.topics):
+                    msgs = messages.topics[topic_index].output()
+                else:
+                    msgs = []
+            else:
+                # No topic selected, get all messages
+                msgs = messages.output()
+        elif isinstance(messages, list):
+            msgs = messages
+        else:
+            # Fallback for other iterable types if any, or treat as single message?
+            msgs = list(messages) if messages else []
+
+        # Apply slicing if indices are provided
+        if start_index is not None or end_index is not None:
+            msgs = msgs[start_index:end_index]
+
+        return history.output_text(msgs, human_label="user", ai_label="assistant")
 
     def get_chat_model(self):
         return models.get_chat_model(
