@@ -13,3 +13,7 @@
 ## 2026-01-20 - Actionable Empty States
 **Learning:** Empty states ("No documents found") are often dead ends. They are prime opportunities to guide the user towards the primary action (e.g., "Create Document").
 **Action:** Replace text-only empty states with "Hero" empty states: Icon + Title + Description + Primary Action Button.
+
+## 2025-05-23 - Custom Modal Accessibility
+**Learning:** Custom modal components often lack standard interaction behaviors (Escape to close, Click outside to close), trapping keyboard users or frustrating mouse users.
+**Action:** Always verify `useEffect` for 'Escape' key and overlay `onClick` handlers when auditing custom modals.
