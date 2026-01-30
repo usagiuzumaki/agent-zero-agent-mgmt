@@ -38,5 +38,19 @@ class TestDirtyJson(unittest.TestCase):
         result = parser.parse(json_str)
         self.assertEqual(result, "line1\nline2")
 
+    def test_string_escapes(self):
+        json_str = '"Line 1\\nLine 2\\tTabbed\\""'
+        parser = DirtyJson()
+        result = parser.parse(json_str)
+        self.assertEqual(result, 'Line 1\nLine 2\tTabbed"')
+
+    def test_long_string_correctness(self):
+        # A test that ensures the optimized parser handles long strings correctly
+        segment = "abc" * 1000
+        json_str = f'"{segment}"'
+        parser = DirtyJson()
+        result = parser.parse(json_str)
+        self.assertEqual(result, segment)
+
 if __name__ == '__main__':
     unittest.main()
