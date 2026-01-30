@@ -29,24 +29,25 @@ def test_branding_in_docs():
         else:
             return
 
-    for filename in os.listdir(docs_dir):
-        if not filename.endswith(".md"):
-            continue
+    for root, dirs, files in os.walk(docs_dir):
+        for filename in files:
+            if not filename.endswith(".md"):
+                continue
 
-        filepath = os.path.join(docs_dir, filename)
-        with open(filepath, "r", encoding="utf-8") as f:
-            content = f.read()
+            filepath = os.path.join(root, filename)
+            with open(filepath, "r", encoding="utf-8") as f:
+                content = f.read()
 
-        lines = content.splitlines()
-        for i, line in enumerate(lines):
-            if "Agent Zero" in line:
-                # Allow "formerly Agent Zero"
-                if "(formerly Agent Zero)" in line:
-                    continue
+            lines = content.splitlines()
+            for i, line in enumerate(lines):
+                if "Agent Zero" in line:
+                    # Allow "formerly Agent Zero"
+                    if "(formerly Agent Zero)" in line:
+                        continue
 
-                # Allow in image alt text if we missed it? No, I replaced it.
-                # Allow in link targets? URLs usually are lowercase or specific.
-                # If there is a legitimate use, we can add exception.
+                    # Allow links to the original repo or website
+                    if "agent-zero.ai" in line or "agent0ai/agent-zero" in line or "fredrl/agent-zero" in line:
+                        continue
 
-                # Fail
-                assert False, f"Found 'Agent Zero' in {filename}:{i+1}: {line.strip()}"
+                    # Fail
+                    assert False, f"Found 'Agent Zero' in {filepath}:{i+1}: {line.strip()}"

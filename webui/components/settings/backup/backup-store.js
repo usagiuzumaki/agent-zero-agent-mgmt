@@ -655,7 +655,7 @@ const model = {
 
     // Check Aria Bot version compatibility
     // Note: Both backup and current versions are obtained via git.get_git_info()
-    const backupVersion = this.backupMetadata.agent_zero_version; // Keeping internal key for now
+    const backupVersion = this.backupMetadata.aria_bot_version || this.backupMetadata.agent_zero_version;
     const currentVersion = "current"; // Retrieved from git.get_git_info() on backend
 
     if (backupVersion !== currentVersion && backupVersion !== "development") {
