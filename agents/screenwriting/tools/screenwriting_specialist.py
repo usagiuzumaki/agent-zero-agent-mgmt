@@ -12,6 +12,7 @@ from agents.screenwriting.marketability import Marketability
 from agents.screenwriting.mbti_evaluator import MBTIEvaluator
 from agents.screenwriting.scream_analyzer import ScreamAnalyzer
 from agents.screenwriting.storyboard_generator import StoryboardGenerator
+from agents.screenwriting.version_tracker import VersionTracker
 from agents.screenwriting.world_builder import WorldBuilder
 from python.helpers.print_style import PrintStyle
 
@@ -31,6 +32,7 @@ class ScreenwritingSpecialist(Tool):
     - Marketability: Assesses commercial potential
     - MBTIEvaluator: Analyzes character personalities
     - WorldBuilder: Develops setting and lore
+    - VersionTracker: Keep history of script versions and changes
     """
 
     def __init__(self, agent, name, method, args,
@@ -66,6 +68,7 @@ class ScreenwritingSpecialist(Tool):
             "ScreamAnalyzer": (ScreamAnalyzer, "analyze"),
             "StoryboardGenerator": (StoryboardGenerator, "generate"),
             "WorldBuilder": (WorldBuilder, "build"),
+            "VersionTracker": (VersionTracker, "record"),
         }
 
         if specialist not in specialist_map:
