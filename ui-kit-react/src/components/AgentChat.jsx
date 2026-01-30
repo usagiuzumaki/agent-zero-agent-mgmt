@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { getTools } from '../plugins';
 import Spinner from './common/Spinner';
 import MessageList from './MessageList';
-import Spinner from './common/Spinner';
+import EmptyState from './common/EmptyState';
 
 /**
  * Chat panel with message list, input box and plugin action buttons.
@@ -83,13 +83,26 @@ export default function AgentChat({ onLog }) {
     }
   };
 
+  const renderTools = () => (
+    <>
+      {tools.map((tool) => (
+        <button
+          key={tool.name}
+          onClick={() => handleTool(tool)}
+          disabled={!!activeTool}
+          aria-busy={activeTool === tool.name}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
+        >
+          {activeTool === tool.name && <Spinner size="small" />}
+          {tool.label}
+        </button>
+      ))}
+    </>
+  );
+
   return (
     <div className="agent-chat">
-      <div
-        className="messages"
-        ref={containerRef}
-        onScroll={handleScroll}
-      >
+      <div className="messages" ref={containerRef} onScroll={handleScroll}>
         {messages.length === 0 ? (
           <EmptyState
             icon={
@@ -109,25 +122,13 @@ export default function AgentChat({ onLog }) {
             }
             title="Aria"
             description="I'm here to help with your screenwriting tasks. Type a message or select a tool to get started."
+            action={renderTools()}
           />
         ) : (
           <MessageList messages={messages} bottomRef={messagesEndRef} />
         )}
       </div>
-      <div className="tool-bar">
-        {tools.map((tool) => (
-          <button
-            key={tool.name}
-            onClick={() => handleTool(tool)}
-            disabled={!!activeTool}
-            aria-busy={activeTool === tool.name}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
-          >
-            {activeTool === tool.name && <Spinner size="small" />}
-            {tool.label}
-          </button>
-        ))}
-      </div>
+      {messages.length > 0 && <div className="tool-bar">{renderTools()}</div>}
       <div className="input-row">
         <textarea
           ref={textareaRef}
