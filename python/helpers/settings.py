@@ -613,7 +613,7 @@ def convert_out(settings: Settings) -> SettingsOutput:
         {
             "id": "memory_recall_enabled",
             "title": "Memory auto-recall enabled",
-            "description": "Agent Zero will automatically recall memories based on convesation context.",
+            "description": "Aria Bot will automatically recall memories based on convesation context.",
             "type": "switch",
             "value": settings["memory_recall_enabled"],
         }
@@ -719,7 +719,7 @@ def convert_out(settings: Settings) -> SettingsOutput:
         {
             "id": "memory_memorize_enabled",
             "title": "Auto-memorize enabled",
-            "description": "A0 will automatically memorize facts and solutions from conversation history.",
+            "description": "Aria Bot will automatically memorize facts and solutions from conversation history.",
             "type": "switch",
             "value": settings["memory_memorize_enabled"],
         }
@@ -729,7 +729,7 @@ def convert_out(settings: Settings) -> SettingsOutput:
         {
             "id": "memory_memorize_consolidation",
             "title": "Auto-memorize AI consolidation",
-            "description": "A0 will automatically consolidate similar memories using utility LLM. Improves memory quality over time, adds 2 utility LLM calls per memory.",
+            "description": "Aria Bot will automatically consolidate similar memories using utility LLM. Improves memory quality over time, adds 2 utility LLM calls per memory.",
             "type": "switch",
             "value": settings["memory_memorize_consolidation"],
         }
