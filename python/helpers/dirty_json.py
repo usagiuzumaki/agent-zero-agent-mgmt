@@ -283,9 +283,51 @@ class DirtyJson:
                             # If invalid hex value, treat as literal
                             result.append("\\u" + unicode_char)
                     continue # Continue to next char in while loop
+                else:
+                    # Unknown escape: ignore to match legacy behavior (swallows the character)
+                    pass
             else:
-                result.append(self.current_char)
+                # Optimization: use find and slicing instead of character-by-character loop
+                current_idx = self.index
+
+                # Find next backslash or quote
+                next_bs = self.json_string.find("\\", current_idx)
+                next_quote = self.json_string.find(quote_char, current_idx)
+
+                if next_bs == -1: next_bs = float('inf')
+                if next_quote == -1: next_quote = float('inf')
+
+                nearest_val = min(next_bs, next_quote)
+
+                if nearest_val == float('inf'):
+                    # No more special chars, consume the rest
+                    chunk = self.json_string[current_idx:]
+                    result.append(chunk)
+                    self._advance(len(chunk))
+                    continue
+
+                nearest = int(nearest_val)
+
+                if nearest > current_idx:
+                    # Append chunk up to the nearest special char
+                    chunk = self.json_string[current_idx:nearest]
+                    result.append(chunk)
+                    self._advance(len(chunk))
+
+                    continue
+
+                # If nearest == current_idx, it means we are at a special char.
+                # If it's a backslash, the if block will handle it in next iteration (but we need to let the loop proceed)
+                # If it's a quote, the loop condition will handle it.
+                # However, since we are in `else` (not backslash), we must be at a normal char OR at a quote that `find` found.
+                # If we are at a quote, `self.current_char` should be `quote_char`.
+
+                if self.current_char != quote_char and self.current_char != "\\":
+                    # Fallback for safety (though find should have caught it)
+                    result.append(self.current_char)
+
             self._advance()
+
         if self.current_char == quote_char:
             self._advance()  # Skip closing quote
         return "".join(result)
