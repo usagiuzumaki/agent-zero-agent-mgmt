@@ -29,24 +29,91 @@ def test_branding_in_docs():
         else:
             return
 
-    for filename in os.listdir(docs_dir):
-        if not filename.endswith(".md"):
-            continue
+    for root, dirs, files in os.walk(docs_dir):
+        for filename in files:
+            if not filename.endswith(".md"):
+                continue
 
-        filepath = os.path.join(docs_dir, filename)
-        with open(filepath, "r", encoding="utf-8") as f:
-            content = f.read()
+            filepath = os.path.join(root, filename)
+            with open(filepath, "r", encoding="utf-8") as f:
+                content = f.read()
 
-        lines = content.splitlines()
-        for i, line in enumerate(lines):
-            if "Agent Zero" in line:
-                # Allow "formerly Agent Zero"
-                if "(formerly Agent Zero)" in line:
-                    continue
+            lines = content.splitlines()
+            for i, line in enumerate(lines):
+                if "Agent Zero" in line:
+                    # Allow "formerly Agent Zero"
+                    if "(formerly Agent Zero)" in line:
+                        continue
 
-                # Allow in image alt text if we missed it? No, I replaced it.
-                # Allow in link targets? URLs usually are lowercase or specific.
-                # If there is a legitimate use, we can add exception.
+                    # Allow attribution/credit lines
+                    if "Credit to the original project by" in line:
+                        continue
 
-                # Fail
-                assert False, f"Found 'Agent Zero' in {filename}:{i+1}: {line.strip()}"
+                    # Allow links to the original repo or similar
+                    if "github.com/fredrl/agent-zero" in line or "github.com/agent0ai/agent-zero" in line:
+                        continue
+
+                    # Fail
+                    assert False, f"Found 'Agent Zero' in {filepath}:{i+1}: {line.strip()}"
+
+def test_branding_in_python():
+    python_dir = "python"
+    if not os.path.exists(python_dir):
+        if os.path.exists("../../python"):
+            python_dir = "../../python"
+        else:
+            return
+
+    for root, dirs, files in os.walk(python_dir):
+        # Skip tests directory and __pycache__
+        if "tests" in dirs:
+            dirs.remove("tests")
+        if "__pycache__" in dirs:
+            dirs.remove("__pycache__")
+
+        # Also skip tests folder itself if we are inside it?
+        # The os.walk starts at python/, so python/tests is a child.
+        if "tests" in root.split(os.sep):
+             continue
+
+        for filename in files:
+            if not filename.endswith(".py"):
+                continue
+
+            filepath = os.path.join(root, filename)
+            with open(filepath, "r", encoding="utf-8") as f:
+                content = f.read()
+
+            lines = content.splitlines()
+            for i, line in enumerate(lines):
+                if "Agent Zero" in line:
+                    # Allow "formerly Agent Zero"
+                    if "(formerly Agent Zero)" in line:
+                        continue
+
+                    # Allow variable names (snake_case)
+                    # This is a naive check, but should cover most cases like self.agent_zero_root
+                    if "agent_zero" in line or "AGENT_ZERO" in line:
+                        # Ensure it's not part of a string literal that is user facing?
+                        # It's hard to distinguish perfectly without AST, but let's see.
+                        # If "Agent Zero" (with space) is in the line, it's likely a string or comment.
+                        # If it is a variable like agent_zero_root, it won't have the space.
+                        pass
+
+                    # If the exact string "Agent Zero" is present
+                    if "Agent Zero" in line:
+                         # Allow comments if they are historical or explanatory about the variable
+                         # But we want to catch user facing strings.
+                         # Let's flag it if it contains "Agent Zero" with space,
+                         # unless it is explicitly exempted.
+
+                         # Exemptions:
+                         if "Resolved Agent Zero root" in line: # Allow this specific comment if we must, but better to update it.
+                             # Wait, the plan is to update comments too if possible.
+                             # So I won't exempt it yet.
+                             pass
+
+                         if "formerly Agent Zero" in line:
+                             continue
+
+                         assert False, f"Found 'Agent Zero' in {filepath}:{i+1}: {line.strip()}"
