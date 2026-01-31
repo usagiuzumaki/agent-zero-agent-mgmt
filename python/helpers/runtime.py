@@ -139,7 +139,7 @@ def _log_rfc_connection_issue(url: str, exc: Exception) -> None:
 
     message = (
         "[runtime] Unable to reach RFC endpoint at {url} ({error_name}: {error}). "
-        "Falling back to local execution. Start the Agent Zero UI (run_ui.py) "
+        "Falling back to local execution. Start the Aria Bot UI (run_ui.py) "
         "and confirm RFC_URL/RFC_PASSWORD match across instances for remote calls."
     ).format(url=url, error_name=type(exc).__name__, error=exc)
 
