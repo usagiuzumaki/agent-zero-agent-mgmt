@@ -1,4 +1,4 @@
-"""Core tool package for Agent Zero.
+"""Core tool package for Aria Bot.
 
 This package exposes built-in tools so they can be discovered by
 agent profiles.  Currently it registers the :class:`CodeExecution`

@@ -613,7 +613,7 @@ def convert_out(settings: Settings) -> SettingsOutput:
         {
             "id": "memory_recall_enabled",
             "title": "Memory auto-recall enabled",
-            "description": "Agent Zero will automatically recall memories based on convesation context.",
+            "description": "Aria Bot will automatically recall memories based on conversation context.",
             "type": "switch",
             "value": settings["memory_recall_enabled"],
         }
@@ -689,7 +689,7 @@ def convert_out(settings: Settings) -> SettingsOutput:
         {
             "id": "memory_recall_memories_max_result",
             "title": "Memory auto-recall max memories to use",
-            "description": "The maximum number of memories to inject into A0's context window.",
+            "description": "The maximum number of memories to inject into Aria Bot's context window.",
             "type": "number",
             "value": settings["memory_recall_memories_max_result"],
         }
@@ -709,7 +709,7 @@ def convert_out(settings: Settings) -> SettingsOutput:
         {
             "id": "memory_recall_solutions_max_result",
             "title": "Memory auto-recall max solutions to use",
-            "description": "The maximum number of solutions to inject into A0's context window.",
+            "description": "The maximum number of solutions to inject into Aria Bot's context window.",
             "type": "number",
             "value": settings["memory_recall_solutions_max_result"],
         }
@@ -719,7 +719,7 @@ def convert_out(settings: Settings) -> SettingsOutput:
         {
             "id": "memory_memorize_enabled",
             "title": "Auto-memorize enabled",
-            "description": "A0 will automatically memorize facts and solutions from conversation history.",
+            "description": "Aria Bot will automatically memorize facts and solutions from conversation history.",
             "type": "switch",
             "value": settings["memory_memorize_enabled"],
         }
@@ -729,7 +729,7 @@ def convert_out(settings: Settings) -> SettingsOutput:
         {
             "id": "memory_memorize_consolidation",
             "title": "Auto-memorize AI consolidation",
-            "description": "A0 will automatically consolidate similar memories using utility LLM. Improves memory quality over time, adds 2 utility LLM calls per memory.",
+            "description": "Aria Bot will automatically consolidate similar memories using utility LLM. Improves memory quality over time, adds 2 utility LLM calls per memory.",
             "type": "switch",
             "value": settings["memory_memorize_consolidation"],
         }
@@ -751,7 +751,7 @@ def convert_out(settings: Settings) -> SettingsOutput:
     memory_section: SettingsSection = {
         "id": "memory",
         "title": "Memory",
-        "description": "Configuration of A0's memory system. A0 memorizes and recalls memories automatically to help it's context awareness.",
+        "description": "Configuration of Aria Bot's memory system. Aria Bot memorizes and recalls memories automatically to help it's context awareness.",
         "fields": memory_fields,
         "tab": "agent",
     }
@@ -763,7 +763,7 @@ def convert_out(settings: Settings) -> SettingsOutput:
         #     {
         #         "id": "rfc_auto_docker",
         #         "title": "RFC Auto Docker Management",
-        #         "description": "Automatically create dockerized instance of A0 for RFCs using this instance's code base and, settings and .env.",
+        #         "description": "Automatically create dockerized instance of Aria Bot for RFCs using this instance's code base and, settings and .env.",
         #         "type": "text",
         #         "value": settings["rfc_auto_docker"],
         #     }
@@ -773,7 +773,7 @@ def convert_out(settings: Settings) -> SettingsOutput:
             {
                 "id": "rfc_url",
                 "title": "RFC Destination URL",
-                "description": "URL of dockerized A0 instance for remote function calls. Do not specify port here.",
+                "description": "URL of dockerized Aria Bot instance for remote function calls. Do not specify port here.",
                 "type": "text",
                 "value": settings["rfc_url"],
             }
@@ -798,7 +798,7 @@ def convert_out(settings: Settings) -> SettingsOutput:
             {
                 "id": "rfc_port_http",
                 "title": "RFC HTTP port",
-                "description": "HTTP port for dockerized instance of A0.",
+                "description": "HTTP port for dockerized instance of Aria Bot.",
                 "type": "text",
                 "value": settings["rfc_port_http"],
             }
@@ -808,7 +808,7 @@ def convert_out(settings: Settings) -> SettingsOutput:
             {
                 "id": "rfc_port_ssh",
                 "title": "RFC SSH port",
-                "description": "SSH port for dockerized instance of A0.",
+                "description": "SSH port for dockerized instance of Aria Bot.",
                 "type": "text",
                 "value": settings["rfc_port_ssh"],
             }
@@ -817,7 +817,7 @@ def convert_out(settings: Settings) -> SettingsOutput:
     dev_section: SettingsSection = {
         "id": "dev",
         "title": "Development",
-        "description": "Parameters for A0 framework development. RFCs (remote function calls) are used to call functions on another A0 instance. You can develop and debug A0 natively on your local system while redirecting some functions to A0 instance in docker. This is crucial for development as A0 needs to run in standardized environment to support all features.",
+        "description": "Parameters for Aria Bot framework development. RFCs (remote function calls) are used to call functions on another Aria Bot instance. You can develop and debug Aria Bot natively on your local system while redirecting some functions to Aria Bot instance in docker. This is crucial for development as Aria Bot needs to run in standardized environment to support all features.",
         "fields": dev_fields,
         "tab": "developer",
     }
