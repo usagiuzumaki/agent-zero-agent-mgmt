@@ -38,7 +38,7 @@ from anyio.streams.memory import (
 
 from pydantic import BaseModel, Field, Discriminator, Tag, PrivateAttr
 from python.helpers import dirty_json
-from python.helpers.files import read_file, replace_placeholders_text
+from python.helpers.files import replace_placeholders_text
 from python.helpers.print_style import PrintStyle
 from python.helpers.tool import Tool, Response
 
@@ -685,7 +685,7 @@ class MCPConfig(BaseModel):
         with self.__lock:
             pass
 
-        prompt = '## "Remote (MCP Server) Agent Tools" available:\n\n'
+        parts = ['## "Remote (MCP Server) Agent Tools" available:\n\n']
         server_names = []
         for server in self.servers:
             if not server_name or server.name == server_name:
@@ -694,18 +694,17 @@ class MCPConfig(BaseModel):
         if server_name and server_name not in server_names:
             raise ValueError(f"Server {server_name} not found")
 
-        usage_template = read_file("prompts/agent.system.mcp_tool_usage.md")
         usage_template = files.read_file("prompts/agent.system.mcp_tool_usage.md")
 
         for server in self.servers:
             if server.name in server_names:
                 server_name = server.name
-                prompt += f"### {server_name}\n"
-                prompt += f"{server.description}\n"
+                parts.append(f"### {server_name}\n")
+                parts.append(f"{server.description}\n")
                 tools = server.get_tools()
 
                 for tool in tools:
-                    prompt += (
+                    parts.append(
                         f"\n### {server_name}.{tool['name']}:\n"
                         f"{tool['description']}\n\n"
                         # f"#### Categories:\n"
@@ -718,23 +717,21 @@ class MCPConfig(BaseModel):
                         json.dumps(tool["input_schema"]) if tool["input_schema"] else ""
                     )
 
-                    prompt += f"#### Input schema for tool_args:\n{input_schema}\n"
-
-                    prompt += "\n"
+                    parts.append(f"#### Input schema for tool_args:\n{input_schema}\n\n")
 
                     usage_str = replace_placeholders_text(
                         usage_template, tool_name=f"{server_name}.{tool['name']}"
                     )
-                    prompt += f"#### Usage:\n{usage_str}\n"
-                    tool_usage = files.replace_placeholders_text(
+                    parts.append(f"#### Usage:\n{usage_str}\n")
+                    tool_usage = replace_placeholders_text(
                         usage_template,
                         tool_name=f"{server_name}.{tool['name']}",
                         observations="",
                         reflection="",
                     )
-                    prompt += tool_usage + "\n"
+                    parts.append(tool_usage + "\n")
 
-        return prompt
+        return "".join(parts)
 
     def has_tool(self, tool_name: str) -> bool:
         """Check if a tool is available"""
