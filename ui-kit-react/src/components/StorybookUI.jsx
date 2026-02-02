@@ -204,12 +204,13 @@ export default function StorybookUI() {
                       className="btn-icon delete-doc-btn"
                       onClick={() => handleDelete(doc.id)}
                       title="Delete Document"
+                      aria-label={`Delete document: ${doc.name}`}
                       disabled={deletingId === doc.id}
                     >
                       {deletingId === doc.id ? (
                         <Spinner size="small" />
                       ) : (
-                        <span>🗑️</span>
+                        <span role="img" aria-hidden="true">🗑️</span>
                       )}
                     </button>
                   </div>
@@ -246,7 +247,12 @@ export default function StorybookUI() {
                             <span className="beat-type" style={{color: calculateTensionColor(bIndex, chapter.beats.length)}}>
                                 {beat.label}
                             </span>
-                            <span className="visual-hint" title={beat.visual_prompt}>
+                            <span
+                                className="visual-hint"
+                                title={beat.visual_prompt}
+                                role="img"
+                                aria-label={bIndex % 2 === 0 ? "Cinematic shot" : "Visual detail"}
+                            >
                                 {bIndex % 2 === 0 ? '🎬' : '👁️'}
                             </span>
                         </div>
