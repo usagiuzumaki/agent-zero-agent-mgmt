@@ -265,6 +265,7 @@ class DirtyJson:
                         "r": "\r",
                         "t": "\t",
                     }.get(self.current_char, self.current_char))
+                    self._advance()
                 elif self.current_char == "u":
                     self._advance()  # Skip 'u'
                     unicode_char = ""
@@ -282,10 +283,40 @@ class DirtyJson:
                         except ValueError:
                             # If invalid hex value, treat as literal
                             result.append("\\u" + unicode_char)
-                    continue # Continue to next char in while loop
+                    # continue # Continue to next char in while loop -> Removed because we are inside a larger logic block now
+                else:
+                    # Invalid escape, ignore to match legacy behavior
+                    self._advance()
             else:
-                result.append(self.current_char)
-            self._advance()
+                # Optimization: use find and slicing instead of character-by-character loop
+                start_index = self.index
+
+                # Find next interesting character (quote or backslash)
+                next_quote = self.json_string.find(quote_char, start_index)
+                next_slash = self.json_string.find("\\", start_index)
+
+                target_index = -1
+
+                if next_quote == -1 and next_slash == -1:
+                    # Take everything until end
+                    chunk = self.json_string[start_index:]
+                    result.append(chunk)
+                    self._advance(len(chunk))
+                    continue
+
+                if next_quote != -1 and next_slash != -1:
+                    target_index = min(next_quote, next_slash)
+                elif next_quote != -1:
+                    target_index = next_quote
+                else:
+                    target_index = next_slash
+
+                if target_index > start_index:
+                    chunk = self.json_string[start_index:target_index]
+                    result.append(chunk)
+                    self._advance(target_index - start_index)
+                # If target_index == start_index, we do nothing and loop continues to handle special char
+
         if self.current_char == quote_char:
             self._advance()  # Skip closing quote
         return "".join(result)
