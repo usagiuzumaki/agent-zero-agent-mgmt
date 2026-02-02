@@ -8,11 +8,17 @@ from helpers.dirty_json import DirtyJson
 
 class TestDirtyJson(unittest.TestCase):
     def test_multiline_string(self):
-        # The parser strips the result, so "line1\nline2" might become "line1\nline2"
+        # The parser used to strip the result, but now it preserves whitespace.
         json_str = '"""line1\nline2"""'
         parser = DirtyJson()
         result = parser.parse(json_str)
         self.assertEqual(result, "line1\nline2")
+
+    def test_multiline_string_preserves_whitespace(self):
+        json_str = '"""  line1\nline2  """'
+        parser = DirtyJson()
+        result = parser.parse(json_str)
+        self.assertEqual(result, "  line1\nline2  ")
 
     def test_multiline_string_with_quotes(self):
         json_str = '"""He said "hello"."""'
