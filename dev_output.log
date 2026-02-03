@@ -3,10 +3,24 @@
 > vite
 
 
-  VITE v7.3.0  ready in 263 ms
+  VITE v7.3.0  ready in 261 ms
 
   ➜  Local:   http://localhost:5173/
   ➜  Network: use --host to expose
-3:20:12 AM [vite] (client) hmr update /src/theme.css
-3:20:19 AM [vite] (client) hmr update /src/components/AgentChat.jsx
+10:07:14 AM [vite] http proxy error: /api/screenwriting/storybook
+AggregateError [ECONNREFUSED]:
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+10:07:14 AM [vite] http proxy error: /api/screenwriting/storybook
+AggregateError [ECONNREFUSED]:
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+10:07:43 AM [vite] http proxy error: /api/screenwriting/storybook
+AggregateError [ECONNREFUSED]:
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+10:07:43 AM [vite] http proxy error: /api/screenwriting/storybook
+AggregateError [ECONNREFUSED]:
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
  ELIFECYCLE  Command failed.
