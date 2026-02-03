@@ -847,7 +847,7 @@ class Agent:
         if not classes:
             try:
                 classes = extract_tools.load_classes_from_file(
-                    f"python/tools/screenwriting/{normalized_name}.py", Tool
+                    f"agents/screenwriting/tools/{normalized_name}.py", Tool
                 )
             except Exception:
                 pass
