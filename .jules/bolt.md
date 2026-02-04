@@ -19,3 +19,7 @@
 ## 2025-05-21 - [Optimizing DirtyJson Parser]
 **Learning:** String concatenation in a loop (O(N^2)) and character-by-character processing in Python are extremely slow for large strings. Replacing a character-loop with `str.find()` and slicing (O(1) loop overhead) reduced execution time by ~300x (3.5s -> 0.01s) for parsing large multiline strings.
 **Action:** When parsing strings, avoid iterating by character if possible. Use built-in string methods like `find`, `index`, and slicing which are implemented in C and highly optimized.
+
+## 2025-05-22 - [Redundant I/O and String Concatenation]
+**Learning:** In `mcp_handler.py`, a template file was being read and parsed twice within a single function call. Additionally, string concatenation (`+=`) in a loop was used to build a large prompt. Removing the redundant read and switching to `"".join(list)` improved code scalability and reduced unnecessary I/O/processing overhead.
+**Action:** Audit functions for redundant `read_file` calls. Use list accumulation and `join` for building large strings in loops.
