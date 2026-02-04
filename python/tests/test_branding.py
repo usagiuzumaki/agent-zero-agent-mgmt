@@ -43,10 +43,50 @@ def test_branding_in_docs():
                 # Allow "formerly Agent Zero"
                 if "(formerly Agent Zero)" in line:
                     continue
-
-                # Allow in image alt text if we missed it? No, I replaced it.
-                # Allow in link targets? URLs usually are lowercase or specific.
-                # If there is a legitimate use, we can add exception.
+                # Allow links to original repo
+                if "github.com/fredrl/agent-zero" in line or "github.com/agent0ai/agent-zero" in line:
+                    continue
 
                 # Fail
                 assert False, f"Found 'Agent Zero' in {filename}:{i+1}: {line.strip()}"
+
+def test_branding_in_python_code():
+    start_dir = "python"
+    if not os.path.exists(start_dir):
+        if os.path.exists("../../python"):
+            start_dir = "../../python"
+        else:
+            assert False, "Could not find 'python' directory to test branding."
+
+    # Walk through python directory
+    for root, dirs, files in os.walk(start_dir):
+        # Exclude tests directory and __pycache__
+        if "tests" in dirs:
+            dirs.remove("tests")
+        if "__pycache__" in dirs:
+            dirs.remove("__pycache__")
+
+        # Skip if we are somehow inside a tests directory (e.g. nested)
+        if "tests" in root.split(os.sep):
+             continue
+
+        for filename in files:
+            if not filename.endswith(".py"):
+                continue
+
+            filepath = os.path.join(root, filename)
+
+            with open(filepath, "r", encoding="utf-8") as f:
+                content = f.read()
+
+            lines = content.splitlines()
+            for i, line in enumerate(lines):
+                if "Agent Zero" in line:
+                    # Exceptions
+                    if "(formerly Agent Zero)" in line:
+                        continue
+                    # Allow credit/links
+                    if "github.com/fredrl/agent-zero" in line or "github.com/agent0ai/agent-zero" in line:
+                        continue
+
+                    assert False, f"Found 'Agent Zero' in {filepath}:{i+1}: {line.strip()}"
