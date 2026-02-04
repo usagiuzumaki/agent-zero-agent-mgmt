@@ -2,7 +2,6 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { getTools } from '../plugins';
 import Spinner from './common/Spinner';
 import MessageList from './MessageList';
-import Spinner from './common/Spinner';
 
 /**
  * Chat panel with message list, input box and plugin action buttons.

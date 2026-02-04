@@ -13,3 +13,7 @@
 ## 2026-01-20 - Actionable Empty States
 **Learning:** Empty states ("No documents found") are often dead ends. They are prime opportunities to guide the user towards the primary action (e.g., "Create Document").
 **Action:** Replace text-only empty states with "Hero" empty states: Icon + Title + Description + Primary Action Button.
+
+## 2026-03-01 - Modal Accessibility Defaults
+**Learning:** Custom modal implementations often miss standard keyboard behaviors (Escape to close) and ARIA roles, creating "traps" for keyboard users.
+**Action:** Enforce a "Modal Checklist": Escape listener, role="dialog", aria-modal="true", and ensure focus is managed (or at least not trapped destructively).
