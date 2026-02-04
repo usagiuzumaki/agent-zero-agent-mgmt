@@ -32,6 +32,13 @@ body {
   margin: 0;
 }
 
+/* Global Focus Styles for Accessibility */
+:where(button, input, textarea, select, a, [role="button"], [role="tab"]):focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  transition: outline-offset 0.1s ease;
+}
+
 .agent-launcher {
   position: fixed;
   bottom: 1rem;
