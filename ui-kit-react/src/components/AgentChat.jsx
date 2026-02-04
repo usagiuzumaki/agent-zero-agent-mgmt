@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { getTools } from '../plugins';
 import Spinner from './common/Spinner';
 import MessageList from './MessageList';
-import Spinner from './common/Spinner';
+import EmptyState from './common/EmptyState';
 
 /**
  * Chat panel with message list, input box and plugin action buttons.
@@ -109,6 +109,20 @@ export default function AgentChat({ onLog }) {
             }
             title="Aria"
             description="I'm here to help with your screenwriting tasks. Type a message or select a tool to get started."
+            action={
+              <button
+                type="button"
+                className="btn-primary"
+                onClick={() => {
+                  setInput('Help me brainstorm a scene about ');
+                  if (textareaRef.current) {
+                    textareaRef.current.focus();
+                  }
+                }}
+              >
+                Start Brainstorming
+              </button>
+            }
           />
         ) : (
           <MessageList messages={messages} bottomRef={messagesEndRef} />
