@@ -22,6 +22,9 @@ class TestStableDiffusion(unittest.TestCase):
     def setUp(self):
         # Reset mocks
         sys.modules['replicate'].reset_mock()
+        # Force stable_diffusion to use the mock even if it was imported before the mock was set
+        stable_diffusion.replicate = sys.modules['replicate']
+
         mock_simple = sys.modules['python.helpers.stable_diffusion_simple']
         mock_simple.reset_mock()
         mock_simple.generate_image.side_effect = None # Clear side effects
