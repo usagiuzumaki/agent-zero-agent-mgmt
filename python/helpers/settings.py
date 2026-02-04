@@ -613,7 +613,7 @@ def convert_out(settings: Settings) -> SettingsOutput:
         {
             "id": "memory_recall_enabled",
             "title": "Memory auto-recall enabled",
-            "description": "Agent Zero will automatically recall memories based on convesation context.",
+            "description": "Aria Bot will automatically recall memories based on convesation context.",
             "type": "switch",
             "value": settings["memory_recall_enabled"],
         }

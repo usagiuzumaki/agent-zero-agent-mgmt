@@ -29,24 +29,45 @@ def test_branding_in_docs():
         else:
             return
 
-    for filename in os.listdir(docs_dir):
-        if not filename.endswith(".md"):
-            continue
+    for root, dirs, files in os.walk(docs_dir):
+        for filename in files:
+            if not filename.endswith(".md"):
+                continue
 
-        filepath = os.path.join(docs_dir, filename)
-        with open(filepath, "r", encoding="utf-8") as f:
-            content = f.read()
+            filepath = os.path.join(root, filename)
+            with open(filepath, "r", encoding="utf-8") as f:
+                content = f.read()
 
-        lines = content.splitlines()
-        for i, line in enumerate(lines):
-            if "Agent Zero" in line:
-                # Allow "formerly Agent Zero"
-                if "(formerly Agent Zero)" in line:
-                    continue
+            lines = content.splitlines()
+            for i, line in enumerate(lines):
+                if "Agent Zero" in line:
+                    # Allow "formerly Agent Zero"
+                    if "(formerly Agent Zero)" in line:
+                        continue
 
-                # Allow in image alt text if we missed it? No, I replaced it.
-                # Allow in link targets? URLs usually are lowercase or specific.
-                # If there is a legitimate use, we can add exception.
+                    # Fail
+                    assert False, f"Found 'Agent Zero' in {filepath}:{i+1}: {line.strip()}"
 
-                # Fail
-                assert False, f"Found 'Agent Zero' in {filename}:{i+1}: {line.strip()}"
+def test_branding_in_backup_create():
+    # Determine path to backup_create.py
+    # From root: python/api/backup_create.py
+    # From python/tests: ../api/backup_create.py
+
+    path = "python/api/backup_create.py"
+    if not os.path.exists(path):
+        if os.path.exists("../api/backup_create.py"):
+             path = "../api/backup_create.py"
+        elif os.path.exists("../../python/api/backup_create.py"):
+             path = "../../python/api/backup_create.py"
+
+    assert os.path.exists(path), f"Could not find backup_create.py"
+
+    with open(path, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    # Check default backup name
+    assert 'backup_name = input.get("backup_name", "aria-bot-backup")' in content, \
+        "backup_create.py should use 'aria-bot-backup' as default"
+
+    # Check for Agent Zero string (specifically the old backup name)
+    assert "agent-zero-backup" not in content, "backup_create.py should not contain 'agent-zero-backup'"
