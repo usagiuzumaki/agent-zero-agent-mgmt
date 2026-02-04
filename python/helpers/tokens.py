@@ -22,6 +22,16 @@ def count_tokens(text: str, encoding_name="cl100k_base") -> int:
 def approximate_tokens(
     text: str,
 ) -> int:
+    if not text:
+        return 0
+
+    # Optimization: For short strings (e.g. streaming deltas), use a simple heuristic
+    # to avoid the overhead of tiktoken encoding.
+    # We assume ~3 characters per token (conservative estimate vs typical 4)
+    # which aligns with the APPROX_BUFFER conservatism.
+    if len(text) < 100:
+        return max(1, int(len(text) / 3))
+
     return int(count_tokens(text) * APPROX_BUFFER)
 
 
