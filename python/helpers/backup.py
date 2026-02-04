@@ -55,7 +55,7 @@ class BackupService:
     def _get_default_patterns(self) -> str:
         """Get default backup patterns with resolved absolute paths.
 
-        Only includes Agent Zero project directory patterns.
+        Only includes Aria Bot project directory patterns.
         """
         # Ensure paths don't have double slashes
         agent_root = self.agent_zero_root.rstrip('/')
@@ -370,6 +370,7 @@ class BackupService:
                 # Add comprehensive metadata
                 metadata = {
                     # Basic backup information
+                    "aria_bot_version": self.agent_zero_version,
                     "agent_zero_version": self.agent_zero_version,
                     "timestamp": datetime.datetime.now().isoformat(),
                     "backup_name": backup_name,
