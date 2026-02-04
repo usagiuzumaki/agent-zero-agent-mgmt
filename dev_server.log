@@ -1,0 +1,10 @@
+
+> ui-kit-react@0.0.0 dev /app/ui-kit-react
+> vite
+
+
+  VITE v7.3.0  ready in 240 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+10:23:30 AM [vite] (client) hmr update /src/components/AgentChat.jsx
