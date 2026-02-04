@@ -20,6 +20,12 @@
   color: var(--studio-text);
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   overflow: hidden;
+
+  /* Map Studio Theme to Common Variables for shared components like EmptyState */
+  --color-surface: var(--studio-card-bg);
+  --color-text: var(--studio-text);
+  --color-text-muted: var(--studio-text-muted);
+  --color-border: var(--studio-border);
 }
 
 /* Sidebar Navigation */

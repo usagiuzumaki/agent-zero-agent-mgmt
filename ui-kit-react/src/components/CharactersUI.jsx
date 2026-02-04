@@ -157,7 +157,8 @@ export default function CharactersUI() {
         {characters.length === 0 ? (
           <EmptyState
             icon={<span>👥</span>}
-            description="No characters yet. Every story needs a cast!"
+            title="No Characters Yet"
+            description="Every story needs a cast!"
             action={
               <button
                 className="btn-studio-primary"
