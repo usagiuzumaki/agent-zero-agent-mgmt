@@ -309,12 +309,12 @@ class DirtyJson:
             # Current index is start_index (because we called _advance(3) before)
             # So we need to advance by (end_index - start_index) + 3
             self._advance(end_index - start_index + 3)
-            return result.strip()
+            return result
         else:
             # If no closing marker found, consume the rest of the string
             result = self.json_string[start_index:]
             self._advance(len(self.json_string) - start_index)
-            return result.strip()
+            return result
 
     def _parse_number(self):
         number_str = ""
