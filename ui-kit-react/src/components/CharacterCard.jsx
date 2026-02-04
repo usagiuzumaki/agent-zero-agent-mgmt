@@ -56,6 +56,7 @@ const CharacterCard = memo(({ char, onEdit, onDelete, isDeleting }) => {
           onClick={() => onEdit(char)}
           disabled={isDeleting}
           style={{padding: '0.4rem 0.8rem', fontSize: '0.85rem'}}
+          aria-label={char.name ? `Edit ${char.name}` : 'Edit character'}
         >
           Edit
         </button>
@@ -64,6 +65,7 @@ const CharacterCard = memo(({ char, onEdit, onDelete, isDeleting }) => {
           onClick={() => onDelete(char.id)}
           disabled={isDeleting}
           style={{padding: '0.4rem 0.8rem', fontSize: '0.85rem', color: '#ef4444', borderColor: '#ef4444'}}
+          aria-label={char.name ? `Delete ${char.name}` : 'Delete character'}
         >
           {isDeleting ? <Spinner size="small" /> : 'Delete'}
         </button>
