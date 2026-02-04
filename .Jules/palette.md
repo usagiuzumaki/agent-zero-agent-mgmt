@@ -13,3 +13,7 @@
 ## 2026-01-20 - Actionable Empty States
 **Learning:** Empty states ("No documents found") are often dead ends. They are prime opportunities to guide the user towards the primary action (e.g., "Create Document").
 **Action:** Replace text-only empty states with "Hero" empty states: Icon + Title + Description + Primary Action Button.
+
+## 2026-02-04 - Emojis as Icons
+**Learning:** Emojis used as icons (like 🗑️ or ←) are often announced by their literal name (e.g., "Wastebasket", "Left Arrow") which can be confusing or redundant when accompanying text or when the action is specific (e.g., "Delete Document").
+**Action:** Wrap decorative emojis in `<span aria-hidden="true">` and provide explicit `aria-label`s for the interactive element. For semantic icons (like status indicators), use `role="img"` and an `aria-label` describing the meaning, not the symbol.

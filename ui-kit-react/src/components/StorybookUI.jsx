@@ -204,12 +204,13 @@ export default function StorybookUI() {
                       className="btn-icon delete-doc-btn"
                       onClick={() => handleDelete(doc.id)}
                       title="Delete Document"
+                      aria-label={`Delete ${doc.name}`}
                       disabled={deletingId === doc.id}
                     >
                       {deletingId === doc.id ? (
                         <Spinner size="small" />
                       ) : (
-                        <span>🗑️</span>
+                        <span aria-hidden="true">🗑️</span>
                       )}
                     </button>
                   </div>
@@ -221,7 +222,7 @@ export default function StorybookUI() {
           <div className="document-view">
              <div className="doc-header-row">
                 <button className="btn-back" onClick={() => setSelectedDoc(null)}>
-                    <span>←</span> Back to Library
+                    <span aria-hidden="true">←</span> Back to Library
                 </button>
                 <h3 style={{margin:0}}>{selectedDoc.name}</h3>
                 <div style={{width: 60}}></div> {/* Spacer */}
@@ -246,7 +247,12 @@ export default function StorybookUI() {
                             <span className="beat-type" style={{color: calculateTensionColor(bIndex, chapter.beats.length)}}>
                                 {beat.label}
                             </span>
-                            <span className="visual-hint" title={beat.visual_prompt}>
+                            <span
+                              className="visual-hint"
+                              title={beat.visual_prompt}
+                              role="img"
+                              aria-label={beat.visual_prompt}
+                            >
                                 {bIndex % 2 === 0 ? '🎬' : '👁️'}
                             </span>
                         </div>
@@ -255,7 +261,7 @@ export default function StorybookUI() {
                         </div>
                         <div className="beat-footer">
                              <button className="btn-draft">
-                                ✍️ Draft Scene
+                                <span aria-hidden="true">✍️</span> Draft Scene
                              </button>
                         </div>
                       </div>
