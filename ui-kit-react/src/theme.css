@@ -394,3 +394,20 @@ body {
   width: 2.5rem;
   height: 2.5rem;
 }
+
+/* Empty State Quick Actions */
+.agent-chat .empty-state-action button {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 9999px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--color-text);
+  font-size: 0.9rem;
+}
+
+.agent-chat .empty-state-action button:hover {
+  background: var(--color-border);
+  transform: translateY(-1px);
+}
