@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Spinner from './common/Spinner';
 import EmptyState from './common/EmptyState';
+import AgentModal from './AgentModal';
 import './StorybookUI.css';
 
 export default function StorybookUI() {
@@ -13,6 +14,11 @@ export default function StorybookUI() {
   const [showUpload, setShowUpload] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
+
+  // Drafting state
+  const [draftingBeatId, setDraftingBeatId] = useState(null);
+  const [draftResult, setDraftResult] = useState(null);
+  const [showDraftModal, setShowDraftModal] = useState(false);
 
   useEffect(() => {
     fetchDocuments();
@@ -95,6 +101,29 @@ export default function StorybookUI() {
     }
   };
 
+  const handleDraftScene = async (beat) => {
+    setDraftingBeatId(beat.id);
+    setError(null);
+    try {
+      const response = await fetch('/api/screenwriting/scene/draft', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          beat_summary: beat.summary,
+          scene_title: beat.label
+        })
+      });
+      if (!response.ok) throw new Error('Failed to draft scene');
+      const data = await response.json();
+      setDraftResult(data.draft);
+      setShowDraftModal(true);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setDraftingBeatId(null);
+    }
+  };
+
   const calculateTensionColor = (beatIndex, totalBeats) => {
     // Simple visualizer: start low, rise, dip, rise high
     const progress = beatIndex / totalBeats;
@@ -115,6 +144,23 @@ export default function StorybookUI() {
 
   return (
     <div className="storybook-ui">
+      <AgentModal
+        open={showDraftModal}
+        onClose={() => setShowDraftModal(false)}
+        className="screenplay-modal"
+      >
+        <div className="modal-header">
+            <h3 style={{margin: '0 0 1rem 0'}}>Scene Draft</h3>
+        </div>
+        <div className="modal-content" style={{overflowY: 'auto', maxHeight: '60vh', fontFamily: 'Courier New, monospace', whiteSpace: 'pre-wrap', padding: '1rem', background: '#f5f5f5', borderRadius: '4px', color: '#333', border: '1px solid #ddd'}}>
+            {draftResult}
+        </div>
+        <div className="modal-actions" style={{marginTop: '1rem', display: 'flex', justifyContent: 'flex-end', gap: '0.5rem'}}>
+             <button className="btn-studio-secondary" onClick={() => {navigator.clipboard.writeText(draftResult); alert('Copied to clipboard!')}}>Copy</button>
+             <button className="btn-studio-primary" onClick={() => setShowDraftModal(false)}>Close</button>
+        </div>
+      </AgentModal>
+
       {!selectedDoc && (
         <div className="storybook-header">
             <h3>Storybook Documents</h3>
@@ -254,8 +300,16 @@ export default function StorybookUI() {
                             {beat.summary}
                         </div>
                         <div className="beat-footer">
-                             <button className="btn-draft">
-                                ✍️ Draft Scene
+                             <button
+                                className="btn-draft"
+                                onClick={() => handleDraftScene(beat)}
+                                disabled={draftingBeatId === beat.id}
+                             >
+                                {draftingBeatId === beat.id ? (
+                                    <span style={{display:'flex', alignItems:'center', gap: '0.5rem'}}><Spinner size="small"/> Drafting...</span>
+                                ) : (
+                                    '✍️ Draft Scene'
+                                )}
                              </button>
                         </div>
                       </div>
