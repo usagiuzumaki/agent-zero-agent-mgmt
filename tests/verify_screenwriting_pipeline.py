@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, AsyncMock
 # Adjust path to import from repo root
 sys.path.append(os.getcwd())
 
-from python.tools.screenwriting.screenwriting_pipeline import ScreenwritingPipeline
+from agents.screenwriting.tools.screenwriting_pipeline import ScreenwritingPipeline
 
 async def test_pipeline():
     # Mock the main agent
@@ -36,10 +36,10 @@ async def test_pipeline():
         include_world_building=True,
         include_character_analysis=True,
         include_pacing=True,
-        include_emotional_tension=True,
+        include_tension=True,
         include_marketability=True,
         include_mbti=True,
-        include_scream_analysis=True,
+        include_scream=True,
         include_storyboard=True
     )
 
@@ -49,13 +49,13 @@ async def test_pipeline():
     expected_stages = [
         "World Builder",
         "Character Analyzer",
+        "MBTI Evaluator",
         "Plot Analyzer",
         "Creative Ideas",
         "Co-Writer",
         "Dialogue Evaluator",
         "Pacing Metrics",
         "Emotional Tension",
-        "MBTI Evaluator",
         "Scream Analyzer",
         "Script Formatter",
         "Marketability",

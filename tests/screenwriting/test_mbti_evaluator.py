@@ -50,7 +50,7 @@ mock_module("langchain.embeddings.base")
 import pytest
 import models
 from agents import AgentConfig
-from agents.screenwriting.mbti_evaluator import MBTIEvaluator
+from agents.screenwriting.components.mbti_evaluator import MBTIEvaluator
 import asyncio
 
 def dummy_config():
