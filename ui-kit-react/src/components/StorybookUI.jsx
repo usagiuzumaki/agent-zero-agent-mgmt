@@ -174,7 +174,8 @@ export default function StorybookUI() {
             {documents.length === 0 ? (
               <EmptyState
                 icon={<span>📖</span>}
-                description="No documents found. Start your story by creating or uploading a new document."
+                title="No Documents Found"
+                description="Start your story by creating or uploading a new document."
                 action={
                   <button
                     className="btn-studio-primary"
