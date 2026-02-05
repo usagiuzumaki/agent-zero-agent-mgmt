@@ -28,7 +28,7 @@ def calculate_valid_match_lengths(first: bytes | str, second: bytes | str,
 
     # Pre-compile patterns to avoid recompilation and enable usage of match(pos=...)
     # This avoids O(N) string slicing in the inner loop
-    compiled_patterns = [re.compile(p) for p in ignore_patterns]
+    compiled_patterns = [p if isinstance(p, re.Pattern) else re.compile(p) for p in ignore_patterns]
 
     def skip_ignored_patterns(s, index):
         """Skip characters in `s` that match any pattern in `ignore_patterns` starting from `index`."""

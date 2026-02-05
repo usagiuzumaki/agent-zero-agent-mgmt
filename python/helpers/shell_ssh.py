@@ -13,6 +13,15 @@ class SSHInteractiveSession:
     # end_comment = "# @@==>> SSHInteractiveSession End-of-Command  <<==@@"
     # ps1_label = "SSHInteractiveSession CLI>"
 
+    # Pre-compiled regex patterns for performance
+    ANSI_ESCAPE_PATTERN = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
+
+    IGNORE_PATTERNS = [
+        re.compile(rb"\x1b\[\?\d{4}[a-zA-Z](?:> )?"),  # ANSI escape sequences
+        re.compile(rb"\r"),  # Carriage return
+        re.compile(rb">\s"),  # Greater-than symbol
+    ]
+
     def __init__(
         self, logger: Log, hostname: str, port: int, username: str, password: str
     ):
@@ -113,11 +122,7 @@ class SSHInteractiveSession:
                     data_to_trim,
                     deviation_threshold=8,
                     deviation_reset=2,
-                    ignore_patterns=[
-                        rb"\x1b\[\?\d{4}[a-zA-Z](?:> )?",  # ANSI escape sequences
-                        rb"\r",  # Carriage return
-                        rb">\s",  # Greater-than symbol
-                    ],
+                    ignore_patterns=self.IGNORE_PATTERNS,
                     debug=False,
                 )
 
@@ -190,8 +195,7 @@ class SSHInteractiveSession:
 
     def clean_string(self, input_string):
         # Remove ANSI escape codes
-        ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
-        cleaned = ansi_escape.sub("", input_string)
+        cleaned = self.ANSI_ESCAPE_PATTERN.sub("", input_string)
 
         # remove null bytes
         cleaned = cleaned.replace("\x00", "")
