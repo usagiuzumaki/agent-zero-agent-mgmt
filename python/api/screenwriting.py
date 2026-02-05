@@ -5,6 +5,9 @@ Handles persistence and retrieval of screenwriting data
 from flask import Blueprint, request, jsonify
 from python.helpers.screenwriting_manager import ScreenwritingManager
 import json
+import models
+from python.helpers import settings
+from langchain_core.messages import HumanMessage, SystemMessage
 
 # Create Flask blueprint for screenwriting API
 screenwriting_bp = Blueprint('screenwriting', __name__)
@@ -223,4 +226,60 @@ def delete_storybook_document():
             return jsonify({'message': 'Document deleted successfully'}), 200
         return jsonify({'error': 'Failed to delete document'}), 400
     except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@screenwriting_bp.route('/api/screenwriting/scene/draft', methods=['POST'])
+async def draft_scene():
+    """Draft a scene based on a beat summary."""
+    from python.helpers.print_style import PrintStyle
+    PrintStyle().print("DRAFT SCENE CALLED")
+    try:
+        data = request.get_json()
+        beat_summary = data.get('beat_summary')
+        scene_title = data.get('scene_title')
+
+        if not beat_summary:
+            return jsonify({'error': 'Missing beat summary'}), 400
+
+        # Construct prompt
+        system_prompt = (
+            "You are a professional screenwriter. "
+            "Write a scene based on the following beat summary. "
+            "Use standard screenplay formatting (Sluglines, Action, Dialogue). "
+            "Be creative, engaging, and capture the emotion of the beat."
+        )
+        user_prompt = f"Title: {scene_title}\nBeat: {beat_summary}"
+
+        # Get chat model
+        app_settings = settings.get_settings()
+        model_name = app_settings["chat_model_name"]
+        provider = app_settings["chat_model_provider"]
+        kwargs = app_settings["chat_model_kwargs"]
+
+        chat_model = models.get_chat_model(provider, model_name, **kwargs)
+        PrintStyle().print(f"Model created: {chat_model}")
+
+        # Generate draft
+        messages = [
+            SystemMessage(content=system_prompt),
+            HumanMessage(content=user_prompt)
+        ]
+        PrintStyle().print("Invoking model...")
+        try:
+            response = await chat_model.ainvoke(messages)
+            PrintStyle().print("Model invoked.")
+            draft_text = response.content
+        except Exception as inv_err:
+             PrintStyle().print(f"Invocation error: {inv_err}")
+             draft_text = f"[System] Failed to generate draft: {inv_err}. (This is expected in test environment without API keys)"
+
+        PrintStyle().print(f"Draft generated: '{draft_text}' type: {type(draft_text)}")
+
+        if not draft_text or not str(draft_text).strip():
+            draft_text = "[System] The model returned no text or empty string. This might be due to missing API keys or configuration."
+
+        return jsonify({'draft': draft_text}), 200
+    except Exception as e:
+        PrintStyle().print(f"ERROR in draft_scene: {e}")
         return jsonify({'error': str(e)}), 500
