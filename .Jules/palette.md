@@ -13,3 +13,7 @@
 ## 2026-01-20 - Actionable Empty States
 **Learning:** Empty states ("No documents found") are often dead ends. They are prime opportunities to guide the user towards the primary action (e.g., "Create Document").
 **Action:** Replace text-only empty states with "Hero" empty states: Icon + Title + Description + Primary Action Button.
+
+## 2026-01-24 - Icon-Only Button Accessibility
+**Learning:** Icon-only buttons (like trash cans or arrows) are completely inaccessible to screen readers if they rely solely on visual cues (emojis/svgs).
+**Action:** Always provide an `aria-label` describing the action, and hide the decorative icon with `aria-hidden="true"`.
