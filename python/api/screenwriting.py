@@ -5,6 +5,8 @@ Handles persistence and retrieval of screenwriting data
 from flask import Blueprint, request, jsonify
 from python.helpers.screenwriting_manager import ScreenwritingManager
 import json
+import initialize
+from agents.screenwriting.co_writer import CoWriter
 
 # Create Flask blueprint for screenwriting API
 screenwriting_bp = Blueprint('screenwriting', __name__)
@@ -222,5 +224,38 @@ def delete_storybook_document():
         if manager.delete_document(doc_id):
             return jsonify({'message': 'Document deleted successfully'}), 200
         return jsonify({'error': 'Failed to delete document'}), 400
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@screenwriting_bp.route('/api/screenwriting/scene/draft', methods=['POST'])
+async def draft_scene():
+    """Draft a scene using the CoWriter agent."""
+    try:
+        data = request.get_json()
+        beat_summary = data.get('beat_summary')
+        scene_title = data.get('scene_title')
+
+        if not beat_summary:
+            return jsonify({'error': 'Beat summary is required'}), 400
+
+        # Construct prompt
+        prompt = f"Draft a scene titled '{scene_title}'.\n\nSummary:\n{beat_summary}"
+
+        # Initialize agent
+        config = initialize.initialize_agent()
+        # Ensure profile is screenwriting
+        config.profile = "screenwriting"
+
+        # Instantiate CoWriter. Number 1 for subordinate (or just 0 for standalone)
+        # Using 0 as it's a standalone task for this request
+        agent = CoWriter(0, config)
+
+        # Execute draft
+        # draft() calls monologue() which returns the result string
+        result = await agent.draft(prompt)
+
+        return jsonify({'result': result}), 200
+
     except Exception as e:
         return jsonify({'error': str(e)}), 500
