@@ -1,8 +1,15 @@
 from typing import Literal
+import functools
 import tiktoken
 
 APPROX_BUFFER = 1.1
 TRIM_BUFFER = 0.8
+
+
+@functools.lru_cache()
+def get_encoding(encoding_name: str):
+    # Caching the encoding object prevents re-initialization overhead on every call.
+    return tiktoken.get_encoding(encoding_name)
 
 
 def count_tokens(text: str, encoding_name="cl100k_base") -> int:
@@ -10,7 +17,7 @@ def count_tokens(text: str, encoding_name="cl100k_base") -> int:
         return 0
 
     # Get the encoding
-    encoding = tiktoken.get_encoding(encoding_name)
+    encoding = get_encoding(encoding_name)
 
     # Encode the text and count the tokens
     tokens = encoding.encode(text)
