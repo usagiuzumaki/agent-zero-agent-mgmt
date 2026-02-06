@@ -1,14 +1,14 @@
 import sys
 import asyncio
-from unittest.mock import patch
+from unittest.mock import patch, AsyncMock
 from tests.screenwriting.mock_utils import get_sys_modules_mocks
 
-def test_analyze_basic():
+def test_analyze_plot():
     with patch.dict(sys.modules, get_sys_modules_mocks()):
         # Imports must happen inside the patch to use the mocks
         import models
         from agents import AgentConfig
-        from agents.screenwriting.pacing_metrics import PacingMetrics
+        from agents.screenwriting.plot_analyzer import PlotAnalyzer
 
         def dummy_config():
             mc = models.ModelConfig(type=models.ModelType.CHAT, provider="x", name="y")
@@ -21,9 +21,13 @@ def test_analyze_basic():
                 mcp_servers="",
             )
 
-        agent = PacingMetrics(0, dummy_config())
-        metrics_str = asyncio.run(agent.analyze("Run! Jump. Stop?"))
-        assert "sentences" in metrics_str
-        assert "3" in metrics_str
-        assert "exclamations" in metrics_str
-        assert "1" in metrics_str
+        agent = PlotAnalyzer(0, dummy_config())
+
+        # Mock monologue to avoid calling the LLM
+        agent.monologue = AsyncMock(return_value="Plot Analysis: The structure follows the hero's journey.")
+
+        outline_content = "Act 1: Introduction. Act 2: Conflict. Act 3: Resolution."
+        result = asyncio.run(agent.analyze(outline_content))
+
+        assert "Plot Analysis: The structure follows the hero's journey." in result
+        agent.monologue.assert_called_once()
