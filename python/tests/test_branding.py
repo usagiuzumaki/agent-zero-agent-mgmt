@@ -50,3 +50,40 @@ def test_branding_in_docs():
 
                 # Fail
                 assert False, f"Found 'Agent Zero' in {filename}:{i+1}: {line.strip()}"
+
+def test_branding_in_python_files():
+    root_dir = "python"
+    if not os.path.exists(root_dir):
+        if os.path.exists("../../python"):
+            root_dir = "../../python"
+        else:
+            assert False, "Could not find 'python' directory to scan"
+
+    for root, dirs, files in os.walk(root_dir):
+        # Skip tests directory and pycache to avoid self-flagging or testing test files
+        if "tests" in dirs:
+            dirs.remove("tests")
+        if "__pycache__" in dirs:
+            dirs.remove("__pycache__")
+
+        for filename in files:
+            if not filename.endswith(".py"):
+                continue
+
+            filepath = os.path.join(root, filename)
+            with open(filepath, "r", encoding="utf-8") as f:
+                content = f.read()
+
+            lines = content.splitlines()
+            for i, line in enumerate(lines):
+                if "Agent Zero" in line:
+                    # Exceptions
+                    if "(formerly Agent Zero)" in line:
+                        continue
+                    if "Credit to the original project by" in line: # Attribution
+                        continue
+                    if "fredrl/agent-zero" in line: # GitHub link
+                        continue
+
+                    # Fail
+                    assert False, f"Found 'Agent Zero' in {filepath}:{i+1}: {line.strip()}"
