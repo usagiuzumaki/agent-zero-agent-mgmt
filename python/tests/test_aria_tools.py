@@ -7,16 +7,6 @@ import os
 # Add repo root to path
 sys.path.append(os.getcwd())
 
-# Mock OpenAI before import
-sys.modules['openai'] = MagicMock()
-sys.modules['elevenlabs.client'] = MagicMock()
-
-# Mock dependencies used by aria_tools imports
-sys.modules['python.helpers.stable_diffusion'] = MagicMock()
-sys.modules['python.helpers.tunnel_manager'] = MagicMock()
-sys.modules['python.helpers.egirl.instagram'] = MagicMock()
-sys.modules['python.helpers.egirl.stripe'] = MagicMock()
-
 from python.helpers import aria_tools
 
 class TestAriaTools(unittest.TestCase):

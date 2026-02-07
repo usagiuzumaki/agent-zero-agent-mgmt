@@ -46,12 +46,12 @@ class TestStableDiffusion(unittest.TestCase):
             self.assertEqual(kwargs['output_dir'], tmpdirname)
 
     @patch.dict(os.environ, {"REPLICATE_API_TOKEN": "r8_test_token"})
-    def test_generate_image_replicate_fallback_success(self):
+    @patch('python.helpers.stable_diffusion.replicate')
+    def test_generate_image_replicate_fallback_success(self, mock_replicate):
         # Setup Mock: simple fails, replicate works
         mock_simple = sys.modules['python.helpers.stable_diffusion_simple']
         mock_simple.generate_image.side_effect = Exception("Subprocess failed")
 
-        mock_replicate = sys.modules['replicate']
         mock_replicate.run.return_value = ["https://replicate.com/image.png"]
 
         # Mock requests/httpx needed for downloading

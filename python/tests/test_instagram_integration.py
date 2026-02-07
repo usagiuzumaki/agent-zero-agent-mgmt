@@ -8,7 +8,6 @@ sys.path.append(os.getcwd())
 
 # Mock dependencies BEFORE importing anything that uses them
 sys.modules['flaredantic'] = MagicMock()
-sys.modules['requests'] = MagicMock()
 
 from python.helpers.aria_tools import _post_to_instagram
 
