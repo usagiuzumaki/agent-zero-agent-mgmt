@@ -4,6 +4,7 @@ import os
 import sys
 import tempfile
 import shutil
+import importlib
 
 # Add repo root to path
 sys.path.append(os.getcwd())
@@ -11,15 +12,22 @@ sys.path.append(os.getcwd())
 # Mock dependencies BEFORE importing
 sys.modules['torch'] = MagicMock()
 sys.modules['diffusers'] = MagicMock()
+# We set this here, but we MUST reload stable_diffusion in setUp to ensure it picks it up
 sys.modules['replicate'] = MagicMock()
 sys.modules['httpx'] = MagicMock()
 sys.modules['python.helpers.stable_diffusion_simple'] = MagicMock()
 
+# Import initially (might be stale)
 from python.helpers import stable_diffusion
 
 class TestStableDiffusion(unittest.TestCase):
 
     def setUp(self):
+        # Reload stable_diffusion to ensure it imports the MOCKS from sys.modules
+        # This is crucial because other tests might have loaded stable_diffusion with real modules
+        global stable_diffusion
+        stable_diffusion = importlib.reload(stable_diffusion)
+
         # Reset mocks
         sys.modules['replicate'].reset_mock()
         mock_simple = sys.modules['python.helpers.stable_diffusion_simple']
@@ -52,6 +60,7 @@ class TestStableDiffusion(unittest.TestCase):
         mock_simple.generate_image.side_effect = Exception("Subprocess failed")
 
         mock_replicate = sys.modules['replicate']
+        # The module uses replicate.run()
         mock_replicate.run.return_value = ["https://replicate.com/image.png"]
 
         # Mock requests/httpx needed for downloading
