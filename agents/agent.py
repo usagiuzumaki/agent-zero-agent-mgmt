@@ -569,9 +569,13 @@ class Agent:
         return self.hist_add_message(False, content=content)
 
     def concat_messages(
-        self, messages
+        self, messages, human_label="user", ai_label="assistant"
     ):  # TODO add param for message range, topic, history
-        return self.history.output_text(human_label="user", ai_label="assistant")
+        if hasattr(messages, "output_text"):
+            return messages.output_text(human_label=human_label, ai_label=ai_label)
+        if isinstance(messages, list):
+            return history.output_text(messages, human_label=human_label, ai_label=ai_label)
+        return self.history.output_text(human_label=human_label, ai_label=ai_label)
 
     def get_chat_model(self):
         return models.get_chat_model(
