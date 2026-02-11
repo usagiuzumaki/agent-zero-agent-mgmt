@@ -1,10 +1,13 @@
 import os
 import json
-import replicate
 import requests
 from typing import Dict, Any
 from python.helpers.tool import Tool, Response
 
+try:
+    import replicate
+except ImportError:
+    replicate = None
 
 class GenerateImage(Tool):
     """
@@ -25,8 +28,14 @@ class GenerateImage(Tool):
                 break_loop=False
             )
         
+        if replicate is None:
+             return Response(
+                message="❌ 'replicate' library is not installed.",
+                break_loop=False
+            )
+
         # Set the API token directly from environment
-        api_token = os.getenv("REPLICATE_API_TOKEN", "r8_V2fxPthzEVS2cS3ej43UJIlIzUam3Gj0nxHh6")
+        api_token = os.getenv("REPLICATE_API_TOKEN")
         if not api_token:
             return Response(
                 message="❌ REPLICATE_API_TOKEN not configured. Please set your Replicate API token.",
@@ -63,7 +72,7 @@ class GenerateImage(Tool):
                 image_url = output[0]
                 
                 # Download and save the image
-                response = requests.get(image_url)
+                response = requests.get(image_url, timeout=30)
                 if response.status_code == 200:
                     # Create directory if it doesn't exist
                     os.makedirs("generated_images", exist_ok=True)
