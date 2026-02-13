@@ -13,3 +13,7 @@
 ## 2026-01-20 - Actionable Empty States
 **Learning:** Empty states ("No documents found") are often dead ends. They are prime opportunities to guide the user towards the primary action (e.g., "Create Document").
 **Action:** Replace text-only empty states with "Hero" empty states: Icon + Title + Description + Primary Action Button.
+
+## 2025-02-17 - Visible Focus Indicators
+**Learning:** Default browser focus rings are often suppressed by resets or invisible on custom backgrounds, leaving keyboard users lost.
+**Action:** Always include a global `:focus-visible` style in the theme to ensure all interactive elements have a clear, high-contrast focus indicator.
