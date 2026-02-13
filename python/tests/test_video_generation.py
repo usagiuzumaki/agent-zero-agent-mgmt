@@ -3,10 +3,6 @@ from unittest.mock import patch, MagicMock, mock_open
 import os
 import sys
 
-# We need to mock 'requests' if it's not installed in the test environment,
-# but we assumed it is installed since we installed it earlier.
-import requests
-
 class TestVideoGeneration(unittest.TestCase):
     def setUp(self):
         # We need to reload the module to apply patches if we modify sys.modules or os.environ
