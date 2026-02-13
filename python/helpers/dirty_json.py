@@ -332,15 +332,24 @@ class DirtyJson:
     def _parse_unquoted_string(self):
         # Optimization: use list join instead of string concatenation
         result = []
-        while self.current_char is not None and self.current_char not in [
-            ":",
-            ",",
-            "}",
-            "]",
-        ]:
+        while self.current_char is not None:
+            if self.current_char in [",", "}", "]"]:
+                break
+
+            if self.current_char == ":":
+                # Check for URL pattern (e.g., http://)
+                # If : is followed by //, treat it as part of the string
+                if self._peek(2) == "//":
+                    result.append(self.current_char)
+                    self._advance()
+                    continue
+                else:
+                    break
+
             result.append(self.current_char)
             self._advance()
-        self._advance()
+
+        # Do not consume the delimiter (matching _parse_number behavior)
         return "".join(result).strip()
 
     def _peek(self, n):
