@@ -35,7 +35,9 @@ CHECK_DIRS = [
     "knowledge",
     "python",
     "webui",
-    "docs"
+    "docs",
+    "agents",
+    "prompts",
 ]
 
 IGNORE_DIRS = [
@@ -46,6 +48,7 @@ IGNORE_DIRS = [
     "tests", # Skip tests directory to avoid self-flagging this file if we rename it, but we should check other tests
     "tmp",
     "logs",
+    "_example",
 ]
 
 IGNORE_FILES = [
@@ -126,3 +129,16 @@ def test_branding_in_run_ui_boot_message():
 
     # Check for Aria Bot in boot message
     assert '[BOOT] Aria Bot' in content, "run_ui.py should contain '[BOOT] Aria Bot'"
+
+def test_branding_in_agents():
+    # Helper to check if a file contains "Aria Bot"
+    def check_file(path):
+        if not os.path.exists(path):
+            pytest.fail(f"File {path} not found")
+        with open(path, "r", encoding="utf-8") as f:
+            content = f.read()
+        assert "Aria Bot" in content, f"{path} should contain 'Aria Bot'"
+
+    # Check key agent files
+    check_file(os.path.join(REPO_ROOT, "agents/developer/prompts/agent.system.main.role.md"))
+    check_file(os.path.join(REPO_ROOT, "agents/researcher/prompts/agent.system.main.role.md"))
