@@ -50,7 +50,7 @@ mock_module("langchain.embeddings.base")
 import pytest
 import models
 from agents import AgentConfig
-from agents.screenwriting.pacing_metrics import PacingMetrics
+from agents.screenwriting.components.pacing_metrics import PacingMetrics
 import asyncio
 
 def dummy_config():

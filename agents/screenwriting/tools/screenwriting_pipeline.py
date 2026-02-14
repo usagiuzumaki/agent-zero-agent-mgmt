@@ -1,19 +1,19 @@
 from agents import Agent
 from python.helpers.tool import Tool, Response
-from agents.screenwriting.plot_analyzer import PlotAnalyzer
-from agents.screenwriting.creative_ideas import CreativeIdeas
-from agents.screenwriting.co_writer import CoWriter
-from agents.screenwriting.dialogue_evaluator import DialogueEvaluator
-from agents.screenwriting.script_formatter import ScriptFormatter
-from agents.screenwriting.world_builder import WorldBuilder
-from agents.screenwriting.character_analyzer import CharacterAnalyzer
-from agents.screenwriting.pacing_metrics import PacingMetrics
-from agents.screenwriting.emotional_tension import EmotionalTension
-from agents.screenwriting.marketability import Marketability
-from agents.screenwriting.mbti_evaluator import MBTIEvaluator
-from agents.screenwriting.scream_analyzer import ScreamAnalyzer
-from agents.screenwriting.storyboard_generator import StoryboardGenerator
-from agents.screenwriting.version_tracker import VersionTracker
+from agents.screenwriting.components.plot_analyzer import PlotAnalyzer
+from agents.screenwriting.components.creative_ideas import CreativeIdeas
+from agents.screenwriting.components.co_writer import CoWriter
+from agents.screenwriting.components.dialogue_evaluator import DialogueEvaluator
+from agents.screenwriting.components.script_formatter import ScriptFormatter
+from agents.screenwriting.components.world_builder import WorldBuilder
+from agents.screenwriting.components.character_analyzer import CharacterAnalyzer
+from agents.screenwriting.components.pacing_metrics import PacingMetrics
+from agents.screenwriting.components.emotional_tension import EmotionalTension
+from agents.screenwriting.components.marketability import Marketability
+from agents.screenwriting.components.mbti_evaluator import MBTIEvaluator
+from agents.screenwriting.components.scream_analyzer import ScreamAnalyzer
+from agents.screenwriting.components.storyboard_generator import StoryboardGenerator
+from agents.screenwriting.components.version_tracker import VersionTracker
 from python.helpers.print_style import PrintStyle
 
 
