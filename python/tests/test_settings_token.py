@@ -2,6 +2,7 @@ import unittest
 from unittest.mock import patch, MagicMock
 import sys
 import os
+import importlib
 
 # Mock modules that might not be available or side-effect heavy
 sys.modules['litellm'] = MagicMock()
@@ -22,17 +23,24 @@ from python.helpers import settings
 
 class TestSettingsToken(unittest.TestCase):
     def setUp(self):
+        # Setup mocks BEFORE reload
+        self.dotenv_mock = sys.modules['python.helpers.dotenv']
+        self.dotenv_mock.KEY_AUTH_LOGIN = "AUTH_LOGIN"
+        self.dotenv_mock.KEY_AUTH_PASSWORD = "AUTH_PASSWORD"
+
+        # Reload settings to ensure we have fresh module state and use mocks
+        global settings
+        settings = importlib.reload(settings)
+
+        # FORCE override of dotenv in settings to ensure it matches our mock
+        # This handles cases where relative imports might resolve differently during test reload
+        settings.dotenv = self.dotenv_mock
+
         # Reset settings global state
         settings._settings = None
         settings._final_settings = None
 
-        # Setup mocks
         self.runtime_mock = sys.modules['python.helpers.runtime']
-        self.dotenv_mock = sys.modules['python.helpers.dotenv']
-
-        # Set constants on the mocked dotenv module
-        self.dotenv_mock.KEY_AUTH_LOGIN = "AUTH_LOGIN"
-        self.dotenv_mock.KEY_AUTH_PASSWORD = "AUTH_PASSWORD"
 
         # Default mock return values
         self.runtime_mock.get_persistent_id.return_value = "test_runtime_id"
@@ -54,12 +62,17 @@ class TestSettingsToken(unittest.TestCase):
 
     def test_create_auth_token_with_env(self):
         """Test create_auth_token uses env vars when args are missing."""
-        self.dotenv_mock.get_dotenv_value.side_effect = lambda key, default=None: {
-            "AUTH_LOGIN": "env_user",
-            "AUTH_PASSWORD": "env_pass"
-        }.get(key, default)
+        def side_effect(key, default=None):
+            if str(key) == "AUTH_LOGIN":
+                return "env_user"
+            if str(key) == "AUTH_PASSWORD":
+                return "env_pass"
+            return default
+
+        self.dotenv_mock.get_dotenv_value.side_effect = side_effect
 
         token = settings.create_auth_token()
+
         token_expected = settings.create_auth_token(username="env_user", password="env_pass")
         self.assertEqual(token, token_expected)
 
