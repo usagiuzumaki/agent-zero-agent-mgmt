@@ -138,8 +138,9 @@ export default function StorybookUI() {
         <div className="storybook-upload">
           <h4>Ingest New Document</h4>
           <form onSubmit={handleUpload}>
-            <label className="input-label">Document Title</label>
+            <label className="input-label" htmlFor="doc-title-input">Document Title</label>
             <input
+              id="doc-title-input"
               type="text"
               placeholder="e.g. My Screenplay Draft"
               value={uploadName}
@@ -147,8 +148,9 @@ export default function StorybookUI() {
               className="input-field"
               autoFocus
             />
-            <label className="input-label">Paste Text Content</label>
+            <label className="input-label" htmlFor="doc-content-input">Paste Text Content</label>
             <textarea
+              id="doc-content-input"
               placeholder="Paste text content here to generate beats..."
               value={uploadContent}
               onChange={(e) => setUploadContent(e.target.value)}
@@ -204,12 +206,13 @@ export default function StorybookUI() {
                       className="btn-icon delete-doc-btn"
                       onClick={() => handleDelete(doc.id)}
                       title="Delete Document"
+                      aria-label="Delete Document"
                       disabled={deletingId === doc.id}
                     >
                       {deletingId === doc.id ? (
                         <Spinner size="small" />
                       ) : (
-                        <span>🗑️</span>
+                        <span aria-hidden="true">🗑️</span>
                       )}
                     </button>
                   </div>
@@ -220,8 +223,12 @@ export default function StorybookUI() {
         ) : (
           <div className="document-view">
              <div className="doc-header-row">
-                <button className="btn-back" onClick={() => setSelectedDoc(null)}>
-                    <span>←</span> Back to Library
+                <button
+                  className="btn-back"
+                  onClick={() => setSelectedDoc(null)}
+                  aria-label="Back to Library"
+                >
+                    <span aria-hidden="true">←</span> Back to Library
                 </button>
                 <h3 style={{margin:0}}>{selectedDoc.name}</h3>
                 <div style={{width: 60}}></div> {/* Spacer */}
