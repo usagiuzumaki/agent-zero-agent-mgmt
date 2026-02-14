@@ -4,6 +4,7 @@ Handles persistence and retrieval of screenwriting data
 """
 from flask import Blueprint, request, jsonify
 from python.helpers.screenwriting_manager import ScreenwritingManager
+from python.helpers.story_generator import StoryGenerator
 import json
 
 # Create Flask blueprint for screenwriting API
@@ -222,5 +223,26 @@ def delete_storybook_document():
         if manager.delete_document(doc_id):
             return jsonify({'message': 'Document deleted successfully'}), 200
         return jsonify({'error': 'Failed to delete document'}), 400
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@screenwriting_bp.route('/api/screenwriting/storybook/generate', methods=['POST'])
+async def generate_storybook_endpoint():
+    """Generate a storybook from a prompt using agents."""
+    try:
+        data = request.get_json()
+        prompt = data.get('prompt')
+
+        if not prompt:
+            return jsonify({'error': 'Missing prompt'}), 400
+
+        generator = StoryGenerator()
+        document = await generator.generate_story(prompt)
+
+        if manager.add_story_document(document):
+            return jsonify(document), 200
+
+        return jsonify({'error': 'Failed to save generated story'}), 500
     except Exception as e:
         return jsonify({'error': str(e)}), 500

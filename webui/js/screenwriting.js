@@ -235,15 +235,27 @@
             <div class="storybook-header">
                 <div>
                     <h3>Storybook Builder</h3>
-                    <p class="storybook-subtitle">Upload drafts to auto-build chapters, beats, and visual prompts.</p>
+                    <p class="storybook-subtitle">Upload drafts or generate stories from scratch.</p>
                 </div>
                 <button class="storybook-close" aria-label="Close" type="button">×</button>
             </div>
             <div class="storybook-upload">
-                <input id="storybook-file" type="file" accept=".txt,.md,.fountain,.pdf,.docx" />
-                <input id="storybook-name" type="text" placeholder="Document name (optional)" />
-                <textarea id="storybook-description" rows="2" placeholder="Context or notes for this upload"></textarea>
-                <button id="storybook-generate" class="storybook-action">Generate Storybook</button>
+                <div class="storybook-section">
+                    <h4>Upload Draft</h4>
+                    <input id="storybook-file" type="file" accept=".txt,.md,.fountain,.pdf,.docx" />
+                    <input id="storybook-name" type="text" placeholder="Document name (optional)" />
+                    <textarea id="storybook-description" rows="2" placeholder="Context or notes for this upload"></textarea>
+                    <button id="storybook-generate" class="storybook-action">Ingest Draft</button>
+                </div>
+
+                <div class="storybook-divider" style="margin: 1rem 0; border-top: 1px solid var(--color-border); opacity: 0.3;"></div>
+
+                <div class="storybook-section">
+                    <h4>Auto-Generate Story</h4>
+                    <p class="storybook-hint" style="font-size: 0.8em; opacity: 0.7; margin-bottom: 0.5rem;">Let AI create a full story package from your idea.</p>
+                    <textarea id="storybook-prompt" rows="3" placeholder="Describe your story idea... (e.g. 'A cyberpunk noir where the detective is an AI')"></textarea>
+                    <button id="storybook-auto-write" class="storybook-action primary">✨ Auto-Write Story</button>
+                </div>
             </div>
             <div class="storybook-content">
                 <div class="storybook-column">
@@ -275,7 +287,45 @@
 
         panel.querySelector('.storybook-close').addEventListener('click', () => toggleStorybookPanel(false));
         panel.querySelector('#storybook-generate').addEventListener('click', ingestStorybookFromUpload);
+        panel.querySelector('#storybook-auto-write').addEventListener('click', generateStorybookFromPrompt);
         panel.querySelector('#storybook-suggestions-btn').addEventListener('click', showStorybookSuggestions);
+    }
+
+    async function generateStorybookFromPrompt() {
+        const promptInput = document.getElementById('storybook-prompt');
+        if (!promptInput || !promptInput.value.trim()) {
+            alert('Please enter a story idea.');
+            return;
+        }
+
+        const btn = document.getElementById('storybook-auto-write');
+        const originalText = btn.textContent;
+        btn.textContent = '✨ Generating... (this may take a minute)';
+        btn.disabled = true;
+
+        try {
+            const response = await fetch('/api/screenwriting/storybook/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: promptInput.value.trim() })
+            });
+
+            if (response.ok) {
+                const doc = await response.json();
+                storybookState.documents.unshift(doc);
+                renderStorybookDocument(doc);
+                promptInput.value = ''; // clear input
+            } else {
+                const error = await response.json();
+                alert('Failed to generate story: ' + (error.error || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error('Failed to generate story', error);
+            alert('Error generating story.');
+        } finally {
+            btn.textContent = originalText;
+            btn.disabled = false;
+        }
     }
 
     function toggleStorybookPanel(forceOpen = false) {
