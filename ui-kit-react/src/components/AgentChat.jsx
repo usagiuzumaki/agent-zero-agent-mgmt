@@ -109,6 +109,18 @@ export default function AgentChat({ onLog }) {
             }
             title="Aria"
             description="I'm here to help with your screenwriting tasks. Type a message or select a tool to get started."
+            action={
+              <button
+                onClick={() => {
+                  setInput('Hello! What can you do?');
+                  textareaRef.current?.focus();
+                }}
+                className="agent-launcher"
+                style={{ position: 'static', transform: 'none' }}
+              >
+                Say Hello 👋
+              </button>
+            }
           />
         ) : (
           <MessageList messages={messages} bottomRef={messagesEndRef} />
