@@ -40,6 +40,8 @@ class Screenwriting(Tool):
                 return await self._search_quotes(args)
             elif operation == 'ingest_storybook':
                 return await self._ingest_storybook(args)
+            elif operation == 'generate_story':
+                return await self._generate_story(args)
             else:
                 return Response(message=f"Unknown operation: {operation}", break_loop=False)
         except Exception as e:
@@ -169,6 +171,26 @@ class Screenwriting(Tool):
             return Response(message=formatted, break_loop=True)
 
         return Response(message="Failed to ingest storybook document", break_loop=False)
+
+    async def _generate_story(self, args):
+        """Generate a story from a prompt."""
+        prompt = args.get('prompt')
+        if not prompt:
+             return Response(message="Prompt is required for story generation.", break_loop=False)
+
+        # Import locally to avoid circular dependency
+        from python.helpers.story_generator import StoryGenerator
+
+        try:
+            generator = StoryGenerator()
+            document = await generator.generate_story(prompt)
+            if self.manager.add_story_document(document):
+                formatted = self._format_storybook({'documents': [document]})
+                return Response(message=f"✨ Story Generated Successfully!\n\n{formatted}", break_loop=True)
+            else:
+                return Response(message="Failed to save generated story.", break_loop=False)
+        except Exception as e:
+            return Response(message=f"Error generating story: {str(e)}", break_loop=False)
     
     async def _search_quotes(self, args):
         """Search for quotes"""
