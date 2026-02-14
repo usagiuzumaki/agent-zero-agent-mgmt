@@ -1,7 +1,7 @@
-# Agent Zero Backup/Restore Backend Specification
+# Aria Bot Backup/Restore Backend Specification
 
 ## Overview
-This specification defines the backend implementation for Agent Zero's backup and restore functionality, providing users with the ability to backup and restore their Agent Zero configurations, data, and custom files using glob pattern-based selection. The backup functionality is implemented as a dedicated "backup" tab in the settings interface for easy access and organization.
+This specification defines the backend implementation for Aria Bot's backup and restore functionality, providing users with the ability to backup and restore their Aria Bot configurations, data, and custom files using glob pattern-based selection. The backup functionality is implemented as a dedicated "backup" tab in the settings interface for easy access and organization.
 
 ## Core Requirements
 
@@ -25,7 +25,7 @@ Add backup/restore section with dedicated tab to `python/helpers/settings.py`:
 
 **Integration Notes:**
 - Leverages existing settings button handler pattern (follows MCP servers example)
-- Integrates with Agent Zero's established error handling and toast notification system
+- Integrates with Aria Bot's established error handling and toast notification system
 - Uses existing file operation helpers with RFC support for development mode compatibility
 
 ```python
@@ -33,7 +33,7 @@ Add backup/restore section with dedicated tab to `python/helpers/settings.py`:
 backup_section: SettingsSection = {
     "id": "backup_restore",
     "title": "Backup & Restore",
-    "description": "Backup and restore Agent Zero data and configurations using glob pattern-based file selection.",
+    "description": "Backup and restore Aria Bot data and configurations using glob pattern-based file selection.",
     "fields": [
         {
             "id": "backup_create",
@@ -64,11 +64,11 @@ def _get_default_patterns(self) -> str:
     agent_root = self.agent_zero_root.rstrip('/')
     user_home = self.user_home.rstrip('/')
 
-    return f"""# Agent Zero Knowledge (excluding defaults)
+    return f"""# Aria Bot Knowledge (excluding defaults)
 {agent_root}/knowledge/**
 !{agent_root}/knowledge/default/**
 
-# Agent Zero Instruments (excluding defaults)
+# Aria Bot Instruments (excluding defaults)
 {agent_root}/instruments/**
 !{agent_root}/instruments/default/**
 
@@ -106,7 +106,7 @@ def _get_default_patterns(self) -> str:
 !/home/rafael/.*
 ```
 
-> **⚠️ CRITICAL FILE NOTICE**: The `{agent_root}/.env` file contains essential configuration including API keys, model settings, and runtime parameters. This file is **REQUIRED** for Agent Zero to function properly and should always be included in backups alongside `settings.json`. Without this file, restored Agent Zero instances will not have access to configured language models or external services.
+> **⚠️ CRITICAL FILE NOTICE**: The `{agent_root}/.env` file contains essential configuration including API keys, model settings, and runtime parameters. This file is **REQUIRED** for Aria Bot to function properly and should always be included in backups alongside `settings.json`. Without this file, restored Aria Bot instances will not have access to configured language models or external services.
 
 ### 2. API Endpoints
 
@@ -473,7 +473,7 @@ class BackupInspect(ApiHandler):
 **File**: `python/helpers/backup.py`
 
 **RFC Integration Notes:**
-The BackupService leverages Agent Zero's existing file operation helpers which already support RFC (Remote Function Call) routing for development mode. This ensures seamless operation whether running in direct mode or with container isolation.
+The BackupService leverages Aria Bot's existing file operation helpers which already support RFC (Remote Function Call) routing for development mode. This ensures seamless operation whether running in direct mode or with container isolation.
 
 ```python
 import zipfile
@@ -488,11 +488,11 @@ from python.helpers import files, runtime, git
 import shutil
 
 class BackupService:
-    """Core backup and restore service for Agent Zero"""
+    """Core backup and restore service for Aria Bot"""
 
     def __init__(self):
         self.agent_zero_version = self._get_agent_zero_version()
-        self.agent_zero_root = files.get_abs_path("")  # Resolved Agent Zero root
+        self.agent_zero_root = files.get_abs_path("")  # Resolved Aria Bot root
         self.user_home = os.path.expanduser("~")       # Current user's home directory
 
     def _get_default_patterns(self) -> str:
@@ -500,7 +500,7 @@ class BackupService:
         return DEFAULT_BACKUP_PATTERNS
 
     def _get_agent_zero_version(self) -> str:
-        """Get current Agent Zero version"""
+        """Get current Aria Bot version"""
         try:
             # Get version from git info (same as run_ui.py)
             gitinfo = git.get_git_info()
@@ -1234,8 +1234,8 @@ pathspec>=0.10.0  # For gitignore-style pattern matching
 psutil>=5.8.0     # For system information collection
 ```
 
-#### Agent Zero Internal Dependencies
-The backup system requires these Agent Zero helper modules:
+#### Aria Bot Internal Dependencies
+The backup system requires these Aria Bot helper modules:
 - `python.helpers.git` - For version detection using git.get_git_info() (consistent with run_ui.py)
 - `python.helpers.files` - For file operations and path resolution
 - `python.helpers.runtime` - For development/production mode detection
@@ -1247,14 +1247,14 @@ pip install pathspec psutil
 
 ### 5. Error Handling
 
-#### Integration with Agent Zero Error System
-The backup system integrates with Agent Zero's existing error handling infrastructure:
+#### Integration with Aria Bot Error System
+The backup system integrates with Aria Bot's existing error handling infrastructure:
 
 ```python
 from python.helpers.errors import format_error
 from python.helpers.print_style import PrintStyle
 
-# Follow Agent Zero's error handling patterns
+# Follow Aria Bot's error handling patterns
 try:
     result = await backup_operation()
     return {"success": True, "data": result}
@@ -1333,7 +1333,7 @@ BACKUP_CONFIG = {
 
 #### Future Integration Opportunities
 **Task Scheduler Integration:**
-Agent Zero's existing task scheduler could be extended to support automated backups:
+Aria Bot's existing task scheduler could be extended to support automated backups:
 
 ```python
 # Potential future enhancement - scheduled backups
@@ -1352,11 +1352,11 @@ Agent Zero's existing task scheduler could be extended to support automated back
 ## Enhanced Metadata Structure and Restore Workflow
 
 ### Version Detection Implementation
-The backup system uses the same version detection method as Agent Zero's main UI:
+The backup system uses the same version detection method as Aria Bot's main UI:
 
 ```python
 def _get_agent_zero_version(self) -> str:
-    """Get current Agent Zero version"""
+    """Get current Aria Bot version"""
     try:
         # Get version from git info (same as run_ui.py)
         gitinfo = git.get_git_info()
@@ -1427,11 +1427,11 @@ The backup archive includes a comprehensive `metadata.json` file with the follow
 ### Enhanced Metadata Structure
 The backup metadata has been significantly enhanced to include:
 - **System Information**: Platform, architecture, Python version, CPU count, memory, disk usage
-- **Environment Details**: User, timezone, working directory, runtime mode, Agent Zero root path
+- **Environment Details**: User, timezone, working directory, runtime mode, Aria Bot root path
 - **Backup Author**: System identifier (user@hostname) for backup tracking
 - **File Checksums**: SHA-256 hashes for all backed up files for integrity verification
 - **Backup Statistics**: Total files, directories, sizes with verification methods
-- **Compatibility Data**: Agent Zero version and environment for restoration validation
+- **Compatibility Data**: Aria Bot version and environment for restoration validation
 
 ### Smart File Management
 - **Grouped File Preview**: Organize files by directory structure with depth limitation (max 3 levels)
@@ -1464,7 +1464,7 @@ The backup metadata has been significantly enhanced to include:
 - **Path Security**: Enhanced validation with system information context
 - **Backup Validation**: Version compatibility checking and environment verification
 
-This enhanced backend specification provides a production-ready, comprehensive backup and restore system with advanced metadata tracking, real-time progress monitoring, and intelligent file management capabilities, all while maintaining Agent Zero's architectural patterns and security standards.
+This enhanced backend specification provides a production-ready, comprehensive backup and restore system with advanced metadata tracking, real-time progress monitoring, and intelligent file management capabilities, all while maintaining Aria Bot's architectural patterns and security standards.
 
 ### Implementation Status Updates
 
@@ -1472,7 +1472,7 @@ This enhanced backend specification provides a production-ready, comprehensive b
 - **Git Version Integration**: Updated to use `git.get_git_info()` consistent with `run_ui.py`
 - **Type Safety**: Fixed psutil return values to be strings for JSON metadata consistency
 - **Code Quality**: All linting errors resolved, proper import structure
-- **Testing Verified**: BackupService initializes correctly and detects Agent Zero root paths
+- **Testing Verified**: BackupService initializes correctly and detects Aria Bot root paths
 - **Dependencies Added**: pathspec>=0.10.0 for pattern matching, psutil>=5.8.0 for system info
 - **Git Helper Integration**: Uses python.helpers.git.get_git_info() for version detection consistency
 
@@ -1550,7 +1550,7 @@ if not include_hidden and file.startswith('.'):
 - **Explicit patterns** (like `/a0/.env`) - Always included regardless of `include_hidden` setting
 - **Wildcard discoveries** (like `/a0/*`) - Respect the `include_hidden` setting
 
-**Result:** Critical files like `.env` are now properly backed up when explicitly specified, ensuring Agent Zero configurations are preserved.
+**Result:** Critical files like `.env` are now properly backed up when explicitly specified, ensuring Aria Bot configurations are preserved.
 
 ### **Implementation Status: ✅ PRODUCTION READY**
 
@@ -1568,7 +1568,7 @@ The backup system is now:
 - ✅ **Cleaner API** - Only endpoints that are actually used
 - ✅ **Better reliability** - Removed complex features that weren't properly implemented
 
-The Agent Zero backup system is now production-ready and battle-tested! 🚀
+The Aria Bot backup system is now production-ready and battle-tested! 🚀
 
 ## ✅ **FINAL STATUS: ACE EDITOR STATE GUARANTEE COMPLETED (December 2024)**
 
@@ -1687,7 +1687,7 @@ async def _find_files_to_clean_with_user_metadata(self, user_metadata: Dict[str,
 #### **✅ Cross-System Compatibility:**
 - Path translation preserves technical functionality
 - Users don't need to manually adjust paths
-- Works seamlessly between different Agent Zero installations
+- Works seamlessly between different Aria Bot installations
 - Maintains backup portability across environments
 
 #### **✅ Clean Architecture:**
@@ -1698,7 +1698,7 @@ async def _find_files_to_clean_with_user_metadata(self, user_metadata: Dict[str,
 
 ### **Final Status: ✅ PRODUCTION READY**
 
-The Agent Zero backup system now provides:
+The Aria Bot backup system now provides:
 - **✅ Complete user control** via ACE editor state
 - **✅ Cross-system compatibility** through intelligent path translation
 - **✅ Clean, maintainable code** with dead code eliminated
