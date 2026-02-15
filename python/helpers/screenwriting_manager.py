@@ -316,6 +316,22 @@ class ScreenwritingManager:
                 return self.save_data('storybook', storybook)
         return False
 
+    def add_story_document(self, document_data: Dict[str, Any]) -> bool:
+        """Directly add a structured storybook document."""
+        storybook = self.load_data('storybook') or self._get_default_structure('storybook')
+
+        # Ensure ID exists
+        if 'id' not in document_data:
+            document_data['id'] = hashlib.md5(
+                f"{document_data.get('name', '')}_{datetime.now().isoformat()}".encode()
+            ).hexdigest()[:8]
+
+        if 'uploaded_at' not in document_data:
+            document_data['uploaded_at'] = datetime.now().isoformat()
+
+        storybook['documents'].append(document_data)
+        return self.save_data('storybook', storybook)
+
     def ingest_story_document(
         self,
         name: str,

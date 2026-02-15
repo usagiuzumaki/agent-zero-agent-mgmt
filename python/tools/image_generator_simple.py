@@ -4,15 +4,21 @@ Simplified image generation tool that bypasses import issues
 """
 import os
 import json
-import urllib.request
-import urllib.parse
+import time
 from datetime import datetime
+import requests
 
 def generate_image_direct(prompt, output_dir="outputs"):
     """Generate image using direct HTTP requests to Replicate API"""
     
     # API configuration
-    api_token = os.getenv("REPLICATE_API_TOKEN", "r8_IamCkTsQVQVc4C98QySJXkub1HXoIQn4YT5E9")
+    api_token = os.getenv("REPLICATE_API_TOKEN")
+    if not api_token:
+        return {
+            "success": False,
+            "message": "❌ REPLICATE_API_TOKEN not configured"
+        }
+
     model_version = "39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b"
     
     # Create prediction
@@ -22,7 +28,7 @@ def generate_image_direct(prompt, output_dir="outputs"):
         "Content-Type": "application/json"
     }
     
-    data = json.dumps({
+    payload = {
         "version": model_version,
         "input": {
             "prompt": prompt,
@@ -34,24 +40,24 @@ def generate_image_direct(prompt, output_dir="outputs"):
             "num_inference_steps": 25,
             "guidance_scale": 7.5
         }
-    }).encode()
+    }
     
     try:
         # Create prediction
-        req = urllib.request.Request(url, data=data, headers=headers)
-        response = urllib.request.urlopen(req)
-        prediction = json.loads(response.read())
+        response = requests.post(url, json=payload, headers=headers, timeout=30)
+        response.raise_for_status()
+        prediction = response.json()
         
         prediction_id = prediction["id"]
         
         # Poll for completion
-        import time
         max_attempts = 60
         for attempt in range(max_attempts):
             status_url = f"https://api.replicate.com/v1/predictions/{prediction_id}"
-            req = urllib.request.Request(status_url, headers={"Authorization": f"Bearer {api_token}"})
-            response = urllib.request.urlopen(req)
-            result = json.loads(response.read())
+
+            response = requests.get(status_url, headers=headers, timeout=10)
+            response.raise_for_status()
+            result = response.json()
             
             if result["status"] == "succeeded":
                 # Download image
@@ -60,8 +66,11 @@ def generate_image_direct(prompt, output_dir="outputs"):
                 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
                 filename = f"{output_dir}/image_{timestamp}.png"
                 
-                # Download with urllib
-                urllib.request.urlretrieve(image_url, filename)
+                # Download with requests
+                img_response = requests.get(image_url, timeout=30)
+                img_response.raise_for_status()
+                with open(filename, "wb") as f:
+                    f.write(img_response.content)
                 
                 return {
                     "success": True,

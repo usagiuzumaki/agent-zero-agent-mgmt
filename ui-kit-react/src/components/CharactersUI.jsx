@@ -8,7 +8,7 @@ export default function CharactersUI() {
   const [characters, setCharacters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [showForm, setShowForm] = useState(false);
+  const [showDrawer, setShowDrawer] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
 
@@ -49,22 +49,22 @@ export default function CharactersUI() {
       bio: char.bio || ''
     });
     setEditingId(char.id);
-    setShowForm(true);
-    // Scroll to form
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setShowDrawer(true);
   }, []);
 
   const handleCancel = useCallback(() => {
-    setShowForm(false);
-    setEditingId(null);
-    setNewChar({
-      name: '',
-      role: 'Protagonist',
-      archetype: '',
-      motivation: '',
-      flaw: '',
-      bio: ''
-    });
+    setShowDrawer(false);
+    setTimeout(() => {
+        setEditingId(null);
+        setNewChar({
+          name: '',
+          role: 'Protagonist',
+          archetype: '',
+          motivation: '',
+          flaw: '',
+          bio: ''
+        });
+    }, 300); // Wait for transition
   }, []);
 
   const handleDelete = useCallback(async (charId) => {
@@ -80,7 +80,6 @@ export default function CharactersUI() {
 
       if (response.ok) {
         fetchCharacters();
-        // If we were editing this character, reset form
         if (editingId === charId) {
           handleCancel();
         }
@@ -98,7 +97,6 @@ export default function CharactersUI() {
     try {
       let response;
       if (editingId) {
-        // Update existing character
         response = await fetch('/api/screenwriting/character/update', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -108,7 +106,6 @@ export default function CharactersUI() {
           })
         });
       } else {
-        // Create new character
         response = await fetch('/api/screenwriting/character/add', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -117,8 +114,9 @@ export default function CharactersUI() {
       }
 
       if (response.ok) {
-        handleCancel();
+        setShowDrawer(false);
         fetchCharacters();
+        handleCancel(); // Reset form
       }
     } catch (err) {
       console.error("Failed to save character", err);
@@ -127,10 +125,19 @@ export default function CharactersUI() {
     }
   };
 
+  const handleGenerate = () => {
+     // Mock generation
+     setNewChar(prev => ({
+         ...prev,
+         archetype: prev.archetype || 'The Reluctant Hero',
+         motivation: prev.motivation || 'To save their family from impending doom.',
+         flaw: prev.flaw || 'Cannot trust anyone.'
+     }));
+  };
+
   if (loading) return (
-    <div className="loading-container">
-      <Spinner size="lg" color="primary" />
-      <p>Loading Cast...</p>
+    <div className="loading-container" style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%'}}>
+      <Spinner size="large" color="primary" />
     </div>
   );
 
@@ -139,133 +146,23 @@ export default function CharactersUI() {
       <div className="chars-header">
         <h3>Cast of Characters</h3>
         <button
-          className={showForm ? "btn-secondary" : "btn-primary"}
-          onClick={showForm ? handleCancel : () => setShowForm(true)}
-          aria-expanded={showForm}
-          aria-controls="char-form"
+          className="btn-studio-primary"
+          onClick={() => setShowDrawer(true)}
         >
-          {showForm ? 'Cancel' : '+ Add Character'}
+          + Add Character
         </button>
       </div>
-
-      {showForm && (
-        <div id="char-form" className="char-form-card">
-          <h4>{editingId ? 'Edit Character Profile' : 'New Character Profile'}</h4>
-          <form onSubmit={handleSubmit}>
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="char-name">
-                  Name <span className="required-star" aria-hidden="true">*</span>
-                </label>
-                <input
-                  id="char-name"
-                  value={newChar.name}
-                  onChange={e => setNewChar({...newChar, name: e.target.value})}
-                  required
-                  aria-required="true"
-                  placeholder="Character Name"
-                  autoFocus
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="char-role">Role</label>
-                <select
-                  id="char-role"
-                  value={newChar.role}
-                  onChange={e => setNewChar({...newChar, role: e.target.value})}
-                >
-                  <option>Protagonist</option>
-                  <option>Antagonist</option>
-                  <option>Supporting</option>
-                  <option>Minor</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="char-archetype">Archetype</label>
-                <input
-                  id="char-archetype"
-                  placeholder="e.g. The Reluctant Hero"
-                  value={newChar.archetype}
-                  onChange={e => setNewChar({...newChar, archetype: e.target.value})}
-                />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="char-motivation">Motivation (Want)</label>
-                <input
-                  id="char-motivation"
-                  value={newChar.motivation}
-                  onChange={e => setNewChar({...newChar, motivation: e.target.value})}
-                  placeholder="What drives them?"
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="char-flaw">Fatal Flaw (Need)</label>
-                <input
-                  id="char-flaw"
-                  value={newChar.flaw}
-                  onChange={e => setNewChar({...newChar, flaw: e.target.value})}
-                  placeholder="What holds them back?"
-                />
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="char-bio">Bio & Notes</label>
-              <textarea
-                id="char-bio"
-                rows={3}
-                value={newChar.bio}
-                onChange={e => setNewChar({...newChar, bio: e.target.value})}
-                placeholder="Backstory, physical description, or key traits..."
-              />
-            </div>
-
-            <div className="form-actions">
-              <button
-                type="button"
-                className="btn-secondary"
-                onClick={handleCancel}
-                style={{ marginRight: '1rem' }}
-              >
-                Cancel
-              </button>
-              <button type="submit" className="btn-save" disabled={isSaving} style={{ marginTop: 0 }}>
-                {isSaving ? (
-                  <div className="btn-save-content">
-                    <Spinner size="small" color="white" />
-                    <span>Saving...</span>
-                  </div>
-                ) : (
-                  'Save Character'
-                )}
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
 
       <div className="chars-grid">
         {characters.length === 0 ? (
           <EmptyState
-            icon={
-              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                <circle cx="9" cy="7" r="4"></circle>
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-              </svg>
-            }
-            description="No characters yet. Every story needs a cast!"
+            icon={<span>👥</span>}
+            title="No Characters Yet"
+            description="Every story needs a cast!"
             action={
               <button
-                className="btn-primary"
-                onClick={() => setShowForm(true)}
+                className="btn-studio-primary"
+                onClick={() => setShowDrawer(true)}
               >
                 Create First Character
               </button>
@@ -282,6 +179,104 @@ export default function CharactersUI() {
             />
           ))
         )}
+      </div>
+
+      {/* Side Drawer */}
+      <div className={`char-drawer-overlay ${showDrawer ? 'open' : ''}`} onClick={(e) => {
+          if(e.target === e.currentTarget) handleCancel();
+      }}>
+        <div className="char-drawer">
+            <div className="drawer-header">
+                <h4>{editingId ? 'Edit Profile' : 'New Character'}</h4>
+            </div>
+
+            <form onSubmit={handleSubmit} className="drawer-form">
+                <div className="form-group">
+                    <label htmlFor="char-name">Name</label>
+                    <input
+                        id="char-name"
+                        value={newChar.name}
+                        onChange={e => setNewChar({...newChar, name: e.target.value})}
+                        required
+                        placeholder="Character Name"
+                        autoFocus
+                    />
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="char-role">Role</label>
+                    <select
+                        id="char-role"
+                        value={newChar.role}
+                        onChange={e => setNewChar({...newChar, role: e.target.value})}
+                    >
+                        <option>Protagonist</option>
+                        <option>Antagonist</option>
+                        <option>Supporting</option>
+                        <option>Minor</option>
+                    </select>
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="char-archetype">Archetype</label>
+                    <input
+                        id="char-archetype"
+                        placeholder="e.g. The Reluctant Hero"
+                        value={newChar.archetype}
+                        onChange={e => setNewChar({...newChar, archetype: e.target.value})}
+                    />
+                    {!editingId && !newChar.archetype && (
+                        <button type="button" className="btn-generate" onClick={handleGenerate}>
+                            ✨ Generate Traits
+                        </button>
+                    )}
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="char-motivation">Want (Motivation)</label>
+                    <input
+                        id="char-motivation"
+                        value={newChar.motivation}
+                        onChange={e => setNewChar({...newChar, motivation: e.target.value})}
+                        placeholder="What drives them?"
+                    />
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="char-flaw">Need (Fatal Flaw)</label>
+                    <input
+                        id="char-flaw"
+                        value={newChar.flaw}
+                        onChange={e => setNewChar({...newChar, flaw: e.target.value})}
+                        placeholder="What holds them back?"
+                    />
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="char-bio">Bio & Notes</label>
+                    <textarea
+                        id="char-bio"
+                        rows={6}
+                        value={newChar.bio}
+                        onChange={e => setNewChar({...newChar, bio: e.target.value})}
+                        placeholder="Backstory, physical description..."
+                    />
+                </div>
+
+                <div className="drawer-footer">
+                    <button
+                        type="button"
+                        className="btn-studio-secondary"
+                        onClick={handleCancel}
+                    >
+                        Cancel
+                    </button>
+                    <button type="submit" className="btn-studio-primary" disabled={isSaving}>
+                        {isSaving ? <Spinner size="small" color="white" /> : 'Save Profile'}
+                    </button>
+                </div>
+            </form>
+        </div>
       </div>
     </div>
   );

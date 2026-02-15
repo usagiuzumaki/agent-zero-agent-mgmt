@@ -1,32 +1,32 @@
-![Agent Zero Logo](res/header.png)
-# Agent Zero Documentation
-To begin with Agent Zero, follow the links below for detailed guides on various topics:
+![Aria Bot Logo](res/header.png)
+# Aria Bot Documentation
+To begin with Aria Bot, follow the links below for detailed guides on various topics:
 
-- **[Installation](installation.md):** Set up (or [update](installation.md#how-to-update-agent-zero)) Agent Zero on your system.
+- **[Installation](installation.md):** Set up (or [update](installation.md#how-to-update-aria-bot)) Aria Bot on your system.
 - **[Usage Guide](usage.md):** Explore GUI features and usage scenarios.
 - **[Architecture Overview](architecture.md):** Understand the internal workings of the framework.
-- **[Contributing](contribution.md):** Learn how to contribute to the Agent Zero project.
+- **[Contributing](contribution.md):** Learn how to contribute to the Aria Bot project.
 - **[Troubleshooting and FAQ](troubleshooting.md):** Find answers to common issues and questions.
 
-### Your experience with Agent Zero starts now!
+### Your experience with Aria Bot starts now!
 
-- **Download Agent Zero:** Follow the [installation guide](installation.md) to download and run Agent Zero.
-- **Join the Community:** Join the Agent Zero [Skool](https://www.skool.com/agent-zero) or [Discord](https://discord.gg/B8KZKNsPpj) community to discuss ideas, ask questions, and collaborate with other contributors.
-- **Share your Work:** Share your Agent Zero creations, workflows and discoverings on our [Show and Tell](https://github.com/agent0ai/agent-zero/discussions/categories/show-and-tell) area on GitHub.
+- **Download Aria Bot:** Follow the [installation guide](installation.md) to download and run Aria Bot.
+- **Join the Community:** Join the Agent Zero [Skool](https://www.skool.com/agent-zero) or [Discord](https://discord.gg/B8KZKNsPpj) community to discuss ideas, ask questions, and collaborate with other contributors. (Aria Bot is a spin-off of Agent Zero).
+- **Share your Work:** Share your Aria Bot creations, workflows and discoverings on our [Show and Tell](https://github.com/agent0ai/agent-zero/discussions/categories/show-and-tell) area on GitHub.
 - **Report Issues:** Use the [GitHub issue tracker](https://github.com/agent0ai/agent-zero/issues) to report framework-relative bugs or suggest new features.
 
 ## Table of Contents
 
-- [Welcome to the Agent Zero Documentation](#agent-zero-documentation)
-  - [Your Experience with Agent Zero](#your-experience-with-agent-zero-starts-now)
+- [Welcome to the Aria Bot Documentation](#aria-bot-documentation)
+  - [Your Experience with Aria Bot](#your-experience-with-aria-bot-starts-now)
   - [Table of Contents](#table-of-contents)
 - [Installation Guide](installation.md)
   - [Windows, macOS and Linux Setup](installation.md#windows-macos-and-linux-setup-guide)
   - [Settings Configuration](installation.md#settings-configuration)
   - [Choosing Your LLMs](installation.md#choosing-your-llms)
   - [Installing and Using Ollama](installation.md#installing-and-using-ollama-local-models)
-  - [Using Agent Zero on Mobile](installation.md#using-agent-zero-on-your-mobile-device)
-  - [How to Update Agent Zero](installation.md#how-to-update-agent-zero)
+  - [Using Aria Bot on Mobile](installation.md#using-aria-bot-on-your-mobile-device)
+  - [How to Update Aria Bot](installation.md#how-to-update-aria-bot)
   - [Full Binaries Installation](installation.md#in-depth-guide-for-full-binaries-installation)
 - [Usage Guide](usage.md)
   - [Basic Operations](usage.md#basic-operations)

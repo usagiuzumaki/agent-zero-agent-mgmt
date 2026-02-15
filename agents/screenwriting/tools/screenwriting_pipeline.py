@@ -1,18 +1,19 @@
 from agents import Agent
 from python.helpers.tool import Tool, Response
-from agents.screenwriting.plot_analyzer import PlotAnalyzer
-from agents.screenwriting.creative_ideas import CreativeIdeas
-from agents.screenwriting.co_writer import CoWriter
-from agents.screenwriting.dialogue_evaluator import DialogueEvaluator
-from agents.screenwriting.script_formatter import ScriptFormatter
-from agents.screenwriting.world_builder import WorldBuilder
-from agents.screenwriting.character_analyzer import CharacterAnalyzer
-from agents.screenwriting.pacing_metrics import PacingMetrics
-from agents.screenwriting.emotional_tension import EmotionalTension
-from agents.screenwriting.marketability import Marketability
-from agents.screenwriting.mbti_evaluator import MBTIEvaluator
-from agents.screenwriting.scream_analyzer import ScreamAnalyzer
-from agents.screenwriting.storyboard_generator import StoryboardGenerator
+from agents.screenwriting.components.plot_analyzer import PlotAnalyzer
+from agents.screenwriting.components.creative_ideas import CreativeIdeas
+from agents.screenwriting.components.co_writer import CoWriter
+from agents.screenwriting.components.dialogue_evaluator import DialogueEvaluator
+from agents.screenwriting.components.script_formatter import ScriptFormatter
+from agents.screenwriting.components.world_builder import WorldBuilder
+from agents.screenwriting.components.character_analyzer import CharacterAnalyzer
+from agents.screenwriting.components.pacing_metrics import PacingMetrics
+from agents.screenwriting.components.emotional_tension import EmotionalTension
+from agents.screenwriting.components.marketability import Marketability
+from agents.screenwriting.components.mbti_evaluator import MBTIEvaluator
+from agents.screenwriting.components.scream_analyzer import ScreamAnalyzer
+from agents.screenwriting.components.storyboard_generator import StoryboardGenerator
+from agents.screenwriting.components.version_tracker import VersionTracker
 from python.helpers.print_style import PrintStyle
 
 
@@ -54,6 +55,7 @@ class ScreenwritingPipeline(Tool):
                       include_mbti: bool = False,
                       include_scream: bool = False,
                       include_storyboard: bool = False,
+                      include_version_history: bool = False,
                       **kwargs):
         """
         Executes a screenwriting task by passing it through a chain of specialized agents.
@@ -69,6 +71,7 @@ class ScreenwritingPipeline(Tool):
             include_mbti (bool): Whether to include MBTI evaluation.
             include_scream (bool): Whether to include scream/intensity analysis.
             include_storyboard (bool): Whether to include storyboard generation.
+            include_version_history (bool): Whether to include version tracking.
         """
         if not task:
             return Response(
@@ -92,7 +95,8 @@ class ScreenwritingPipeline(Tool):
             results.append(await self._run_stage(CharacterAnalyzer, "Character Analyzer", "analyze", current_input))
             current_input = results[-1]
 
-            # MBTI is best run on character analysis output or raw description if available here
+            # MBTI is best run on character analysis output or raw description
+            # if available here
             if include_mbti:
                 report = await self._run_stage(MBTIEvaluator, "MBTI Evaluator", "analyze", current_input)
                 analysis_reports.append(report)
@@ -130,10 +134,11 @@ class ScreenwritingPipeline(Tool):
             report = await self._run_stage(ScreamAnalyzer, "Scream Analyzer", "analyze", draft_text)
             analysis_reports.append(report)
 
-        # Optional MBTI on script if not run on characters (or run again on script)
+        # Optional MBTI on script if not run on characters (or run again on
+        # script)
         if include_mbti and not include_character_analysis:
-             report = await self._run_stage(MBTIEvaluator, "MBTI Evaluator", "analyze", draft_text)
-             analysis_reports.append(report)
+            report = await self._run_stage(MBTIEvaluator, "MBTI Evaluator", "analyze", draft_text)
+            analysis_reports.append(report)
 
         # 5. Formatting
         results.append(await self._run_stage(ScriptFormatter, "Script Formatter", "format", current_input))
@@ -148,10 +153,15 @@ class ScreenwritingPipeline(Tool):
             report = await self._run_stage(StoryboardGenerator, "Storyboard Generator", "generate", draft_text)
             analysis_reports.append(report)
 
+        if include_version_history:
+            report = await self._run_stage(VersionTracker, "Version Tracker", "record", f"Automated version entry for project: {project_name}. Task: {task}")
+            analysis_reports.append(report)
+
         final_output = f"## Production Line Result\n\n{formatted_script}"
 
         if analysis_reports:
-            final_output += "\n\n---\n\n## Analysis & Extras\n\n" + "\n\n".join(analysis_reports)
+            final_output += "\n\n---\n\n## Analysis & Extras\n\n" + \
+                "\n\n".join(analysis_reports)
 
         return Response(message=final_output, break_loop=True)
 

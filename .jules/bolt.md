@@ -15,3 +15,11 @@
 ## 2025-02-24 - [Pre-compiling Regex in Helper Functions]
 **Learning:** Pre-compiling regex patterns in frequently called helper functions (like `replace_placeholders_dict` which is recursive) yields significant speedups (1.4x), whereas for simple operations on long strings (`remove_code_fences`) the gain is marginal (1.01x) but improves code cleanliness.
 **Action:** Prioritize regex pre-compilation for recursive or tight-loop functions.
+
+## 2025-05-21 - [Optimizing DirtyJson Parser]
+**Learning:** String concatenation in a loop (O(N^2)) and character-by-character processing in Python are extremely slow for large strings. Replacing a character-loop with `str.find()` and slicing (O(1) loop overhead) reduced execution time by ~300x (3.5s -> 0.01s) for parsing large multiline strings.
+**Action:** When parsing strings, avoid iterating by character if possible. Use built-in string methods like `find`, `index`, and slicing which are implemented in C and highly optimized.
+
+## 2025-05-22 - [Optimizing Token Approximation]
+**Learning:** `tiktoken` encoding, while fast in Rust, has overhead when called frequently on very short strings (e.g., streaming deltas). Replacing `tiktoken.encode` with a length-based heuristic (`len // 3`) for strings < 100 chars yielded a ~40x speedup (7.7µs -> 0.34µs).
+**Action:** For "approximate" metrics in hot paths involving short text (like streaming or rate limiting), prefer simple integer arithmetic heuristics over full tokenizer calls.

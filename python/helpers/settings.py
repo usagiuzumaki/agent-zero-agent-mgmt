@@ -613,7 +613,7 @@ def convert_out(settings: Settings) -> SettingsOutput:
         {
             "id": "memory_recall_enabled",
             "title": "Memory auto-recall enabled",
-            "description": "Agent Zero will automatically recall memories based on convesation context.",
+            "description": "Aria Bot will automatically recall memories based on conversation context.",
             "type": "switch",
             "value": settings["memory_recall_enabled"],
         }
@@ -1392,9 +1392,7 @@ async def _apply_settings(previous: Settings | None):
             await update_mcp_settings(config.mcp_servers)
 
         # update token in mcp server
-        current_token = (
-            create_auth_token()
-        )  # TODO - ugly, token in settings is generated from dotenv and does not always correspond
+        current_token = _settings["mcp_server_token"]
         if not previous or current_token != previous["mcp_server_token"]:
 
             async def update_mcp_token(token: str):

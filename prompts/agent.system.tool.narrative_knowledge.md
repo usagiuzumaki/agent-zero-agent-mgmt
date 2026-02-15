@@ -1,5 +1,6 @@
 ### narrative_knowledge:
-Provide structural insights based on genre and tone.
+- Provide structural insights based on genre and tone.
+- Use with `query`, `genre`, and `tone`.
 
 **Example usage**:
 ~~~json

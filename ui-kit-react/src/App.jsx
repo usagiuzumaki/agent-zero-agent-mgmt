@@ -31,7 +31,11 @@ export default function App() {
   return (
     <div className="app-container" data-theme={theme}>
       <AgentLauncher onOpen={() => setOpen(true)} />
-      <AgentModal open={open} onClose={() => setOpen(false)}>
+      <AgentModal
+        open={open}
+        onClose={() => setOpen(false)}
+        className={ui === 'screenwriting' ? 'full-screen' : ''}
+      >
         <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
           <select
             className="ui-select"

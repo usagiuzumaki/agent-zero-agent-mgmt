@@ -1,0 +1,169 @@
+/* Screenwriting Studio Theme */
+:root {
+  --studio-bg: #111111;
+  --studio-sidebar-bg: #1a1a1a;
+  --studio-text: #e5e5e5;
+  --studio-text-muted: #a3a3a3;
+  --studio-accent: #6366f1; /* Indigo-500 */
+  --studio-accent-hover: #4f46e5; /* Indigo-600 */
+  --studio-border: #333333;
+  --studio-card-bg: #262626;
+  --studio-success: #10b981;
+  --studio-danger: #ef4444;
+}
+
+.screenwriting-ui {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  background-color: var(--studio-bg);
+  color: var(--studio-text);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  overflow: hidden;
+
+  /* Map Studio Theme to Common Variables for shared components like EmptyState */
+  --color-surface: var(--studio-card-bg);
+  --color-text: var(--studio-text);
+  --color-text-muted: var(--studio-text-muted);
+  --color-border: var(--studio-border);
+}
+
+/* Sidebar Navigation */
+.studio-sidebar {
+  width: 260px;
+  background-color: var(--studio-sidebar-bg);
+  border-right: 1px solid var(--studio-border);
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  flex-shrink: 0;
+}
+
+.studio-brand {
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--studio-border);
+}
+
+.studio-brand h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+  background: linear-gradient(to right, #fff, #a5a5a5);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.025em;
+}
+
+.studio-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  color: var(--studio-text-muted);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+.nav-item:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--studio-text);
+}
+
+.nav-item.active {
+  background-color: var(--studio-accent);
+  color: white;
+  box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.3);
+}
+
+.nav-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* Main Content Area */
+.studio-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+.studio-content > [role="tabpanel"] {
+  flex: 1;
+  overflow-y: auto;
+  padding: 2rem;
+  max-width: 1600px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Panel specific overrides */
+#panel-assistant {
+  padding: 0; /* Chat takes full width/height */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Helper Classes for Studio Look */
+.studio-header {
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.studio-header h3 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin: 0;
+  color: white;
+}
+
+.btn-studio-primary {
+  background-color: var(--studio-accent);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-studio-primary:hover {
+  background-color: var(--studio-accent-hover);
+}
+
+.btn-studio-secondary {
+  background-color: transparent;
+  border: 1px solid var(--studio-border);
+  color: var(--studio-text);
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-studio-secondary:hover {
+  border-color: var(--studio-text-muted);
+  background-color: rgba(255,255,255,0.05);
+}
