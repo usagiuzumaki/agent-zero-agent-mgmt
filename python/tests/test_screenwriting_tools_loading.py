@@ -83,7 +83,10 @@ class TestScreenwritingToolsLoading(unittest.TestCase):
         self.modules_to_unload = [
             "agents.agent",
             "agents.screenwriting.tools.screenwriting_pipeline",
-            "agents.screenwriting.tools.screenwriting_specialist"
+            "agents.screenwriting.tools.screenwriting_specialist",
+            "python.helpers.tokens", # Unload this too as it imports tiktoken
+            "python.helpers.call_llm", # Also imports litellm/models
+            "python.helpers.history",
         ]
         for module in self.modules_to_unload:
             if module in sys.modules:
@@ -114,13 +117,20 @@ class TestScreenwritingToolsLoading(unittest.TestCase):
     def tearDown(self):
         self.patcher.stop()
 
-        # Unload the modules we tested to avoid pollution
-        # Although patch.dict handles restoration, cleaning up modules
-        # that were loaded *during* the patch is good practice if we want to ensure
-        # they are reloaded cleanly next time.
-        # But if patch.dict restores sys.modules, it removes new entries.
-        # So we don't strictly need this loop, but let's leave it out to rely on patch.dict.
-        pass
+        # Unload the modules that were loaded during the test with mocked dependencies
+        # This ensures subsequent tests reload them with real dependencies.
+        modules_to_clean = [
+            "agents.agent",
+            "agents.screenwriting.tools.screenwriting_pipeline",
+            "agents.screenwriting.tools.screenwriting_specialist",
+            "python.helpers.tokens",
+            "python.helpers.call_llm",
+            "python.helpers.history",
+            "models",
+        ]
+        for module in modules_to_clean:
+            if module in sys.modules:
+                del sys.modules[module]
 
     def test_get_tool_screenwriting_pipeline(self):
         # Patch dependencies of Agent.__init__
