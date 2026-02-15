@@ -8,6 +8,7 @@ from agents.screenwriting.components.script_formatter import ScriptFormatter
 from agents.screenwriting.components.character_analyzer import CharacterAnalyzer
 from agents.screenwriting.components.pacing_metrics import PacingMetrics
 from agents.screenwriting.components.emotional_tension import EmotionalTension
+from agents.screenwriting.components.subtext_analyzer import SubtextAnalyzer
 from agents.screenwriting.components.marketability import Marketability
 from agents.screenwriting.components.mbti_evaluator import MBTIEvaluator
 from agents.screenwriting.components.scream_analyzer import ScreamAnalyzer
@@ -29,6 +30,7 @@ class ScreenwritingSpecialist(Tool):
     - CharacterAnalyzer: Deep dive into character arcs
     - PacingMetrics: Analyzes story pacing
     - EmotionalTension: Tracks emotional arcs
+    - SubtextAnalyzer: Uncovers hidden meanings and motivations
     - Marketability: Assesses commercial potential
     - MBTIEvaluator: Analyzes character personalities
     - WorldBuilder: Develops setting and lore
@@ -63,6 +65,7 @@ class ScreenwritingSpecialist(Tool):
             "CharacterAnalyzer": (CharacterAnalyzer, "analyze"),
             "PacingMetrics": (PacingMetrics, "analyze"),
             "EmotionalTension": (EmotionalTension, "analyze"),
+            "SubtextAnalyzer": (SubtextAnalyzer, "analyze"),
             "Marketability": (Marketability, "assess"),
             "MBTIEvaluator": (MBTIEvaluator, "analyze"),
             "ScreamAnalyzer": (ScreamAnalyzer, "analyze"),

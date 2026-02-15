@@ -9,6 +9,7 @@ from agents.screenwriting.components.world_builder import WorldBuilder
 from agents.screenwriting.components.character_analyzer import CharacterAnalyzer
 from agents.screenwriting.components.pacing_metrics import PacingMetrics
 from agents.screenwriting.components.emotional_tension import EmotionalTension
+from agents.screenwriting.components.subtext_analyzer import SubtextAnalyzer
 from agents.screenwriting.components.marketability import Marketability
 from agents.screenwriting.components.mbti_evaluator import MBTIEvaluator
 from agents.screenwriting.components.scream_analyzer import ScreamAnalyzer
@@ -30,7 +31,7 @@ class ScreenwritingPipeline(Tool):
     4. CreativeIdeas (Brainstorming)
     5. CoWriter (Drafting)
     6. DialogueEvaluator (Refinement)
-    7. Analysis Agents (Pacing, Tension, MBTI, Scream) - Optional
+    7. Analysis Agents (Pacing, Tension, Subtext, MBTI, Scream) - Optional
     8. ScriptFormatter (Formatting)
     9. Post-Production Agents (Marketability, Storyboard) - Optional
     """
@@ -51,6 +52,7 @@ class ScreenwritingPipeline(Tool):
                       include_character_analysis: bool = False,
                       include_pacing: bool = False,
                       include_tension: bool = False,
+                      include_subtext: bool = False,
                       include_marketability: bool = False,
                       include_mbti: bool = False,
                       include_scream: bool = False,
@@ -67,6 +69,7 @@ class ScreenwritingPipeline(Tool):
             include_character_analysis (bool): Whether to include a character analysis step.
             include_pacing (bool): Whether to include pacing metrics.
             include_tension (bool): Whether to include emotional tension analysis.
+            include_subtext (bool): Whether to include subtext analysis.
             include_marketability (bool): Whether to include marketability assessment.
             include_mbti (bool): Whether to include MBTI evaluation.
             include_scream (bool): Whether to include scream/intensity analysis.
@@ -128,6 +131,10 @@ class ScreenwritingPipeline(Tool):
 
         if include_tension:
             report = await self._run_stage(EmotionalTension, "Emotional Tension", "analyze", draft_text)
+            analysis_reports.append(report)
+
+        if include_subtext:
+            report = await self._run_stage(SubtextAnalyzer, "Subtext Analyzer", "analyze", draft_text)
             analysis_reports.append(report)
 
         if include_scream:
