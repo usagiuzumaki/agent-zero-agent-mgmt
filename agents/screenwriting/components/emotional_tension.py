@@ -15,15 +15,12 @@ class EmotionalTension(ScreenwritingAgent):
 
         Employs tools and instruments to map intensity levels.
         """
-        self.hist_add_user_message(
-            UserMessage("Use tools and instruments to assess emotional tension in:\n" + script)
+        msg = UserMessage(
+            message="Use tools and instruments to assess emotional tension in:\n" + script
         )
         self.hist_add_user_message(msg)
         return await self.monologue()
 
-    async def analyze(self, text: str) -> str:
-        """Standard interface for pipeline integration."""
-        return await self.gauge(text)
     async def gauge(self, script: str) -> str:
         """Alias for analyze."""
         return await self.analyze(script)
