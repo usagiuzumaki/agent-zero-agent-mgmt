@@ -35,7 +35,7 @@ from langchain_core.messages import (
     HumanMessage,
     SystemMessage,
 )
-from langchain.embeddings.base import Embeddings
+from langchain_core.embeddings import Embeddings
 # Lazy import to avoid loading heavy ML dependencies at module level
 # from sentence_transformers import SentenceTransformer
 
