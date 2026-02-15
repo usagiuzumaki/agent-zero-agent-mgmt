@@ -423,6 +423,119 @@ img {
   opacity: 0.6;
 }
 
+.engagement-hero {
+  position: relative;
+  margin: 4.5rem var(--spacing-lg) var(--spacing-md);
+  padding: var(--spacing-lg);
+  border-radius: calc(var(--border-radius) * 1.2);
+  background: radial-gradient(circle at top left, rgba(255, 105, 180, 0.4), transparent 55%),
+    radial-gradient(circle at bottom right, rgba(124, 65, 255, 0.4), transparent 60%),
+    rgba(58, 2, 41, 0.85);
+  border: 1px solid rgba(255, 209, 220, 0.35);
+  box-shadow: 0 20px 50px rgba(6, 2, 12, 0.45);
+  overflow: hidden;
+}
+
+.engagement-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.08), transparent 50%);
+  pointer-events: none;
+}
+
+.engagement-hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 540px;
+}
+
+.engagement-hero-eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.2rem;
+  font-size: 0.72rem;
+  color: rgba(255, 209, 220, 0.85);
+  font-weight: 600;
+}
+
+.engagement-hero-title {
+  margin: var(--spacing-sm) 0 var(--spacing-xs);
+  font-size: 2rem;
+  line-height: 1.2;
+  color: #fff6fb;
+}
+
+.engagement-hero-subtitle {
+  margin: 0 0 var(--spacing-md);
+  font-size: 1.02rem;
+  color: rgba(255, 228, 236, 0.8);
+}
+
+.engagement-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.engagement-hero-metrics {
+  position: absolute;
+  right: var(--spacing-lg);
+  top: 50%;
+  transform: translateY(-50%);
+  display: grid;
+  gap: var(--spacing-sm);
+  min-width: 190px;
+}
+
+.engagement-metric-card {
+  background: rgba(45, 2, 31, 0.7);
+  border: 1px solid rgba(255, 133, 193, 0.5);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-sm) var(--spacing-md);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 12px 24px rgba(12, 3, 20, 0.3);
+}
+
+.metric-label {
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1rem;
+  color: rgba(255, 209, 220, 0.7);
+}
+
+.metric-value {
+  display: block;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #fff3f9;
+}
+
+.metric-detail {
+  display: block;
+  font-size: 0.8rem;
+  color: rgba(255, 228, 236, 0.7);
+}
+
+@media (max-width: 1024px) {
+  .engagement-hero {
+    margin: 4.5rem var(--spacing-md) var(--spacing-md);
+  }
+
+  .engagement-hero-metrics {
+    position: static;
+    transform: none;
+    margin-top: var(--spacing-md);
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .engagement-hero-title {
+    font-size: 1.6rem;
+  }
+}
+
 /* Typography */
 /* h2,
 h3 {
