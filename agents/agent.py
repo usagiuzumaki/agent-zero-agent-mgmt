@@ -14,6 +14,7 @@ import models
 from python.helpers import extract_tools, files, errors, history, tokens
 from python.helpers import dirty_json
 from python.helpers.print_style import PrintStyle
+from python.helpers.errors import SilentResponseException
 from langchain_core.prompts import (
     ChatPromptTemplate,
 )
@@ -329,8 +330,13 @@ class Agent:
                         # prepare LLM chain (model, system, history)
                         prompt = await self.prepare_prompt(loop_data=self.loop_data)
 
-                        # call before_main_llm_call extensions
-                        await self.call_extensions("before_main_llm_call", loop_data=self.loop_data)
+                        try:
+                            # call before_main_llm_call extensions
+                            await self.call_extensions("before_main_llm_call", loop_data=self.loop_data)
+                        except SilentResponseException:
+                            PrintStyle(font_color="#b3ffd9", padding=False).print("\n(Silently ignored)")
+                            self.context.log.log(type="warning", content="Silent response triggered.")
+                            return
 
                         async def reasoning_callback(chunk: str, full: str):
                             if chunk == full:
