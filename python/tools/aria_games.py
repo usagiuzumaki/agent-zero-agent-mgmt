@@ -1,20 +1,16 @@
-"""
-Aria's Interactive Games and Role-Play Tool
-"""
+
 import json
 import urllib.request
 from python.helpers.tool import Tool, Response
 from python.helpers.aria_story_games import AriaGameSystem
 
 class AriaGames(Tool):
-    """Interactive story games and role-play scenarios"""
     
     def __init__(self, agent, **kwargs):
         super().__init__(agent, **kwargs)
         self.game_system = AriaGameSystem()
     
     async def execute(self, **kwargs):
-        """Execute game actions"""
         action = kwargs.get("action", "list")
         
         try:

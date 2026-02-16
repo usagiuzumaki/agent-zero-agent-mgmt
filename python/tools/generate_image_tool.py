@@ -10,18 +10,9 @@ except ImportError:
     replicate = None
 
 class GenerateImage(Tool):
-    """
-    Generate images using Replicate API (Stable Diffusion XL)
-    """
     
     def execute(self, prompt: str = "", **kwargs) -> Response:
-        """
-        Generate an image from a text prompt using Replicate API
-        
-        Args:
-            prompt: Text description of the image to generate
-            **kwargs: Additional parameters for image generation
-        """
+
         if not prompt:
             return Response(
                 message="❌ Please provide a prompt for image generation!",

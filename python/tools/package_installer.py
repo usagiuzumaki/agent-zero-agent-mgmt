@@ -1,17 +1,12 @@
-"""
-Package installation tool for Aria Bot
-Works around sandboxing issues in deployed environments
-"""
+
 import subprocess
 import sys
 import json
 from python.helpers.tool import Tool, Response
 
 class PackageInstaller(Tool):
-    """Install and manage Python packages"""
     
     async def execute(self, **kwargs):
-        """Install packages directly without sandboxed execution"""
         action = kwargs.get("action", "install")
         packages = kwargs.get("packages", [])
         

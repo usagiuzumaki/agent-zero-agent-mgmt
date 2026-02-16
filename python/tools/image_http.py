@@ -1,15 +1,11 @@
-"""
-Simplified image generation tool using direct HTTP API
-"""
+
 import urllib.request
 import json
 from python.helpers.tool import Tool, Response
 
 class image_generation(Tool):
-    """Generate images using direct HTTP API"""
     
     async def execute(self, **kwargs):
-        """Generate an image by calling the local API endpoint"""
         import urllib.request
         import json
         

@@ -409,11 +409,16 @@ def get_subdirectories(
         include = [include]
     if isinstance(exclude, str):
         exclude = [exclude]
+
+    # Always exclude certain internal directories
+    internal_exclude = ["__pycache__", ".git", ".ipynb_checkpoints"]
+
     return [
         subdir
         for subdir in os.listdir(abs_path)
         if os.path.isdir(os.path.join(abs_path, subdir))
         and any(fnmatch(subdir, inc) for inc in include)
+        and subdir not in internal_exclude
         and (exclude is None or not any(fnmatch(subdir, exc) for exc in exclude))
     ]
 

@@ -1,6 +1,4 @@
-"""
-Aria's enhanced interaction tools - greetings, memories, and quizzes
-"""
+
 import json
 import os
 from datetime import datetime
@@ -8,7 +6,6 @@ from python.helpers.tool import Tool, Response
 from python.helpers.aria_personality import AriaEnhancementSystem
 
 class AriaEnhancedInteraction(Tool):
-    """Handle Aria's personality-enhanced interactions"""
     
     def __init__(self, agent, **kwargs):
         super().__init__(agent, **kwargs)
@@ -16,7 +13,7 @@ class AriaEnhancedInteraction(Tool):
         self.enhancement_system = self._load_enhancement_system()
     
     def _load_enhancement_system(self):
-        """Load the enhancement system with persistent memory"""
+
         # Check if memory file exists and load it
         system = AriaEnhancementSystem()
         if os.path.exists('aria_memories.json'):
@@ -24,11 +21,10 @@ class AriaEnhancedInteraction(Tool):
         return system
     
     def _save_system(self):
-        """Save the system state"""
+
         self.enhancement_system.memory_system.save_memories()
     
     async def execute(self, **kwargs):
-        """Execute enhanced interactions"""
         action = kwargs.get("action", "greeting")
         
         try:
