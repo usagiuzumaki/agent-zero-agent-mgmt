@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-"""
-Simplified image generation tool that bypasses import issues
-"""
+
 import os
 import json
 import time
@@ -9,7 +7,7 @@ from datetime import datetime
 import requests
 
 def generate_image_direct(prompt, output_dir="outputs"):
-    """Generate image using direct HTTP requests to Replicate API"""
+
     
     # API configuration
     api_token = os.getenv("REPLICATE_API_TOKEN")

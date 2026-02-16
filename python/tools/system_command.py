@@ -1,16 +1,12 @@
-"""
-System command execution tool that bypasses sandboxing issues
-"""
+
 import subprocess
 import os
 import asyncio
 from python.helpers.tool import Tool, Response
 
 class SystemCommand(Tool):
-    """Execute system commands directly without sandboxed sessions"""
     
     async def execute(self, **kwargs):
-        """Run system commands reliably in deployed environments"""
         command = kwargs.get("command", "")
         timeout = kwargs.get("timeout", 60)
         working_dir = kwargs.get("working_dir", None)

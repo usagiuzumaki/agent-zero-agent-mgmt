@@ -70,4 +70,9 @@ class CallSubordinate(VariablesPlugin):
                 {"name": "default", "context": "Default Agent‑Zero AI Assistant"}
             ]
 
-        return {"agent_profiles": profiles}
+        # Format profiles for the prompt
+        profiles_str = ""
+        for p in profiles:
+            profiles_str += f"- **{p['name']}**: {p['context']}\n"
+
+        return {"agent_profiles": profiles_str}

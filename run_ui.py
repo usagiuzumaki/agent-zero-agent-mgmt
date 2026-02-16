@@ -297,6 +297,17 @@ def handle_exception(error):
 
 
 def run():
+    # Attempt to free port 5000 if it's already in use
+    try:
+        port = int(os.getenv("PORT") or runtime.get_web_ui_port())
+        PrintStyle().print(f"Checking if port {port} is free...")
+        import subprocess
+        # Check if port is in use and kill process if so
+        cmd = f"lsof -ti:{port} | xargs kill -9 2>/dev/null || true"
+        subprocess.run(cmd, shell=True)
+    except Exception as e:
+        PrintStyle().warning(f"Failed to free port: {e}")
+
     # Log startup information
     commit_hash = os.getenv("GITHUB_SHA", "unknown")[:7]
     port = int(os.getenv("PORT") or runtime.get_web_ui_port())
@@ -330,7 +341,8 @@ def run():
                 
                 PrintStyle().print("✅ Supabase-backed auth with $19 payment gate is ready!")
             else:
-                PrintStyle().print("⚠️ Database is sleeping, auth features temporarily disabled")
+                PrintStyle().print("⚠️ Database (SUPABASE_DB_URL) not found or sleeping. Auth features temporarily disabled.")
+                PrintStyle().print("👉 Please check your .env file and ensure SUPABASE_DB_URL is set correctly.")
             PrintStyle().print("Authentication and payment routes configured successfully")
         except Exception as e:
             PrintStyle().print(f"Warning: Failed to initialize auth/payment: {e}")

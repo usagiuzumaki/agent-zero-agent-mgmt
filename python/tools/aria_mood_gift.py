@@ -1,20 +1,16 @@
-"""
-Aria's mood-based gift and image generation tool
-"""
+
 import json
 import urllib.request
 from python.helpers.tool import Tool, Response
 from python.helpers.aria_personality import AriaEnhancementSystem
 
 class AriaMoodGift(Tool):
-    """Generate mood-based images and virtual gifts for Aria"""
     
     def __init__(self, agent, **kwargs):
         super().__init__(agent, **kwargs)
         self.enhancement_system = AriaEnhancementSystem()
     
     async def execute(self, **kwargs):
-        """Generate mood-based content"""
         action = kwargs.get("action", "mood_image")
         
         try:

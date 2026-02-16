@@ -1,15 +1,10 @@
-"""
-Enhanced code execution tool for deployed environments
-Combines the best of both approaches to avoid sandboxing issues
-"""
+
 from python.helpers.tool import Tool, Response
 from python.helpers.code_runner import DeploymentCodeRunner
 
 class EnhancedCodeExecution(Tool):
-    """Execute code reliably in deployed environments"""
     
     async def execute(self, **kwargs):
-        """Run code with improved handling for deployed environments"""
         runtime = kwargs.get("runtime", "python").lower()
         code = kwargs.get("code", "")
         timeout = kwargs.get("timeout", 30)
