@@ -3,6 +3,10 @@ import traceback
 import asyncio
 
 
+class SilentResponseException(Exception):
+    pass
+
+
 def handle_error(e: Exception):
     # if asyncio.CancelledError, re-raise
     if isinstance(e, asyncio.CancelledError):
