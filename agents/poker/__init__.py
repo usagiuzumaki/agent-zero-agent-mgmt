@@ -22,6 +22,8 @@ class PokerAgent(Agent):
         context: AgentContext | None = None,
     ) -> None:
         """Initialise the poker agent."""
+        if not config.profile:
+            config.profile = "poker"
         super().__init__(number, config, context)
 
     def evaluate_hand(self, cards: List[str]) -> Optional[int]:
