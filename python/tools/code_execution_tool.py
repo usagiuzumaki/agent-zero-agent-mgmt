@@ -102,12 +102,12 @@ class CodeExecution(Tool):
 
             # Only reset the specified session if provided
             if session is not None and session in shells:
-                shells[session].close()
+                await shells[session].close()
                 del shells[session]
             elif reset and not session:
                 # Close all sessions if full reset requested
                 for s in list(shells.keys()):
-                    shells[s].close()
+                    await shells[s].close()
                 shells = {}
 
             # initialize local or remote interactive shell interface for session 0 if needed
@@ -183,7 +183,7 @@ class CodeExecution(Tool):
                     self.state.shells[session] = shell
                     await shell.connect()
 
-                self.state.shells[session].send_command(command)
+                await self.state.shells[session].send_command(command)
 
                 PrintStyle(
                     background_color="white", font_color="#1B4F72", bold=True

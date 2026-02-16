@@ -63,13 +63,13 @@ class SSHInteractiveSession:
                 else:
                     raise e
 
-    def close(self):
+    async def close(self):
         if self.shell:
             self.shell.close()
         if self.client:
             self.client.close()
 
-    def send_command(self, command: str):
+    async def send_command(self, command: str):
         if not self.shell:
             raise Exception("Shell not connected")
         self.full_output = b""
