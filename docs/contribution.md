@@ -1,30 +1,30 @@
-# Contributing to Aria Bot
+# Contributing to Aria - AI Creative Companion
 
-Contributions to improve Aria Bot are very welcome!  This guide outlines how to contribute code, documentation, or other improvements.
+Contributions to improve Aria - AI Creative Companion are very welcome!  This guide outlines how to contribute code, documentation, or other improvements.
 
 ## Getting Started
 
 - See [development](development.md) for instructions on how to set up a development environment.
 - See [extensibility](extensibility.md) for instructions on how to create custom extensions.
 
-1. **Fork the Repository:** Fork the Aria Bot repository on GitHub.
+1. **Fork the Repository:** Fork the Aria - AI Creative Companion repository on GitHub.
 2. **Clone Your Fork:** Clone your forked repository to your local machine.
 3. **Create a Branch:** Create a new branch for your changes. Use a descriptive name that reflects the purpose of your contribution (e.g., `fix-memory-leak`, `add-search-tool`, `improve-docs`).
 
 ## Making Changes
 
-* **Code Style:** Follow the existing code style. Aria Bot generally follows PEP 8 conventions.
+* **Code Style:** Follow the existing code style. Aria - AI Creative Companion generally follows PEP 8 conventions.
 * **Documentation:**  Update the documentation if your changes affect user-facing functionality. The documentation is written in Markdown.
 * **Commit Messages:**  Write clear and concise commit messages that explain the purpose of your changes.
 
 ## Submitting a Pull Request
 
 1. **Push Your Branch:** Push your branch to your forked repository on GitHub.
-2. **Create a Pull Request:** Create a pull request from your branch to the appropriate branch in the main Aria Bot repository.
+2. **Create a Pull Request:** Create a pull request from your branch to the appropriate branch in the main Aria - AI Creative Companion repository.
    * Target the `development` branch.
 3. **Provide Details:** In your pull request description, clearly explain the purpose and scope of your changes. Include relevant context, test results, and any other information that might be helpful for reviewers.
 4. **Address Feedback:**  Be responsive to feedback from the community. We love changes, but we also love to discuss them!
 
 ## Documentation Stack
 
-- The documentation is built using Markdown. We appreciate your contributions even if you don't know Markdown, and look forward to improve Aria Bot for everyone's benefit.
+- The documentation is built using Markdown. We appreciate your contributions even if you don't know Markdown, and look forward to improve Aria - AI Creative Companion for everyone's benefit.

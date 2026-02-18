@@ -1,6 +1,6 @@
 # Screenwriting Agents — Tool Specifications
 
-Each of these tools follows the Agent Zero style:
+Each of these tools follows the Aria style:
 
 ```json
 {

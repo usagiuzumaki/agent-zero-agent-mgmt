@@ -1,17 +1,17 @@
 # Users installation guide for Windows, macOS and Linux
 
-Click to open a video to learn how to install Aria Bot:
+Click to open a video to learn how to install Aria - AI Creative Companion:
 
 [![Easy Installation guide](/docs/res/easy_ins_vid.png)](https://www.youtube.com/watch?v=w5v5Kjx51hs)
 
-The following user guide provides instructions for installing and running Aria Bot using Docker, which is the primary runtime environment for the framework. For developers and contributors, we also provide instructions for setting up the [full development environment](#in-depth-guide-for-full-binaries-installation).
+The following user guide provides instructions for installing and running Aria - AI Creative Companion using Docker, which is the primary runtime environment for the framework. For developers and contributors, we also provide instructions for setting up the [full development environment](#in-depth-guide-for-full-binaries-installation).
 
 
 ## Windows, macOS and Linux Setup Guide
 
 
 1. **Install Docker Desktop:** 
-- Docker Desktop provides the runtime environment for Aria Bot, ensuring consistent behavior and security across platforms
+- Docker Desktop provides the runtime environment for Aria - AI Creative Companion, ensuring consistent behavior and security across platforms
 - The entire framework runs within a Docker container, providing isolation and easy deployment
 - Available as a user-friendly GUI application for all major operating systems
 
@@ -56,11 +56,11 @@ The following user guide provides instructions for installing and running Aria B
 
 ![docker socket macOS](res/setup/macsocket.png)
 
-2. **Run Aria Bot:**
+2. **Run Aria - AI Creative Companion:**
 
-- Note: Aria Bot also offers a Hacking Edition based on Kali linux with modified prompts for cybersecurity tasks. The setup is the same as the regular version, just use the agent0ai/agent-zero:hacking image instead of agent0ai/agent-zero.
+- Note: Aria - AI Creative Companion also offers a Hacking Edition based on Kali linux with modified prompts for cybersecurity tasks. The setup is the same as the regular version, just use the agent0ai/agent-zero:hacking image instead of agent0ai/agent-zero.
 
-2.1. Pull the Aria Bot Docker image:
+2.1. Pull the Aria - AI Creative Companion Docker image:
 - Search for `agent0ai/agent-zero` in Docker Desktop
 - Click the `Pull` button
 - The image will be downloaded to your machine in a few minutes
@@ -77,13 +77,13 @@ The following user guide provides instructions for installing and running Aria B
 2.2. OPTIONAL - Create a data directory for persistence:
 
 > [!CAUTION]
-> Preferred way of persisting Aria Bot data is to use the backup and restore feature.
-> By mapping the whole `/a0` directory to a local directory, you will run into problems when upgrading Aria Bot to a newer version.
+> Preferred way of persisting Aria - AI Creative Companion data is to use the backup and restore feature.
+> By mapping the whole `/a0` directory to a local directory, you will run into problems when upgrading Aria - AI Creative Companion to a newer version.
 
-- Choose or create a directory on your machine where you want to store Aria Bot's data
+- Choose or create a directory on your machine where you want to store Aria - AI Creative Companion's data
 - This can be any location you prefer (e.g., `C:/agent-zero-data` or `/home/user/agent-zero-data`)
 - You can map individual subfolders of `/a0` to a local directory or the full `/a0` directory (not recommended).
-- This directory will contain all your Aria Bot files, like the legacy root folder structure:
+- This directory will contain all your Aria - AI Creative Companion files, like the legacy root folder structure:
   - `/agents` - Specialized agents with their prompts and tools
   - `/memory` - Agent's memory and learned information
   - `/knowledge` - Knowledge base
@@ -91,10 +91,10 @@ The following user guide provides instructions for installing and running Aria B
   - `/prompts` - Prompt files
   - `/work_dir` - Working directory
   - `.env` - Your API keys
-  - `/tmp/settings.json` - Your Aria Bot settings
+  - `/tmp/settings.json` - Your Aria - AI Creative Companion settings
 
 > [!TIP]
-> Choose a location that's easy to access and backup. All your Aria Bot data
+> Choose a location that's easy to access and backup. All your Aria - AI Creative Companion data
 > will be directly accessible in this directory.
 
 2.3. Run the container:
@@ -105,8 +105,8 @@ The following user guide provides instructions for installing and running Aria B
 
 Optionally you can map local folders for file persistence:
 > [!CAUTION]
-> Preferred way of persisting Aria Bot data is to use the backup and restore feature.
-> By mapping the whole `/a0` directory to a local directory, you will run into problems when upgrading Aria Bot to a newer version.
+> Preferred way of persisting Aria - AI Creative Companion data is to use the backup and restore feature.
+> By mapping the whole `/a0` directory to a local directory, you will run into problems when upgrading Aria - AI Creative Companion to a newer version.
 - OPTIONAL: Under "Volumes", configure your mapped folders, if needed:
   - Example host path: Your chosen directory (e.g., `C:\agent-zero\memory`)
   - Example container path: `/a0/memory`
@@ -136,7 +136,7 @@ Optionally you can map local folders for file persistence:
 ![docker logs](res/setup/5-docker-click-to-open.png)
 
 - Open `http://localhost:<PORT>` in your browser
-- The Web UI will open. Aria Bot is ready for configuration!
+- The Web UI will open. Aria - AI Creative Companion is ready for configuration!
 
 ![docker ui](res/setup/6-docker-a0-running.png)
 
@@ -144,15 +144,15 @@ Optionally you can map local folders for file persistence:
 > You can also access the Web UI by clicking the ports right under the container ID in Docker Desktop.
 
 > [!NOTE]
-> After starting the container, you'll find all Aria Bot files in your chosen
+> After starting the container, you'll find all Aria - AI Creative Companion files in your chosen
 > directory. You can access and edit these files directly on your machine, and 
 > the changes will be immediately reflected in the running container.
 
-3. Configure Aria Bot
-- Refer to the following sections for a full guide on how to configure Aria Bot.
+3. Configure Aria - AI Creative Companion
+- Refer to the following sections for a full guide on how to configure Aria - AI Creative Companion.
 
 ## Settings Configuration
-Aria Bot provides a comprehensive settings interface to customize various aspects of its functionality. Access the settings by clicking the "Settings"button with a gear icon in the sidebar.
+Aria - AI Creative Companion provides a comprehensive settings interface to customize various aspects of its functionality. Access the settings by clicking the "Settings"button with a gear icon in the sidebar.
 
 ### Agent Configuration
 - **Prompts Subdirectory:** Choose the subdirectory within `/prompts` for agent behavior customization. The 'default' directory contains the standard prompts.
@@ -203,7 +203,7 @@ Learn more about Remote Function Calls and their purpose [here](#7-configure-ari
 > Always keep your API keys and passwords secure.
 
 # Choosing Your LLMs
-The Settings page is the control center for selecting the Large Language Models (LLMs) that power Aria Bot.  You can choose different LLMs for different roles:
+The Settings page is the control center for selecting the Large Language Models (LLMs) that power Aria - AI Creative Companion.  You can choose different LLMs for different roles:
 
 | LLM Role | Description |
 | --- | --- |
@@ -252,7 +252,7 @@ ollama pull <model-name>
 
 2. A CLI message should confirm the model download on your system
 
-#### Selecting your model within Aria Bot
+#### Selecting your model within Aria - AI Creative Companion
 1. Once you've downloaded your model(s), you must select it in the Settings page of the GUI. 
 
 2. Within the Chat model, Utility model, or Embedding model section, choose Ollama as provider.
@@ -282,11 +282,11 @@ Once you've downloaded some models, you might want to check which ones you have 
 
 - Experiment with different model combinations to find the balance of performance and cost that best suits your needs. E.g., faster and lower latency LLMs will help, and you can also use `faiss_gpu` instead of `faiss_cpu` for the memory.
 
-## Using Aria Bot on your mobile device
-Aria Bot's Web UI is accessible from any device on your network through the Docker container:
+## Using Aria - AI Creative Companion on your mobile device
+Aria - AI Creative Companion's Web UI is accessible from any device on your network through the Docker container:
 
 > [!NOTE]
-> In settings, External Services tab, you can enable Cloudflare Tunnel to expose your Aria Bot instance to the internet.
+> In settings, External Services tab, you can enable Cloudflare Tunnel to expose your Aria - AI Creative Companion instance to the internet.
 > ⚠️ Do not forget to set username and password in the settings Authentication tab to secure your instance on the internet.
 
 1. The Docker container automatically exposes the Web UI on all network interfaces
@@ -303,31 +303,31 @@ Aria Bot's Web UI is accessible from any device on your network through the Dock
 > - The port is automatically assigned by Docker unless you specify one
 
 > [!NOTE]
-> If you're running Aria Bot directly on your system (legacy approach) instead of
+> If you're running Aria - AI Creative Companion directly on your system (legacy approach) instead of
 > using Docker, you'll need to configure the host manually in `run_ui.py` to run on all interfaces using `host="0.0.0.0"`.
 
-For developers or users who need to run Aria Bot directly on their system,see the [In-Depth Guide for Full Binaries Installation](#in-depth-guide-for-full-binaries-installation).
+For developers or users who need to run Aria - AI Creative Companion directly on their system,see the [In-Depth Guide for Full Binaries Installation](#in-depth-guide-for-full-binaries-installation).
 
-# How to update Aria Bot
+# How to update Aria - AI Creative Companion
 
 > [!NOTE]
-> Since v0.9, Aria Bot has a Backup and Restore feature, so you don't need to backup the files manually.
+> Since v0.9, Aria - AI Creative Companion has a Backup and Restore feature, so you don't need to backup the files manually.
 > In Settings, Backup and Restore tab will guide you through the process.
 
-1. **If you come from the previous version of Aria Bot:**
-- Your data is safely stored across various directories and files inside the Aria Bot folder.
+1. **If you come from the previous version of Aria - AI Creative Companion:**
+- Your data is safely stored across various directories and files inside the Aria - AI Creative Companion folder.
 - To update to the new Docker runtime version, you might want to backup the following files and directories:
   - `/memory` - Agent's memory
   - `/knowledge` - Custom knowledge base (if you imported any custom knowledge files)
   - `/instruments` - Custom instruments and functions (if you created any custom)
-  - `/tmp/settings.json` - Your Aria Bot settings
+  - `/tmp/settings.json` - Your Aria - AI Creative Companion settings
   - `/tmp/chats/` - Your chat history
 - Once you have saved these files and directories, you can proceed with the Docker runtime [installation instructions above](#windows-macos-and-linux-setup-guide) setup guide.
-- Reach for the folder where you saved your data and copy it to the new Aria Bot folder set during the installation process.
-- Aria Bot will automatically detect your saved data and use it across memory, knowledge, instruments, prompts and settings.
+- Reach for the folder where you saved your data and copy it to the new Aria - AI Creative Companion folder set during the installation process.
+- Aria - AI Creative Companion will automatically detect your saved data and use it across memory, knowledge, instruments, prompts and settings.
 
 > [!IMPORTANT]
-> If you have issues loading your settings, you can try to delete the `/tmp/settings.json` file and let Aria Bot generate a new one.
+> If you have issues loading your settings, you can try to delete the `/tmp/settings.json` file and let Aria - AI Creative Companion generate a new one.
 > The same goes for chats in `/tmp/chats/`, they might be incompatible with the new version
 
 2. **Update Process (Docker Desktop)**
@@ -343,7 +343,7 @@ For developers or users who need to run Aria Bot directly on their system,see th
 > [!IMPORTANT]
 > Make sure to use the same volume mount path when running the new
 > container to preserve your data. The exact path depends on where you stored
-> your Aria Bot data directory (the chosen directory on your machine).
+> your Aria - AI Creative Companion data directory (the chosen directory on your machine).
 
 > [!TIP]
 > Alternatively, run the following commands in your terminal:
@@ -367,7 +367,7 @@ For developers or users who need to run Aria Bot directly on their system,see th
 
       
 ### Conclusion
-After following the instructions for your specific operating system, you should have Aria Bot successfully installed and running. You can now start exploring the framework's capabilities and experimenting with creating your own intelligent agents.
+After following the instructions for your specific operating system, you should have Aria - AI Creative Companion successfully installed and running. You can now start exploring the framework's capabilities and experimenting with creating your own intelligent agents.
 
-If you encounter any issues during the installation process, please consult the [Troubleshooting section](troubleshooting.md) of this documentation or refer to the Aria Bot [Skool](https://www.skool.com/agent-zero) or [Discord](https://discord.gg/B8KZKNsPpj) community for assistance.
+If you encounter any issues during the installation process, please consult the [Troubleshooting section](troubleshooting.md) of this documentation or refer to the Aria - AI Creative Companion [Skool](https://www.skool.com/agent-zero) or [Discord](https://discord.gg/B8KZKNsPpj) community for assistance.
 
