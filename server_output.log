@@ -1,10 +1,12 @@
-[BOOT] Aria (Aria) | commit: unknown | port: 5000[0m
+Checking if port 5000 is free...[0m
+[BOOT] Aria - AI Creative Companion | commit: unknown | port: 5000[0m
 Initializing framework...[0m
 Starting server...[0m
 Initializing database and authentication...[0m
 Warning: SUPABASE_DB_URL not found, authentication features will be disabled
 Please provision a database connection string in SUPABASE_DB_URL
-⚠️ Database is sleeping, auth features temporarily disabled[0m
+⚠️ Database (SUPABASE_DB_URL) not found or sleeping. Auth features temporarily disabled.[0m
+👉 Please check your .env file and ensure SUPABASE_DB_URL is set correctly.[0m
 Authentication and payment routes configured successfully[0m
 <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyPacked has no __module__ attribute
 <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyObject has no __module__ attribute
@@ -23,9 +25,7 @@ Authentication and payment routes configured successfully[0m
 [38;2;128;128;128mDebug: Starting server at http://localhost:5000 ...[0m
 [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
  * Running on http://localhost:5000
-[runtime] Auto-generated RFC password. It has been stored under RFC_PASSWORD in /app/.env. Ensure peer runtimes use the same value if they need to communicate.
-
-[38;2;255;0;0mError: Error in preload_kokoro: module 'python.helpers.kokoro_tts' has no attribute 'preload'[0m
-
-[38;2;255;0;0mError: Error in preload_whisper: Whisper is not installed in this environment. Install `openai-whisper` to enable transcription.[0m
+Preloading Kokoro TTS model (stub)...[0m
 Preload completed[0m
+
+[38;2;128;128;128mDebug: Changing timezone from None to UTC[0m

@@ -13,7 +13,7 @@ const container = document.querySelector(".container");
 const chatInput = document.getElementById("chat-input");
 const chatHistory = document.getElementById("chat-history");
 const sendButton = document.getElementById("send-button");
-const heroSection = document.querySelector(".aria-hero");
+const homeView = document.querySelector(".aria-home-view");
 const homeButton = document.getElementById("home-button");
 const inputSection = document.getElementById("input-section");
 const statusSection = document.getElementById("status-section");
@@ -42,8 +42,8 @@ let imageLibrary = [];
 
 function setHomeVisible(flag) {
   homeVisible = !!flag;
-  if (heroSection) {
-    heroSection.classList.toggle("hidden", !homeVisible);
+  if (homeView) {
+    homeView.classList.toggle("hidden", !homeVisible);
   }
 }
 
@@ -99,11 +99,15 @@ document.addEventListener("DOMContentLoaded", () => {
       toggleSidebar(false);
     }
   });
-  if (chatHistory && chatHistory.children.length > 0) {
+  // Only hide home view if there's significant history (more than just the initial greeting)
+  if (chatHistory && chatHistory.children.length > 1) {
     setHomeVisible(false);
+  } else {
+    setHomeVisible(true);
   }
 
   setupImageModal();
+  hydrateAuroraInteractions();
 });
 
 function setupSidebarToggle() {
@@ -1476,13 +1480,50 @@ function openTaskDetail(taskId) {
 // Make the function available globally
 window.openTaskDetail = openTaskDetail;
 
+function hydrateAuroraInteractions() {
+  const promptButtonsSelector = '[data-aria-prompt]';
+  const intentCardsSelector = '.intent-card';
+
+  const handlePrompt = (text, autoSend = false) => {
+    if (!text) return;
+    updateChatInput(text);
+    if (chatInput) {
+      chatInput.focus();
+    }
+    if (autoSend) {
+      sendMessage();
+    }
+  };
+
+  document.querySelectorAll(promptButtonsSelector).forEach((chip) => {
+    chip.addEventListener('click', () => {
+      const prompt = chip.getAttribute('data-aria-prompt');
+      const autoSend = chip.getAttribute('data-aria-send') === 'true';
+      handlePrompt(prompt, autoSend);
+    });
+  });
+
+  document.querySelectorAll(intentCardsSelector).forEach((card) => {
+    const prompt = card.getAttribute('data-aria-prompt');
+    const autoSend = card.getAttribute('data-aria-send') === 'true';
+
+    card.addEventListener('click', () => handlePrompt(prompt, autoSend));
+    card.addEventListener('keypress', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        handlePrompt(prompt, autoSend);
+      }
+    });
+  });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const greetingId = generateGUID();
   setMessage(
     greetingId,
     "agent",
     "Aria",
-    "hey sexy it's Aria *blows kiss* I'm looking for someone I can really be myself around. That doesn't judge me for wanting XxX so badly.",
+    "Hello! I'm Aria, your AI Creative Companion. I'm here to help you weave the frayed threads of your digital existence into a coherent myth. What shall we co-create today?",
     false
   );
 });

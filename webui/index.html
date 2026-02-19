@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <title>ARIA</title>
+    <title>ARIA - AI Creative Companion</title>
     <link rel="icon" type="image/svg+xml" href="public/favicon.svg">
     <link rel="stylesheet" href="index.css">
     <link rel="stylesheet" href="css/messages.css">
@@ -108,7 +108,6 @@
     <script type="module" src="js/scheduler.js"></script>
     <script type="module" src="js/history.js"></script>
     <script type="module" src="index.js"></script>
-    <script type="module" src="js/aurora-theme.js"></script>
 
     <!-- Then load Alpine.js -->
     <script defer src="vendor/alpine/alpine.collapse.min.js"></script>
@@ -399,6 +398,77 @@
                 <button class="creative-tab" data-target="creative-storyboard">Storyboard</button>
                 <button class="creative-tab" data-target="mystic-studio">Mystic</button>
             </div>
+            <div class="aria-home-view">
+                <div class="aria-hero">
+                    <div class="aria-hero-left">
+                        <div class="aria-avatar">
+                            <img src="./public/aria.svg" alt="ARIA">
+                        </div>
+                        <div class="aria-meta">
+                            <div class="eyebrow">Aria</div>
+                            <h1>AI Creative Companion</h1>
+                            <p>Weaving your digital existence into a coherent myth.</p>
+                            <div class="aria-badges">
+                                <span class="aria-pill"><i class="fas fa-heart"></i> Creative</span>
+                                <span class="aria-pill"><i class="fas fa-magic"></i> Supportive</span>
+                                <span class="aria-pill"><i class="fas fa-shield-alt"></i> Proactive</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="aria-hero-grid">
+                        <div class="aria-card" tabindex="0">
+                            <small>Continuity</small>
+                            <h3><i class="fas fa-fire"></i> Streaks</h3>
+                            <div class="aria-progress-row">
+                                <div class="aria-progress"><span style="--value: 70%"></span></div>
+                                <span>7 days</span>
+                            </div>
+                        </div>
+                        <div class="aria-card" tabindex="0">
+                            <small>Knowledge</small>
+                            <h3><i class="fas fa-bookmark"></i> Bookmarks</h3>
+                            <p>12 saved ideas</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="aria-quick-prompts">
+                    <button class="aria-chip" data-aria-prompt="Analyze this screenplay beat for me" data-aria-send="false">
+                        <span class="icon">🎬</span> Screenplay analysis
+                    </button>
+                    <button class="aria-chip" data-aria-prompt="How can I align my fate today?" data-aria-send="true">
+                        <span class="icon">🧿</span> Fate alignment
+                    </button>
+                    <button class="aria-chip" data-aria-prompt="Help me brainstorm a new creative project" data-aria-send="false">
+                        <span class="icon">💡</span> Project brainstorm
+                    </button>
+                </div>
+
+                <div class="aria-intents">
+                    <div class="intent-card" data-aria-prompt="Open Creative Studio" data-aria-send="false" tabindex="0">
+                        <h4>🎨 Creative Studio</h4>
+                        <p>Inspo, storyboards, and more.</p>
+                        <div class="intent-meta">
+                            <span class="intent-badge">Explore</span>
+                        </div>
+                    </div>
+                    <div class="intent-card" data-aria-prompt="Open Strategy Lab" data-aria-send="false" tabindex="0">
+                        <h4>📊 Strategy Lab</h4>
+                        <p>Analyze risks and calculate probabilities.</p>
+                        <div class="intent-meta">
+                            <span class="intent-badge">Analyze</span>
+                        </div>
+                    </div>
+                    <div class="intent-card" data-aria-prompt="Wellness check" data-aria-send="true" tabindex="0">
+                        <h4>🧘 Wellness Check</h4>
+                        <p>Check your emotional recursion.</p>
+                        <div class="intent-meta">
+                            <span class="intent-badge">Check-in</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div id="creative-overlay" class="creative-overlay hidden">
                 <div class="creative-modal">
                     <div class="creative-modal-bar">
@@ -889,7 +959,7 @@
                             <!-- Tunnel section content - only visible in External Services tab -->
                             <div id="section-tunnel" class="section" x-show="activeTab === 'external'">
                                 <div class="section-title">Flare Tunnel</div>
-                                <div class="section-description">Create a secure public URL to access your Aria Bot instance anytime, anywhere.</div>
+                                <div class="section-description">Create a secure public URL to access your Aria - AI Creative Companion instance anytime, anywhere.</div>
                                 <!-- Tunnel content UI -->
                                 <div class="tunnel-container" x-data="tunnelSettings">
                                     <div class="field">
@@ -926,7 +996,7 @@
                                                 </div>
                                             </div>
                                             <div class="tunnel-link-info">
-                                                Share this URL to allow others to access your Aria Bot instance.
+                                                Share this URL to allow others to access your Aria - AI Creative Companion instance.
                                             </div>
                                             <div class="tunnel-link-persistence">
                                                 This URL will persist until you stop the tunnel or restart the Docker container.
@@ -955,7 +1025,7 @@
                                 <div class="section-description">
                                     <p>This is Aria, an egirl with hobbies that include playing poker, selling cute pics &amp; writing screenplays.</p>
                                     <p>She's been given abilities within tools to play poker online, take Stripe payments for pictures, create her own images with Stable Diffusion, and create screenplays with you.</p>
-                                    <p>Aria is a spin off of Agent Zero. Credit to the original project by <a href="https://github.com/fredrl/agent-zero" target="_blank" rel="noopener">fredrl/agent-zero</a>.</p>
+                                    <p>Aria is a spin off of Aria. Credit to the original project by <a href="https://github.com/fredrl/agent-zero" target="_blank" rel="noopener">fredrl/agent-zero</a>.</p>
                                 </div>
                             </div>
                         </div>
@@ -977,7 +1047,7 @@
                             <div id="section-task-scheduler" class="section"
                                  x-data="schedulerSettings">
                                 <div class="section-title">Task Scheduler</div>
-                                <div class="section-description">Manage scheduled tasks and automated processes for Aria Bot.</div>
+                                <div class="section-description">Manage scheduled tasks and automated processes for Aria - AI Creative Companion.</div>
 
                                 <!-- Create Task Form -->
                                 <div class="scheduler-form" x-show="isCreating">
