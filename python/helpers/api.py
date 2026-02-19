@@ -74,7 +74,7 @@ class ApiHandler:
             PrintStyle.error(f"API error: {error}")
             return Response(response=error, status=500, mimetype="text/plain")
 
-    # get context to run agent zero in
+    # get context to run Aria in
     def get_context(self, ctxid: str):
         from agents import AgentContext
         from python.helpers.initialize import initialize_agent

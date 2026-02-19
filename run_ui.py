@@ -311,7 +311,7 @@ def run():
     # Log startup information
     commit_hash = os.getenv("GITHUB_SHA", "unknown")[:7]
     port = int(os.getenv("PORT") or runtime.get_web_ui_port())
-    PrintStyle().print(f"[BOOT] Aria Bot | commit: {commit_hash} | port: {port}")
+    PrintStyle().print(f"[BOOT] Aria - AI Creative Companion | commit: {commit_hash} | port: {port}")
     PrintStyle().print("Initializing framework...")
 
     # Suppress only request logs but keep the startup messages

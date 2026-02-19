@@ -15,7 +15,7 @@ from python.helpers.print_style import PrintStyle
 
 class BackupService:
     """
-    Core backup and restore service for Aria Bot.
+    Core backup and restore service for Aria - AI Creative Companion.
 
     Features:
     - JSON-based metadata with user-editable path specifications
@@ -27,7 +27,7 @@ class BackupService:
 
     def __init__(self):
         self.agent_zero_version = self._get_agent_zero_version()
-        self.agent_zero_root = files.get_abs_path("")  # Resolved Aria Bot root
+        self.agent_zero_root = files.get_abs_path("")  # Resolved Aria - AI Creative Companion root
 
         # Build base paths map for pattern resolution
         self.base_paths = {
@@ -55,16 +55,16 @@ class BackupService:
     def _get_default_patterns(self) -> str:
         """Get default backup patterns with resolved absolute paths.
 
-        Only includes Aria Bot project directory patterns.
+        Only includes Aria - AI Creative Companion project directory patterns.
         """
         # Ensure paths don't have double slashes
         agent_root = self.agent_zero_root.rstrip('/')
 
-        return f"""# Aria Bot Knowledge (excluding defaults)
+        return f"""# Aria - AI Creative Companion Knowledge (excluding defaults)
 {agent_root}/knowledge/**
 !{agent_root}/knowledge/default/**
 
-# Aria Bot Instruments (excluding defaults)
+# Aria - AI Creative Companion Instruments (excluding defaults)
 {agent_root}/instruments/**
 !{agent_root}/instruments/default/**
 
@@ -80,7 +80,7 @@ class BackupService:
 {agent_root}/tmp/uploads/**"""
 
     def _get_agent_zero_version(self) -> str:
-        """Get current Aria Bot version"""
+        """Get current Aria - AI Creative Companion version"""
         try:
             # Get version from git info (same as run_ui.py)
             gitinfo = git.get_git_info()
@@ -212,7 +212,7 @@ class BackupService:
     def _translate_patterns(self, patterns: List[str], backup_metadata: Dict[str, Any]) -> List[str]:
         """Translate patterns from backed up system to current system.
 
-        Replaces the backed up Aria Bot root path with the current Aria Bot root path
+        Replaces the backed up Aria - AI Creative Companion root path with the current Aria - AI Creative Companion root path
         in all patterns if there's an exact match at the beginning of the pattern.
 
         Args:
@@ -222,11 +222,11 @@ class BackupService:
         Returns:
             List of translated patterns for the current system
         """
-        # Get the backed up agent zero root path from metadata
+        # Get the backed up Aria root path from metadata
         environment_info = backup_metadata.get("environment_info", {})
         backed_up_agent_root = environment_info.get("agent_zero_root", "")
 
-        # Get current agent zero root path
+        # Get current Aria root path
         current_agent_root = self.agent_zero_root
 
         # If we don't have the backed up root path, return patterns as-is
@@ -239,7 +239,7 @@ class BackupService:
 
         translated_patterns = []
         for pattern in patterns:
-            # Check if the pattern starts with the backed up agent zero root
+            # Check if the pattern starts with the backed up Aria root
             if pattern.startswith(backed_up_agent_root + '/') or pattern == backed_up_agent_root:
                 # Replace the backed up root with the current root
                 relative_pattern = pattern[len(backed_up_agent_root):].lstrip('/')
@@ -769,7 +769,7 @@ class BackupService:
     def _translate_restore_path(self, archive_path: str, backup_metadata: Dict[str, Any]) -> str:
         """Translate file path from backed up system to current system.
 
-        Replaces the backed up Aria Bot root path with the current Aria Bot root path
+        Replaces the backed up Aria - AI Creative Companion root path with the current Aria - AI Creative Companion root path
         if there's an exact match at the beginning of the path.
 
         Args:
@@ -779,11 +779,11 @@ class BackupService:
         Returns:
             Translated path for the current system
         """
-        # Get the backed up agent zero root path from metadata
+        # Get the backed up Aria root path from metadata
         environment_info = backup_metadata.get("environment_info", {})
         backed_up_agent_root = environment_info.get("agent_zero_root", "")
 
-        # Get current agent zero root path
+        # Get current Aria root path
         current_agent_root = self.agent_zero_root
 
         # If we don't have the backed up root path, use original path with leading slash
@@ -800,7 +800,7 @@ class BackupService:
         else:
             absolute_archive_path = archive_path
 
-        # Check if the archive path starts with the backed up agent zero root
+        # Check if the archive path starts with the backed up Aria root
         if absolute_archive_path.startswith(backed_up_agent_root + '/') or absolute_archive_path == backed_up_agent_root:
             # Replace the backed up root with the current root
             relative_path = absolute_archive_path[len(backed_up_agent_root):].lstrip('/')

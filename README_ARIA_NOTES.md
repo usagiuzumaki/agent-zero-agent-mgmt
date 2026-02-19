@@ -1,6 +1,6 @@
 
-# Aria Bot Merge Notes
-- UI rebrand: 'Agent Zero' -> 'Aria Bot' where found.
+# Aria - AI Creative Companion Merge Notes
+- UI rebrand: 'Aria' -> 'Aria - AI Creative Companion' where found.
 - Added instruments: Stripe, Instagram, ElevenLabs, Stable Diffusion (each with run.sh).
 - instruments.py import stubs added.
 - agents/egirl/ persona folder added with prompts.
