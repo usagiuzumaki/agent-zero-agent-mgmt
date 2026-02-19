@@ -1,7 +1,7 @@
 import sqlite3
 import uuid
 import asyncio
-from typing import Optional, List, Any
+from typing import Optional, List, Any, Dict, Tuple
 import logging
 from datetime import datetime
 import json
@@ -13,15 +13,15 @@ from python.helpers.dirty_json import DirtyJson
 from difflib import SequenceMatcher
 
 class MVLManager:
-    def __init__(self, db_path="loom.db", agent=None):
+    def __init__(self, db_path: str = "loom.db", agent: Any = None):
         self.db_path = files.get_abs_path(db_path)
         self.agent = agent
         self._init_db()
 
-    def get_connection(self):
+    def get_connection(self) -> sqlite3.Connection:
         return sqlite3.connect(self.db_path)
 
-    def _init_db(self):
+    def _init_db(self) -> None:
         conn = self.get_connection()
         cursor = conn.cursor()
 
@@ -102,7 +102,7 @@ class MVLManager:
         # print(f"MVL Database initialized at {self.db_path}")
         conn.close()
 
-    def get_state(self, user_id):
+    def get_state(self, user_id: str) -> Dict[str, Any]:
         conn = self.get_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT entropy, silence_streak FROM loom_state WHERE user_id = ?", (user_id,))
@@ -112,7 +112,7 @@ class MVLManager:
             return {"entropy": row[0], "silence_streak": row[1]}
         return {"entropy": 0.5, "silence_streak": 0} # Default
 
-    def update_state(self, user_id, entropy, silence_streak):
+    def update_state(self, user_id: str, entropy: float, silence_streak: int) -> None:
         conn = self.get_connection()
         cursor = conn.cursor()
         cursor.execute('''
@@ -126,7 +126,7 @@ class MVLManager:
         conn.commit()
         conn.close()
 
-    def _get_recent_history(self, user_id, limit=10):
+    def _get_recent_history(self, user_id: str, limit: int = 10) -> List[Dict[str, str]]:
         try:
             conn = self.get_connection()
             cursor = conn.cursor()
@@ -139,23 +139,42 @@ class MVLManager:
             PrintStyle().print(f"MVL History Error: {e}")
             return []
 
-    async def detect_pattern(self, user_id, text):
+    async def detect_pattern(self, user_id: str, text: str) -> Tuple[Optional[Dict[str, Any]], List[str]]:
         if not self.agent:
+            PrintStyle(font_color="yellow").print("MVL: No agent attached, skipping pattern detection.")
             return None, []
 
         history = self._get_recent_history(user_id)
 
-        system_prompt = files.read_file("prompts/mvl_pattern_detection.sys.md")
+        try:
+            system_prompt = files.read_file("prompts/mvl_pattern_detection.sys.md")
+        except Exception as e:
+            PrintStyle(font_color="red").print(f"MVL: Could not read prompt file: {e}")
+            return None, []
 
         # Prepare context
         history_text = "\n".join([f"{msg['role'].upper()}: {msg['content']}" for msg in history])
         user_message = f"HISTORY:\n{history_text}\n\nCURRENT MESSAGE:\nUSER: {text}"
 
         try:
-            response_json = await self.agent.call_utility_model(system_prompt, user_message)
-            analysis = DirtyJson.parse_string(response_json)
+            # Check if agent has call_utility_model method
+            if not hasattr(self.agent, "call_utility_model"):
+                PrintStyle(font_color="red").print("MVL: Agent does not support call_utility_model.")
+                return None, []
+
+            response_json_str = await self.agent.call_utility_model(system_prompt, user_message)
+
+            if not response_json_str:
+                return None, []
+
+            analysis = DirtyJson.parse_string(response_json_str)
+
+            if not isinstance(analysis, dict):
+                 PrintStyle(font_color="yellow").print(f"MVL: Invalid JSON analysis type: {type(analysis)}")
+                 return None, []
+
         except Exception as e:
-            PrintStyle().print(f"MVL Analysis Error: {e}")
+            PrintStyle(font_color="red").print(f"MVL Analysis Error: {e}")
             return None, []
 
         new_pattern_ids = []
@@ -186,7 +205,7 @@ class MVLManager:
                     ))
                     new_pattern_ids.append(pattern_id)
                 except Exception as e:
-                     PrintStyle().print(f"Pattern Insert Error: {e}")
+                     PrintStyle(font_color="red").print(f"Pattern Insert Error: {e}")
 
             conn.commit()
             conn.close()
@@ -234,7 +253,7 @@ class MVLManager:
             is_identity_statement=is_identity
         )
 
-    async def process_message(self, user_id: str, text: str, role="user"):
+    async def process_message(self, user_id: str, text: str, role: str = "user") -> str:
         state = self.get_state(user_id)
         current_entropy = state["entropy"]
         silence_streak = state["silence_streak"]
