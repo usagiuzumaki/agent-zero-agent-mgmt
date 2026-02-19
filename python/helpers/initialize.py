@@ -149,7 +149,7 @@ def initialize_job_loop():
     return defer.DeferredTask("JobLoop").start_task(run_loop)
 
 def initialize_preload():
-    import preload
+    from . import preload
     return defer.DeferredTask().start_task(preload.preload)
 
 

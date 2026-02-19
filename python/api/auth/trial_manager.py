@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from flask import jsonify
 from flask_login import current_user
-from auth_models import db
+from .auth_models import db
 
 TRIAL_DURATION_MINUTES = 3  # 3-minute trial period
 

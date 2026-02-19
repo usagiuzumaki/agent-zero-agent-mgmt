@@ -15,7 +15,7 @@ def run_migrations():
     
     try:
         # Import after path is set
-        from auth_models import db, User, OAuth
+        from python.api.auth.auth_models import db, User, OAuth
         from run_ui import webapp
         
         with webapp.app_context():

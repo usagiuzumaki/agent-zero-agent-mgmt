@@ -23,23 +23,34 @@ def calculate_meaningfulness(narrative_weight: float, novelty: float, entropy: f
     """
     return 0.5 * narrative_weight + 0.3 * novelty + 0.2 * (1.0 - entropy)
 
-def decide_mt_gate(meaningfulness: float, narrative_weight: float, utility_flag: bool, mask_conflict: bool, self_sabotage: bool) -> str:
+def decide_mt_gate(meaningfulness: float, narrative_weight: float, utility_flag: bool, mask_conflict: bool, self_sabotage: bool, active_mask: str = 'light') -> str:
     """
     MT gate mapping:
-    if meaningfulness < 0.25 -> silence
+    - Light Aria: Higher threshold for silence, more likely to reply.
+    - Dark Aria: More indirect, higher threshold for direct reply, more silences/delays.
+
+    if meaningfulness < (0.25 if light else 0.4) -> silence
     if utility_flag == true && narrative_weight < 0.5 -> refuse
     if masks disagree strongly -> delay
-    if meaningfulness > 0.75 AND pattern type self_sabotage active -> confront
+    if meaningfulness > 0.75 AND (self_sabotage OR dark) -> confront/indirect
     else -> reply
     """
-    if meaningfulness < 0.25:
+    silence_threshold = 0.25 if active_mask == 'light' else 0.4
+
+    if meaningfulness < silence_threshold:
         return "silence"
     if utility_flag and narrative_weight < 0.5:
         return "refuse"
     if mask_conflict:
         return "delay"
+
+    # Dark Aria is more likely to confront or be indirect
+    if active_mask == 'dark' and meaningfulness > 0.6:
+        return "confront"
+
     if meaningfulness > 0.75 and self_sabotage:
         return "confront"
+
     return "reply"
 
 def calculate_narrative_weight(

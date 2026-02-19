@@ -8,7 +8,8 @@ class AriaMoodGift(Tool):
     
     def __init__(self, agent, **kwargs):
         super().__init__(agent, **kwargs)
-        self.enhancement_system = AriaEnhancementSystem()
+        user_id = self.agent.context.id
+        self.enhancement_system = AriaEnhancementSystem(user_id=user_id)
     
     async def execute(self, **kwargs):
         action = kwargs.get("action", "mood_image")

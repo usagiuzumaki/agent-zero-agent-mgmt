@@ -35,3 +35,5 @@
 {{ include './agent.system.tool.fountain_to_html.md' }}
 
 {{ include './agent.system.tool.narrative_knowledge.md' }}
+
+{{ include 'agent.system.tool.aria_interactions.md' }}

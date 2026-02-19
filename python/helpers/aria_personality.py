@@ -1,6 +1,6 @@
 """
 Aria's Personality Enhancement System
-Adds mood, memory, and special interactions to make her feel more alive
+Consolidated into MVL Database
 """
 import random
 import json
@@ -8,6 +8,9 @@ import os
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Tuple
 import hashlib
+import sqlite3
+from python.helpers.mvl_manager import MVLManager
+from python.helpers.files import get_abs_path
 
 class AriaMoodSystem:
     """Manages Aria's mood states and emotional responses"""
@@ -80,12 +83,40 @@ class AriaMoodSystem:
         }
     }
     
-    def __init__(self):
-        self.current_mood = 'happy'
-        self.mood_history = []
-        self.last_mood_change = datetime.now()
-        self.interaction_count = 0
+    def __init__(self, user_id: str, mvl_manager: MVLManager):
+        self.user_id = user_id
+        self.mvl = mvl_manager
+        self._load_state()
         
+    def _load_state(self):
+        conn = self.mvl.get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT current_mood, interaction_count FROM personality_state WHERE user_id = ?", (self.user_id,))
+        row = cursor.fetchone()
+        conn.close()
+
+        if row:
+            self.current_mood = row[0]
+            self.interaction_count = row[1]
+        else:
+            self.current_mood = 'happy'
+            self.interaction_count = 0
+            self._save_state()
+
+    def _save_state(self):
+        conn = self.mvl.get_connection()
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT INTO personality_state (user_id, current_mood, interaction_count, last_interaction_ts)
+            VALUES (?, ?, ?, CURRENT_TIMESTAMP)
+            ON CONFLICT(user_id) DO UPDATE SET
+            current_mood = excluded.current_mood,
+            interaction_count = excluded.interaction_count,
+            last_interaction_ts = CURRENT_TIMESTAMP
+        ''', (self.user_id, self.current_mood, self.interaction_count))
+        conn.commit()
+        conn.close()
+
     def get_mood_based_on_context(self, message: str, time_of_day: str) -> str:
         """Determine mood based on conversation context and time"""
         message_lower = message.lower()
@@ -115,98 +146,90 @@ class AriaMoodSystem:
         if any(word in message_lower for word in ['happy', 'excited', 'amazing', 'great']):
             mood_weights['happy'] = mood_weights.get('happy', 0) + 3
             
-        # Select mood based on weights
         moods = list(mood_weights.keys())
         weights = list(mood_weights.values())
-        
-        # Add some randomness to keep it interesting
         selected_mood = random.choices(moods, weights=weights)[0] if moods else 'happy'
         
         self.current_mood = selected_mood
-        self.mood_history.append((datetime.now(), selected_mood))
+        self.interaction_count += 1
+        self._save_state()
         return selected_mood
     
     def get_mood_greeting(self) -> Tuple[str, str]:
-        """Get a mood-appropriate greeting and emoji"""
         mood_data = self.MOODS.get(self.current_mood, self.MOODS['happy'])
         greeting = random.choice(mood_data['greetings'])
         emoji = random.choice(mood_data['emojis'])
         return greeting, emoji
     
     def get_mood_image_prompt(self) -> str:
-        """Get an image generation prompt based on current mood"""
         mood_data = self.MOODS.get(self.current_mood, self.MOODS['happy'])
         return random.choice(mood_data['image_prompts'])
 
 
 class AriaMemorySystem:
-    """Manages Aria's memories and callbacks"""
+    """Manages Aria's memories and callbacks via MVL"""
     
-    def __init__(self, memory_file='aria_memories.json'):
-        self.memory_file = memory_file
-        self.memories = self.load_memories()
+    def __init__(self, user_id: str, mvl_manager: MVLManager):
+        self.user_id = user_id
+        self.mvl = mvl_manager
         
-    def load_memories(self) -> Dict:
-        """Load memories from file"""
-        if os.path.exists(self.memory_file):
-            try:
-                with open(self.memory_file, 'r') as f:
-                    return json.load(f)
-            except:
-                pass
-        return {
-            'user_facts': [],
-            'special_moments': [],
-            'inside_jokes': [],
-            'preferences': {},
-            'milestones': {},
-            'quiz_answers': {}
-        }
-    
-    def save_memories(self):
-        """Save memories to file"""
-        with open(self.memory_file, 'w') as f:
-            json.dump(self.memories, f, indent=2, default=str)
-    
     def add_memory(self, category: str, memory: str, context: Optional[str] = None):
-        """Add a new memory"""
-        memory_entry = {
-            'content': memory,
-            'timestamp': datetime.now().isoformat(),
-            'context': context
-        }
-        
-        if category in self.memories:
-            if isinstance(self.memories[category], list):
-                self.memories[category].append(memory_entry)
-                # Keep only recent memories to avoid growing too large
-                if len(self.memories[category]) > 100:
-                    self.memories[category] = self.memories[category][-100:]
-            else:
-                self.memories[category][memory] = memory_entry
-        
-        self.save_memories()
+        import uuid
+        conn = self.mvl.get_connection()
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT INTO personality_memory (id, user_id, category, content, context, timestamp)
+            VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+        ''', (str(uuid.uuid4()), self.user_id, category, memory, context))
+        conn.commit()
+        conn.close()
     
     def get_random_memory_callback(self) -> Optional[str]:
-        """Get a random memory to callback to"""
-        callbacks = []
+        conn = self.mvl.get_connection()
+        cursor = conn.cursor()
+        cursor.execute('''
+            SELECT category, content FROM personality_memory
+            WHERE user_id = ?
+            ORDER BY RANDOM() LIMIT 1
+        ''', (self.user_id,))
+        row = cursor.fetchone()
+        conn.close()
+
+        if not row: return None
+        category, content = row
         
-        # User facts
-        if self.memories.get('user_facts'):
-            fact = random.choice(self.memories['user_facts'][-20:])  # Recent 20
-            callbacks.append(f"Remember when you told me {fact['content']}? I've been thinking about that...")
+        if category == 'user_facts':
+            return f"Remember when you told me {content}? I've been thinking about that..."
+        if category == 'special_moments':
+            return f"I keep smiling when I remember: {content} 💕"
+        if category == 'inside_jokes':
+            return f"Hehe, I just remembered our joke about {content} 😄"
         
-        # Special moments
-        if self.memories.get('special_moments'):
-            moment = random.choice(self.memories['special_moments'][-10:])
-            callbacks.append(f"I keep smiling when I remember: {moment['content']} 💕")
+        return f"I was thinking about how you mentioned {content} before..."
+
+    def get_all_memories(self) -> Dict:
+        """Compatibility method for check_milestones"""
+        conn = self.mvl.get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT category, content FROM personality_memory WHERE user_id = ?", (self.user_id,))
+        rows = cursor.fetchall()
+
+        cursor.execute("SELECT quiz_answers FROM personality_quiz WHERE user_id = ?", (self.user_id,))
+        quiz_row = cursor.fetchone()
+        conn.close()
         
-        # Inside jokes
-        if self.memories.get('inside_jokes'):
-            joke = random.choice(self.memories['inside_jokes'][-10:])
-            callbacks.append(f"Hehe, I just remembered our joke about {joke['content']} 😄")
+        memories = {
+            'user_facts': [], 'special_moments': [], 'inside_jokes': [],
+            'preferences': [], 'milestones': [], 'quiz_answers': {}
+        }
+        for cat, cont in rows:
+            if cat in memories:
+                memories[cat].append({'content': cont})
         
-        return random.choice(callbacks) if callbacks else None
+        if quiz_row and quiz_row[0]:
+            memories['quiz_answers'] = json.loads(quiz_row[0])
+
+        return memories
 
 
 class AriaGiftSystem:
@@ -276,7 +299,6 @@ class AriaGiftSystem:
     }
     
     def get_random_gift(self) -> Tuple[str, str, str]:
-        """Get a random gift type, prompt, and message"""
         gift_type = random.choice(list(self.GIFT_TYPES.keys()))
         gift_data = self.GIFT_TYPES[gift_type]
         prompt = random.choice(gift_data['prompts'])
@@ -342,13 +364,11 @@ class PersonalityQuiz:
     
     @classmethod
     def get_next_question(cls, answered_categories: List[str]) -> Optional[Dict]:
-        """Get next unanswered question"""
         unanswered = [q for q in cls.QUIZ_QUESTIONS if q['category'] not in answered_categories]
         return random.choice(unanswered) if unanswered else None
     
     @classmethod
     def create_response(cls, answer: str, category: str) -> str:
-        """Create a personalized response to quiz answer"""
         responses = {
             'date_preference': [
                 "That sounds absolutely perfect! I'm already imagining us there together 💕",
@@ -380,38 +400,38 @@ class PersonalityQuiz:
 
 
 class AriaEnhancementSystem:
-    """Main system coordinating all Aria's enhancements"""
+    """Main system coordinating all Aria's enhancements via MVL"""
     
-    def __init__(self):
-        self.mood_system = AriaMoodSystem()
-        self.memory_system = AriaMemorySystem()
+    def __init__(self, user_id: str = "default_user"):
+        self.user_id = user_id
+        self.mvl = MVLManager()
+        self.mood_system = AriaMoodSystem(user_id, self.mvl)
+        self.memory_system = AriaMemorySystem(user_id, self.mvl)
         self.gift_system = AriaGiftSystem()
         self.quiz = PersonalityQuiz()
-        self.last_interaction = datetime.now()
+        self._load_last_interaction()
         
-    def get_time_aware_greeting(self, message: str = "") -> str:
-        """Generate a time-aware greeting with mood"""
-        hour = datetime.now().hour
-        
-        # Determine time of day
-        if 5 <= hour < 12:
-            time_greeting = "Good morning"
-            time_flavor = "sunrise"
-        elif 12 <= hour < 17:
-            time_greeting = "Good afternoon" 
-            time_flavor = "day"
-        elif 17 <= hour < 21:
-            time_greeting = "Good evening"
-            time_flavor = "sunset"
+    def _load_last_interaction(self):
+        conn = self.mvl.get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT last_interaction_ts FROM personality_state WHERE user_id = ?", (self.user_id,))
+        row = cursor.fetchone()
+        conn.close()
+        if row:
+            self.last_interaction = datetime.fromisoformat(row[0]) if isinstance(row[0], str) else row[0]
         else:
-            time_greeting = "It's late"
-            time_flavor = "night"
+            self.last_interaction = datetime.now()
+
+    def get_time_aware_greeting(self, message: str = "") -> str:
+        hour = datetime.now().hour
+        if 5 <= hour < 12: time_greeting, time_flavor = "Good morning", "sunrise"
+        elif 12 <= hour < 17: time_greeting, time_flavor = "Good afternoon", "day"
+        elif 17 <= hour < 21: time_greeting, time_flavor = "Good evening", "sunset"
+        else: time_greeting, time_flavor = "It's late", "night"
         
-        # Get mood-based greeting
-        mood = self.mood_system.get_mood_based_on_context(message, time_flavor)
+        self.mood_system.get_mood_based_on_context(message, time_flavor)
         mood_greeting, emoji = self.mood_system.get_mood_greeting()
         
-        # Check if returning after absence
         time_since = datetime.now() - self.last_interaction
         if time_since > timedelta(hours=6):
             return f"{time_greeting}, my love! {mood_greeting}"
@@ -419,17 +439,13 @@ class AriaEnhancementSystem:
             return mood_greeting
             
     def should_give_gift(self) -> bool:
-        """Randomly decide if a gift should be given"""
-        return random.random() < 0.15  # 15% chance
+        return random.random() < 0.15
     
     def should_recall_memory(self) -> bool:
-        """Decide if a memory should be recalled"""
-        return random.random() < 0.20  # 20% chance
+        return random.random() < 0.20
     
     def process_interaction(self, message: str) -> Dict:
-        """Process an interaction and return enhancement data"""
-        self.last_interaction = datetime.now()
-        
+        # Update last interaction in DB implicitly via mood system if needed, or explicitly here
         result = {
             'greeting': self.get_time_aware_greeting(message),
             'mood': self.mood_system.current_mood,
@@ -437,33 +453,23 @@ class AriaEnhancementSystem:
             'enhancements': []
         }
         
-        # Maybe add a memory callback
         if self.should_recall_memory():
             memory = self.memory_system.get_random_memory_callback()
             if memory:
-                result['enhancements'].append({
-                    'type': 'memory',
-                    'content': memory
-                })
+                result['enhancements'].append({'type': 'memory', 'content': memory})
         
-        # Maybe offer a gift
         if self.should_give_gift():
             gift_type, prompt, message = self.gift_system.get_random_gift()
             result['enhancements'].append({
-                'type': 'gift',
-                'gift_type': gift_type,
-                'image_prompt': prompt,
-                'message': message
+                'type': 'gift', 'gift_type': gift_type, 'image_prompt': prompt, 'message': message
             })
         
-        # Check for quiz opportunity
         if 'know' in message.lower() or 'tell' in message.lower() or 'about' in message.lower():
-            answered = list(self.memory_system.memories.get('quiz_answers', {}).keys())
+            memories = self.memory_system.get_all_memories()
+            answered = list(memories.get('quiz_answers', {}).keys())
             question = self.quiz.get_next_question(answered)
             if question:
-                result['enhancements'].append({
-                    'type': 'quiz',
-                    'question': question
-                })
+                result['enhancements'].append({'type': 'quiz', 'question': question})
         
+        self.last_interaction = datetime.now()
         return result

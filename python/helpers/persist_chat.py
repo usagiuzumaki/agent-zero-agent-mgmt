@@ -5,7 +5,7 @@ import uuid
 from agents import Agent, AgentConfig, AgentContext, AgentContextType
 from python.helpers import files, history
 import json
-from initialize import initialize_agent
+from python.helpers.initialize import initialize_agent
 
 from python.helpers.log import Log, LogItem
 

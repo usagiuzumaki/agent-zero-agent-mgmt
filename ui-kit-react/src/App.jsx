@@ -11,7 +11,7 @@ export default function App() {
   const [open, setOpen] = useState(false);
   const [logs, setLogs] = useState([]);
   const [ui, setUI] = useState('default');
-  const [theme, setTheme] = useState(config.theme || 'light');
+  const [theme, setTheme] = useState(config.theme || 'aurora');
 
   const handleLog = (log) => {
     setLogs((prev) => [...prev, log]);
@@ -57,6 +57,7 @@ export default function App() {
             aria-label="Select Theme"
             title="Select Theme"
           >
+            <option value="aurora">Aurora (Aria)</option>
             <option value="light">Light</option>
             <option value="dark">Dark</option>
             <option value="casino">Story Casino</option>

@@ -20,6 +20,21 @@ Usage:
 }
 ~~~
 
+6. Switch mask
+~~~json
+{
+    "thoughts": [
+        "I need to reveal some deeper truths, time to show my shadow"
+    ],
+    "headline": "Switching to Dark Aria mask",
+    "tool_name": "aria_interactions",
+    "tool_args": {
+        "action": "switch_mask",
+        "mask": "dark"
+    }
+}
+~~~
+
 2. Save memory
 ~~~json
 {

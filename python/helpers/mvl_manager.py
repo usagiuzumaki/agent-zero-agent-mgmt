@@ -86,8 +86,36 @@ class MVLManager:
                 silence_streak INTEGER,
                 dependency_risk REAL CHECK(dependency_risk BETWEEN 0 AND 1),
                 mask_weights TEXT,
+                active_mask TEXT DEFAULT 'light',
                 last_archetype_state_id TEXT,
                 FOREIGN KEY(last_archetype_state_id) REFERENCES archetype_state(id)
+            )
+            ''')
+
+            cursor.execute('''
+            CREATE TABLE IF NOT EXISTS personality_state (
+                user_id TEXT PRIMARY KEY,
+                current_mood TEXT,
+                interaction_count INTEGER DEFAULT 0,
+                last_interaction_ts DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+            ''')
+
+            cursor.execute('''
+            CREATE TABLE IF NOT EXISTS personality_memory (
+                id TEXT PRIMARY KEY,
+                user_id TEXT NOT NULL,
+                category TEXT,
+                content TEXT,
+                context TEXT,
+                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+            ''')
+
+            cursor.execute('''
+            CREATE TABLE IF NOT EXISTS personality_quiz (
+                user_id TEXT PRIMARY KEY,
+                quiz_answers TEXT -- JSON object
             )
             ''')
             conn.commit()
@@ -97,24 +125,35 @@ class MVLManager:
     def get_state(self, user_id):
         conn = self.get_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT entropy, silence_streak FROM loom_state WHERE user_id = ?", (user_id,))
+        cursor.execute("SELECT entropy, silence_streak, active_mask FROM loom_state WHERE user_id = ?", (user_id,))
         row = cursor.fetchone()
         conn.close()
         if row:
-            return {"entropy": row[0], "silence_streak": row[1]}
-        return {"entropy": 0.5, "silence_streak": 0} # Default
+            return {"entropy": row[0], "silence_streak": row[1], "active_mask": row[2] or "light"}
+        return {"entropy": 0.5, "silence_streak": 0, "active_mask": "light"} # Default
 
-    def update_state(self, user_id, entropy, silence_streak):
+    def update_state(self, user_id, entropy, silence_streak, active_mask=None):
         conn = self.get_connection()
         cursor = conn.cursor()
-        cursor.execute('''
-            INSERT INTO loom_state (user_id, entropy, silence_streak, last_active_ts)
-            VALUES (?, ?, ?, CURRENT_TIMESTAMP)
-            ON CONFLICT(user_id) DO UPDATE SET
-            entropy = excluded.entropy,
-            silence_streak = excluded.silence_streak,
-            last_active_ts = CURRENT_TIMESTAMP
-        ''', (user_id, entropy, silence_streak))
+        if active_mask:
+            cursor.execute('''
+                INSERT INTO loom_state (user_id, entropy, silence_streak, active_mask, last_active_ts)
+                VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+                ON CONFLICT(user_id) DO UPDATE SET
+                entropy = excluded.entropy,
+                silence_streak = excluded.silence_streak,
+                active_mask = excluded.active_mask,
+                last_active_ts = CURRENT_TIMESTAMP
+            ''', (user_id, entropy, silence_streak, active_mask))
+        else:
+            cursor.execute('''
+                INSERT INTO loom_state (user_id, entropy, silence_streak, last_active_ts)
+                VALUES (?, ?, ?, CURRENT_TIMESTAMP)
+                ON CONFLICT(user_id) DO UPDATE SET
+                entropy = excluded.entropy,
+                silence_streak = excluded.silence_streak,
+                last_active_ts = CURRENT_TIMESTAMP
+            ''', (user_id, entropy, silence_streak))
         conn.commit()
         conn.close()
 
@@ -181,7 +220,8 @@ class MVLManager:
             narrative_weight=narrative_weight,
             utility_flag=utility_flag,
             mask_conflict=False, # Placeholder
-            self_sabotage=False # Placeholder
+            self_sabotage=False, # Placeholder
+            active_mask=state.get("active_mask", "light")
         )
 
         # Record event

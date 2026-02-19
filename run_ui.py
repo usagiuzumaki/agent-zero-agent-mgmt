@@ -12,7 +12,7 @@ import threading
 import signal
 from flask import Flask, request, Response, session, render_template_string, send_from_directory
 from flask_basicauth import BasicAuth
-import initialize
+from python.helpers import initialize
 from python.helpers import files, git, mcp_server
 from python.helpers.files import get_abs_path
 from python.helpers import runtime, dotenv, process
@@ -21,9 +21,9 @@ from python.helpers.api import ApiHandler
 from python.helpers.print_style import PrintStyle
 
 try:
-    from auth_models import init_db
-    from supabase_auth import init_supabase_auth, require_login
-    from stripe_payments import init_stripe_routes
+    from python.api.auth.auth_models import init_db
+    from python.api.auth.supabase_auth import init_supabase_auth, require_login
+    from python.api.auth.stripe_payments import init_stripe_routes
     from python.api.image_generation_endpoint import register_image_routes
     from flask_login import current_user
     _auth_available = True
@@ -332,7 +332,7 @@ def run():
                 register_image_routes(webapp)
                 
                 # Register payment gate blueprint
-                from payment_gate import payment_gate
+                from python.api.auth.payment_gate import payment_gate
                 webapp.register_blueprint(payment_gate)
                 
                 # Register user data API

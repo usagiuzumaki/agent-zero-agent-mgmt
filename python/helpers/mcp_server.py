@@ -8,7 +8,7 @@ from fastmcp import FastMCP
 
 from agents import AgentContext, AgentContextType, UserMessage
 from python.helpers.persist_chat import save_tmp_chat, remove_chat
-from initialize import initialize_agent
+from python.helpers.initialize import initialize_agent
 from python.helpers.print_style import PrintStyle
 from python.helpers import settings
 from starlette.middleware import Middleware

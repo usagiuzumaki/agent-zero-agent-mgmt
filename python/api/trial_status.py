@@ -3,7 +3,7 @@ from flask import jsonify
 
 try:
     from flask_login import current_user
-    from trial_manager import TrialManager
+    from python.api.auth.trial_manager import TrialManager
     _trial_management_available = True
 except ImportError:
     _trial_management_available = False

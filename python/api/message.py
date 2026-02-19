@@ -10,7 +10,7 @@ from python.helpers.print_style import PrintStyle
 # Import trial management
 try:
     from flask_login import current_user
-    from trial_manager import TrialManager
+    from python.api.auth.trial_manager import TrialManager
     from flask import jsonify
     _trial_management_available = True
 except ImportError:

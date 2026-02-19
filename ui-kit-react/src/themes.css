@@ -77,3 +77,34 @@
   --color-tension-high: #f472b6; /* Pink */
   --color-tension-climax: #ef4444; /* Red */
 }
+
+/*
+ * ✨ AURORA (Aria Signature)
+ * Vibe: Ethereal, Deep Space, Pink & Teal Glow
+ */
+[data-theme="aurora"] {
+  --color-background: #0a0b15;
+  --color-surface: rgba(14, 18, 32, 0.85);
+  --color-text: #f5f7fb;
+  --color-text-muted: #c2c8d6;
+  --color-primary: #ff73c7;
+  --color-primary-hover: #ff91d4;
+  --color-secondary: #5eead4;
+  --color-border: rgba(255, 255, 255, 0.12);
+  --font-family: 'Inter', system-ui, sans-serif;
+  --border-radius: 22px;
+
+  --shadow-card: 0 20px 80px rgba(0, 0, 0, 0.35);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.12);
+
+  /* Tension / Role Colors */
+  --color-tension-low: #5eead4;
+  --color-tension-med: #facc15;
+  --color-tension-high: #ff73c7;
+  --color-tension-climax: #f43f5e;
+
+  /* Aurora specific gradients */
+  --bg-gradient: radial-gradient(circle at 10% 20%, rgba(255, 115, 199, 0.12), transparent 35%),
+    radial-gradient(circle at 90% 10%, rgba(94, 234, 212, 0.12), transparent 30%),
+    linear-gradient(135deg, #0b1020 0%, #0c0f1a 50%, #0a0b15 100%);
+}

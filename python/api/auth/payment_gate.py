@@ -2,7 +2,7 @@ import os
 import stripe
 from flask import Blueprint, render_template_string, redirect, url_for, request, session, jsonify
 from flask_login import login_user, logout_user, current_user
-from auth_models import db, User
+from .auth_models import db, User
 from datetime import datetime
 import json
 
