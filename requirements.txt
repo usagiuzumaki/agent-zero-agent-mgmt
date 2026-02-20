@@ -70,3 +70,5 @@ browser-use
 elevenlabs
 diffusers
 torch
+kokoro
+misaki[en]
