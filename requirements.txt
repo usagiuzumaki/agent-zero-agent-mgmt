@@ -56,6 +56,9 @@ numpy
 nest_asyncio>=1.6.0
 soundfile
 flaredantic
+kokoro>=0.9.0
+misaki[en]
+scipy
 
 # Development Tools
 pypdf==4.3.1
