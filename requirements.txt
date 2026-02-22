@@ -56,7 +56,7 @@ numpy
 nest_asyncio>=1.6.0
 soundfile
 flaredantic
-kokoro>=0.19
+kokoro>=0.9.0
 misaki[en]
 scipy
 
