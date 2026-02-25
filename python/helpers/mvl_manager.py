@@ -234,6 +234,79 @@ class MVLManager:
             is_identity_statement=is_identity
         )
 
+    async def detect_pattern(self, user_id: str, text: str) -> Optional[str]:
+        if not self.agent:
+            return None
+
+        # 1. Fetch recent history (last 10 events)
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT role, text FROM interaction_event WHERE user_id = ? ORDER BY ts DESC LIMIT 10", (user_id,))
+        history_rows = cursor.fetchall()
+        conn.close()
+
+        # Reverse to chronological order
+        history_rows.reverse()
+        history_text = "\n".join([f"{role}: {msg}" for role, msg in history_rows])
+
+        # 2. Call LLM
+        system_prompt = """
+        Analyze the conversation history for recurring psychological patterns.
+        Look for:
+        - Contradiction: Saying one thing, doing another.
+        - Loop: Repeating the same issue without resolution.
+        - Confession: Admitting a hidden truth.
+        - Boundary: Testing limits.
+        - Desire: Expressing a want.
+        - Fear: Expressing anxiety.
+        - Goal: Stating an objective.
+        - Identity Claim: "I am X".
+        - Trigger: Specific topic causing reaction.
+
+        Return JSON:
+        {
+            "pattern_found": boolean,
+            "type": "loop" | "contradiction" | "confession" | "boundary" | "desire" | "fear" | "goal" | "identity_claim" | "trigger",
+            "summary": "User keeps asking about X...",
+            "strength": 0.0 to 1.0,
+            "evidence_quotes": ["quote 1", "quote 2"]
+        }
+        """
+
+        try:
+            response_str = await self.agent.call_utility_model(
+                system=system_prompt,
+                message=f"History:\n{history_text}\n\nCurrent Message:\n{text}"
+            )
+
+            data = DirtyJson.parse_string(response_str)
+            if not isinstance(data, dict):
+                return None
+
+            if data.get("pattern_found") and data.get("strength", 0) > 0.6:
+                pattern_id = str(uuid.uuid4())
+                pattern_type = data.get("type", "unknown")
+                summary = data.get("summary", "")
+                strength = data.get("strength", 0)
+
+                # Insert into pattern_echo
+                conn = self.get_connection()
+                cursor = conn.cursor()
+                cursor.execute('''
+                    INSERT INTO pattern_echo (
+                        id, user_id, type, summary, first_seen_ts, last_seen_ts, strength, recency, lore_weight, status
+                    ) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?, 1.0, 0.5, 'active')
+                ''', (pattern_id, user_id, pattern_type, summary, strength))
+                conn.commit()
+                conn.close()
+
+                return pattern_id
+
+        except Exception as e:
+            PrintStyle().print(f"Pattern detection error: {e}")
+
+        return None
+
     async def process_message(self, user_id: str, text: str, role="user"):
         state = self.get_state(user_id)
         current_entropy = state["entropy"]
@@ -284,6 +357,7 @@ class MVLManager:
 
         # Record event
         event_id = str(uuid.uuid4())
+        pattern_ids_str = f'["{pattern_id}"]' if pattern_id else None
 
         conn = self.get_connection()
         cursor = conn.cursor()
