@@ -8,7 +8,7 @@ class AriaMoodGift(Tool):
     
     def __init__(self, agent, **kwargs):
         super().__init__(agent, **kwargs)
-        user_id = self.agent.context.id
+        user_id = getattr(self.agent.context, 'user_id', 'default_user')
         self.enhancement_system = AriaEnhancementSystem(user_id=user_id)
     
     async def execute(self, **kwargs):

@@ -1,6 +1,6 @@
 
 from openai import OpenAI
-import models
+from python.helpers import llm_models as models
 
 def perplexity_search(query:str, model_name="llama-3.1-sonar-large-128k-online",api_key=None,base_url="https://api.perplexity.ai"):    
     api_key = api_key or models.get_api_key("perplexity")

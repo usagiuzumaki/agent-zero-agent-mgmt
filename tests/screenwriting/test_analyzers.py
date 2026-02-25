@@ -48,7 +48,7 @@ mock_module("langchain.embeddings")
 mock_module("langchain.embeddings.base")
 
 import pytest
-import models
+from python.helpers import llm_models as models
 from agents import AgentConfig
 # We need to make sure nest_asyncio is not mocked when agents is imported
 import agents.agent

@@ -7,7 +7,7 @@ from agents import Agent, InterventionException
 from pathlib import Path
 
 
-import models
+from python.helpers import llm_models as models
 from python.helpers.tool import Tool, Response
 from python.helpers import files, defer, persist_chat, strings
 from python.helpers.browser_use import browser_use

@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 from typing import Any, Awaitable, Coroutine, Dict
 from enum import Enum
 import uuid
-import models
+from python.helpers import llm_models as models
 
 from python.helpers import extract_tools, files, errors, history, tokens
 from python.helpers import dirty_json
@@ -50,9 +50,11 @@ class AgentContext:
         created_at: datetime | None = None,
         type: AgentContextType = AgentContextType.USER,
         last_message: datetime | None = None,
+        user_id: str | None = None,
     ):
         # build context
         self.id = id or str(uuid.uuid4())
+        self.user_id = user_id or "default_user"
         self.name = name
         self.config = config
         self.log = log or Log.Log()

@@ -7,7 +7,7 @@ import subprocess
 import asyncio
 from typing import Any, Literal, TypedDict, cast
 
-import models
+from python.helpers import llm_models as models
 import asyncio
 from python.helpers import runtime, whisper, defer, git
 from . import files, dotenv

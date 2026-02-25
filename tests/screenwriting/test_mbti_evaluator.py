@@ -48,7 +48,7 @@ mock_module("langchain.embeddings")
 mock_module("langchain.embeddings.base")
 
 import pytest
-import models
+from python.helpers import llm_models as models
 from agents import AgentConfig
 from agents.screenwriting.components.mbti_evaluator import MBTIEvaluator
 import asyncio

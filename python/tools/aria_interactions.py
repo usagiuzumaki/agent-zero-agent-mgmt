@@ -13,7 +13,7 @@ class AriaEnhancedInteraction(Tool):
         self.enhancement_system = self._load_enhancement_system()
     
     def _load_enhancement_system(self):
-        user_id = self.agent.context.id
+        user_id = getattr(self.agent.context, 'user_id', 'default_user')
         return AriaEnhancementSystem(user_id=user_id)
     
     def _save_system(self):
@@ -84,12 +84,13 @@ Just tell me the number or describe your choice!"""
                 # Process quiz answer
                 category = kwargs.get("category", "")
                 answer = kwargs.get("answer", "")
+                user_id = getattr(self.agent.context, 'user_id', 'default_user')
                 
                 if category and answer:
                     # Save the answer
                     conn = self.enhancement_system.mvl.get_connection()
                     cursor = conn.cursor()
-                    cursor.execute("SELECT quiz_answers FROM personality_quiz WHERE user_id = ?", (self.agent.context.id,))
+                    cursor.execute("SELECT quiz_answers FROM personality_quiz WHERE user_id = ?", (user_id,))
                     row = cursor.fetchone()
                     answers = json.loads(row[0]) if row and row[0] else {}
                     answers[category] = {
@@ -100,7 +101,7 @@ Just tell me the number or describe your choice!"""
                         INSERT INTO personality_quiz (user_id, quiz_answers)
                         VALUES (?, ?)
                         ON CONFLICT(user_id) DO UPDATE SET quiz_answers = excluded.quiz_answers
-                    ''', (self.agent.context.id, json.dumps(answers)))
+                    ''', (user_id, json.dumps(answers)))
                     conn.commit()
                     conn.close()
                     
@@ -111,12 +112,13 @@ Just tell me the number or describe your choice!"""
             elif action == "switch_mask":
                 # Switch between Light and Dark Aria
                 mask = kwargs.get("mask", "light").lower()
+                user_id = getattr(self.agent.context, 'user_id', 'default_user')
                 if mask not in ["light", "dark"]:
                     return Response(message="💔 I don't know that mask...", break_loop=False)
 
-                state = self.enhancement_system.mvl.get_state(self.agent.context.id)
+                state = self.enhancement_system.mvl.get_state(user_id)
                 self.enhancement_system.mvl.update_state(
-                    self.agent.context.id,
+                    user_id,
                     state["entropy"],
                     state["silence_streak"],
                     active_mask=mask

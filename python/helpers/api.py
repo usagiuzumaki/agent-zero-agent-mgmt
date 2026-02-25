@@ -79,13 +79,22 @@ class ApiHandler:
         from agents import AgentContext
         from python.helpers.initialize import initialize_agent
 
+        # Try to get user_id from flask-login
+        user_id = "default_user"
+        try:
+            from flask_login import current_user
+            if current_user and current_user.is_authenticated:
+                user_id = current_user.id
+        except:
+            pass
+
         with self.thread_lock:
             if not ctxid:
                 first = AgentContext.first()
                 if first:
                     return first
-                return AgentContext(config=initialize_agent())
+                return AgentContext(config=initialize_agent(), user_id=user_id)
             got = AgentContext.get(ctxid)
             if got:
                 return got
-            return AgentContext(config=initialize_agent(), id=ctxid)
+            return AgentContext(config=initialize_agent(), id=ctxid, user_id=user_id)

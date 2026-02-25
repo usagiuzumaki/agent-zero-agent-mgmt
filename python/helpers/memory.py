@@ -41,7 +41,7 @@ from python.helpers import knowledge_import
 from python.helpers.log import Log, LogItem
 from enum import Enum
 from agents import Agent
-import models
+from python.helpers import llm_models as models
 import logging
 
 

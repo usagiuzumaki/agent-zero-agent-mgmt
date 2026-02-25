@@ -1,5 +1,5 @@
 from agents import AgentConfig
-import models
+from python.helpers import llm_models as models
 from python.helpers import runtime, settings, defer
 from python.helpers.print_style import PrintStyle
 
