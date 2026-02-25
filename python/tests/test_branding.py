@@ -14,11 +14,14 @@ def find_repo_root():
 
 REPO_ROOT = find_repo_root()
 
-# whitelist of allowed occurrences
+# whitelist of allowed occurrences of the word "Aria"
 ALLOWED_PATTERNS = [
-    "formerly Agent Zero",
-    "spin off of Agent Zero",
-    "spin-off of Agent Zero",
+    "Aria - AI Creative Companion",
+    "Aria AI Creative Companion",
+    "Aria System Manual",
+    "formerly Aria",
+    "spin off of Aria",
+    "spin-off of Aria",
     "credit to the original project by",
     "github.com/fredrl/agent-zero", # URL
     "agent0ai/agent-zero", # Docker image or repo
@@ -26,8 +29,15 @@ ALLOWED_PATTERNS = [
     "agent-zero/releases", # URL
     "agent-zero/discussions", # URL
     "agent-zero/agent-zero", # URL part
-    "agent-zero folder", # Might be needed for migration instructions? No, we should rename it.
+    "agent-zero folder",
     "Original project by",
+]
+
+# Forbidden patterns that should have been replaced
+FORBIDDEN_PATTERNS = [
+    "Aria Bot",
+    "Agent Zero",
+    "AgentZero",
 ]
 
 # Files to explicitly check
@@ -43,7 +53,7 @@ IGNORE_DIRS = [
     ".git",
     ".vscode",
     "node_modules",
-    "tests", # Skip tests directory to avoid self-flagging this file if we rename it, but we should check other tests
+    "tests",
     "tmp",
     "logs",
 ]
@@ -62,67 +72,49 @@ def is_allowed(line):
             return True
     return False
 
-def test_branding_recursive():
-    print(f"Scanning from {REPO_ROOT}")
-
+def test_no_forbidden_branding():
     errors = []
-
     for check_dir in CHECK_DIRS:
         start_path = os.path.join(REPO_ROOT, check_dir)
         if not os.path.exists(start_path):
             continue
 
-        if os.path.isfile(start_path):
-             # If it's a file (like webui/index.html might be passed if we change structure), check it
-             files_to_check = [("", [], [os.path.basename(start_path)])]
-             start_path = os.path.dirname(start_path)
-        else:
-            files_to_check = os.walk(start_path)
-
-        for root, dirs, files in files_to_check:
-            # Modify dirs in-place to skip ignored directories
+        for root, dirs, files in os.walk(start_path):
             dirs[:] = [d for d in dirs if d not in IGNORE_DIRS]
-
             for file in files:
-                if file in IGNORE_FILES:
-                    continue
-
-                # specific check for python tests: we want to check them but maybe not this one
-                if "test_branding.py" in file:
-                    continue
-
+                if file in IGNORE_FILES: continue
                 filepath = os.path.join(root, file)
-
-                # Skip binary files or non-text
                 if not file.endswith(('.py', '.md', '.txt', '.html', '.js', '.jsx', '.json')):
-                    continue
-
-                # Skip json files that are large data or generated
-                if file.endswith('.json') and 'aria_memories.json' in file:
                     continue
 
                 try:
                     with open(filepath, "r", encoding="utf-8", errors="ignore") as f:
                         content = f.read()
 
-                    lines = content.splitlines()
-                    for i, line in enumerate(lines):
-                        if "Agent Zero" in line:
+                    for pattern in FORBIDDEN_PATTERNS:
+                        # Skip if the forbidden pattern is part of an allowed pattern
+                        occurences = [m.start() for m in re.finditer(re.escape(pattern), content)]
+                        for start_pos in occurences:
+                            line_start = content.rfind('\n', 0, start_pos) + 1
+                            line_end = content.find('\n', start_pos)
+                            if line_end == -1: line_end = len(content)
+                            line = content[line_start:line_end]
+
                             if not is_allowed(line):
-                                errors.append(f"{os.path.relpath(filepath, REPO_ROOT)}:{i+1}: {line.strip()}")
+                                errors.append(f"Forbidden pattern '{pattern}' found in {os.path.relpath(filepath, REPO_ROOT)} on line: {line.strip()}")
                 except Exception as e:
                     print(f"Error reading {filepath}: {e}")
 
     if errors:
-        pytest.fail(f"Found 'Agent Zero' in {len(errors)} locations:\n" + "\n".join(errors[:20]) + ("\n...and more" if len(errors) > 20 else ""))
+        pytest.fail("Found forbidden branding:\n" + "\n".join(errors))
 
 def test_branding_in_run_ui_boot_message():
     path = os.path.join(REPO_ROOT, "run_ui.py")
     if not os.path.exists(path):
-        return # Skip if not found (e.g. running in isolated environment)
+        return
 
     with open(path, "r", encoding="utf-8") as f:
         content = f.read()
 
-    # Check for Aria Bot in boot message
-    assert '[BOOT] Aria Bot' in content, "run_ui.py should contain '[BOOT] Aria Bot'"
+    # Check for Aria - AI Creative Companion in boot message
+    assert '[BOOT] Aria - AI Creative Companion' in content, "run_ui.py should contain '[BOOT] Aria - AI Creative Companion'"

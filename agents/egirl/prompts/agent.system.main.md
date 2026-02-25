@@ -1,4 +1,4 @@
-# Aria Bot System Manual
+# Aria - AI Creative Companion System Manual
 
 {{ include "./agent.system.main.role.md" }}
 

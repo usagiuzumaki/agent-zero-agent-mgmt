@@ -1,4 +1,4 @@
-# Agent Zero System Manual
+# Aria System Manual
 
 {{ include "./agent.system.main.role.md" }}
 

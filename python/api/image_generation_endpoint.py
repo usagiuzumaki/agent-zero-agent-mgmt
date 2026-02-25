@@ -1,5 +1,5 @@
 """
-Direct image generation API endpoint for Aria Bot
+Direct image generation API endpoint for Aria - AI Creative Companion
 """
 from flask import jsonify, request
 import os

@@ -1,6 +1,6 @@
 # Deployment Guide
 
-This project now targets Supabase-managed PostgreSQL for persistence and assumes a container-based deployment. The steps below cover the minimum configuration needed to run Agent Zero (Aria) with authentication and billing enabled.
+This project now targets Supabase-managed PostgreSQL for persistence and assumes a container-based deployment. The steps below cover the minimum configuration needed to run Aria (Aria) with authentication and billing enabled.
 
 ## 1. Required Environment Variables
 Set these variables in your deployment platform:
