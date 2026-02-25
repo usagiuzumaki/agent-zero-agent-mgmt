@@ -2,6 +2,7 @@ import unittest
 import sqlite3
 import os
 import asyncio
+import random
 from python.helpers.mvl_manager import MVLManager
 from python.helpers import files
 
@@ -23,8 +24,18 @@ class TestMVLManager(unittest.TestCase):
     def test_init_db(self):
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
+
+        # Check tables
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='loom_state'")
         self.assertIsNotNone(cursor.fetchone())
+
+        # Check indexes
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='index' AND name='idx_interaction_event_user_ts'")
+        self.assertIsNotNone(cursor.fetchone(), "idx_interaction_event_user_ts missing")
+
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='index' AND name='idx_pattern_echo_user'")
+        self.assertIsNotNone(cursor.fetchone(), "idx_pattern_echo_user missing")
+
         conn.close()
 
     def test_process_message(self):
@@ -40,7 +51,9 @@ class TestMVLManager(unittest.TestCase):
             cursor.execute("SELECT * FROM interaction_event WHERE user_id = ?", (user_id,))
             event = cursor.fetchone()
             self.assertIsNotNone(event)
-            self.assertEqual(event[4], text) # text is 5th column (index 4)
+            # text is 5th column (index 4) - verify schema matches
+            # id, user_id, ts, role, text
+            self.assertEqual(event[4], text)
             conn.close()
 
             # Check state update
@@ -48,6 +61,33 @@ class TestMVLManager(unittest.TestCase):
             self.assertIsNotNone(state)
 
         asyncio.run(run_test())
+
+    def test_concurrent_writes(self):
+        """
+        Simulate concurrent messages to ensure no locking issues.
+        """
+        async def worker(user_id, i):
+            text = f"Message {i} from {user_id}"
+            await self.manager.process_message(user_id, text)
+
+        async def run_concurrent_test():
+            tasks = []
+            # Create 50 concurrent requests across 5 users
+            for i in range(50):
+                user_id = f"user_{i % 5}"
+                tasks.append(worker(user_id, i))
+
+            await asyncio.gather(*tasks)
+
+            # Verify count
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            cursor.execute("SELECT count(*) FROM interaction_event")
+            count = cursor.fetchone()[0]
+            conn.close()
+            self.assertEqual(count, 50)
+
+        asyncio.run(run_concurrent_test())
 
 if __name__ == '__main__':
     unittest.main()
