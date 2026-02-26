@@ -8,7 +8,7 @@ import uuid
 from datetime import datetime
 from flask import Blueprint, request, jsonify, current_app
 from flask_login import login_required, current_user
-from python.api.auth.auth_models import db, UserChat, UserScreenwriting
+from auth_models import db, UserChat, UserScreenwriting
 
 user_data_api = Blueprint('user_data_api', __name__)
 

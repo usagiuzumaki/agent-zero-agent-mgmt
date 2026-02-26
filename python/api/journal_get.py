@@ -1,41 +1,45 @@
+from agents import AgentContext
 from python.helpers.api import ApiHandler, Request, Response
-from python.helpers.journal_manager import JournalManager
-from datetime import datetime
-import os
+from flask import jsonify
 
 class JournalGet(ApiHandler):
+    """
+    API endpoint to retrieve Aria's daily reflections.
+    Gated by MVL resonance (meaningfulness >= 0.7).
+    """
+    @classmethod
+    def get_methods(cls) -> list[str]:
+        return ["GET", "POST"]
+
     async def process(self, input: dict, request: Request) -> dict | Response:
-        date_str = input.get("date") # Expected YYYY-MM-DD
-        ctxid = input.get("context")
+        ctxid = input.get("context") or request.args.get("context")
+        if not ctxid:
+             # Try to get the first context if none provided
+             context = AgentContext.first()
+        else:
+             context = AgentContext.get(ctxid)
 
-        context = self.get_context(ctxid)
-        user_id = getattr(context, 'user_id', 'default_user')
+        if not context:
+            return jsonify({"error": "Context not found"}), 404
 
-        journal_manager = JournalManager()
+        agent = context.get_agent()
+        user_id = context.user_id
 
-        # Check comfort level
-        comfort = journal_manager.get_comfort_level(user_id)
-        if comfort < 0.7:
-             return {
-                 "error": "Aria is not yet comfortable sharing these deep thoughts with you.",
-                 "comfort_level": f"{comfort:.2f}/0.70"
-             }
+        if not hasattr(agent, "journal") or not hasattr(agent, "mvl"):
+            return jsonify({"error": "Journaling system not available"}), 501
 
-        path = journal_manager.get_journal_path()
-        if date_str:
-             try:
-                 date = datetime.strptime(date_str, "%Y-%m-%d")
-                 path = journal_manager.get_journal_path(date)
-             except:
-                 return {"error": "Invalid date format. Use YYYY-MM-DD."}
-
-        if os.path.exists(path):
-            with open(path, "r", encoding="utf-8") as f:
-                content = f.read()
+        if agent.journal.can_share_thoughts(agent.mvl, user_id):
+            thoughts = agent.journal.get_todays_thoughts()
             return {
-                "content": content,
-                "date": date_str or datetime.now().strftime("%Y-%m-%d"),
-                "comfort_level": f"{comfort:.2f}"
+                "thoughts": thoughts,
+                "allowed": True,
+                "resonance": agent.journal.get_comfort_level(agent.mvl, user_id)
             }
         else:
-            return {"error": "Journal entry not found for this date."}
+            comfort = agent.journal.get_comfort_level(agent.mvl, user_id)
+            return jsonify({
+                "error": "Access denied. Resonance too low.",
+                "allowed": False,
+                "resonance": comfort,
+                "required": 0.7
+            }), 403

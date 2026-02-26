@@ -1,17 +1,17 @@
 import sqlite3
 import uuid
 import asyncio
-from typing import Optional, List, Any
+from typing import Optional, List, Any, Tuple
 import logging
 from datetime import datetime
 import json
 from contextlib import contextmanager
-from difflib import SequenceMatcher
 
 from python.helpers import loom_logic
 from python.helpers import files
 from python.helpers.print_style import PrintStyle
 from python.helpers.dirty_json import DirtyJson
+from difflib import SequenceMatcher
 
 class MVLManager:
     def __init__(self, db_path="loom.db", agent=None):
@@ -96,41 +96,13 @@ class MVLManager:
                 silence_streak INTEGER,
                 dependency_risk REAL CHECK(dependency_risk BETWEEN 0 AND 1),
                 mask_weights TEXT,
-                active_mask TEXT DEFAULT 'light',
                 last_archetype_state_id TEXT,
                 FOREIGN KEY(last_archetype_state_id) REFERENCES archetype_state(id)
             )
             ''')
 
-            cursor.execute('''
-            CREATE TABLE IF NOT EXISTS personality_state (
-                user_id TEXT PRIMARY KEY,
-                current_mood TEXT,
-                interaction_count INTEGER DEFAULT 0,
-                last_interaction_ts DATETIME DEFAULT CURRENT_TIMESTAMP
-            )
-            ''')
-
-            cursor.execute('''
-            CREATE TABLE IF NOT EXISTS personality_memory (
-                id TEXT PRIMARY KEY,
-                user_id TEXT NOT NULL,
-                category TEXT,
-                content TEXT,
-                context TEXT,
-                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-            )
-            ''')
-
-            cursor.execute('''
-            CREATE TABLE IF NOT EXISTS personality_quiz (
-                user_id TEXT PRIMARY KEY,
-                quiz_answers TEXT -- JSON object
-            )
-            ''')
-
-            # Performance Indexes
-            cursor.execute("CREATE INDEX IF NOT EXISTS idx_interaction_event_user_ts ON interaction_event(user_id, ts)")
+            # Add Indexes
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_interaction_event_user_ts ON interaction_event(user_id, ts DESC)")
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_pattern_echo_user ON pattern_echo(user_id)")
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_loom_state_user ON loom_state(user_id)")
 
@@ -142,43 +114,26 @@ class MVLManager:
             if "embedding_id" not in columns:
                 cursor.execute("ALTER TABLE interaction_event ADD COLUMN embedding_id TEXT")
 
-            # Check for active_mask in loom_state
-            cursor.execute("PRAGMA table_info(loom_state)")
-            columns = [info[1] for info in cursor.fetchall()]
-            if "active_mask" not in columns:
-                cursor.execute("ALTER TABLE loom_state ADD COLUMN active_mask TEXT DEFAULT 'light'")
-
     def get_state(self, user_id):
         with self._get_db() as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT entropy, silence_streak, active_mask FROM loom_state WHERE user_id = ?", (user_id,))
+            cursor.execute("SELECT entropy, silence_streak FROM loom_state WHERE user_id = ?", (user_id,))
             row = cursor.fetchone()
-        if row:
-            return {"entropy": row[0], "silence_streak": row[1], "active_mask": row[2] or "light"}
-        return {"entropy": 0.5, "silence_streak": 0, "active_mask": "light"} # Default
+            if row:
+                return {"entropy": row[0], "silence_streak": row[1]}
+            return {"entropy": 0.5, "silence_streak": 0} # Default
 
-    def update_state(self, user_id, entropy, silence_streak, active_mask=None):
+    def update_state(self, user_id, entropy, silence_streak):
         with self._get_db() as conn:
             cursor = conn.cursor()
-            if active_mask:
-                cursor.execute('''
-                    INSERT INTO loom_state (user_id, entropy, silence_streak, active_mask, last_active_ts)
-                    VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
-                    ON CONFLICT(user_id) DO UPDATE SET
-                    entropy = excluded.entropy,
-                    silence_streak = excluded.silence_streak,
-                    active_mask = excluded.active_mask,
-                    last_active_ts = CURRENT_TIMESTAMP
-                ''', (user_id, entropy, silence_streak, active_mask))
-            else:
-                cursor.execute('''
-                    INSERT INTO loom_state (user_id, entropy, silence_streak, last_active_ts)
-                    VALUES (?, ?, ?, CURRENT_TIMESTAMP)
-                    ON CONFLICT(user_id) DO UPDATE SET
-                    entropy = excluded.entropy,
-                    silence_streak = excluded.silence_streak,
-                    last_active_ts = CURRENT_TIMESTAMP
-                ''', (user_id, entropy, silence_streak))
+            cursor.execute('''
+                INSERT INTO loom_state (user_id, entropy, silence_streak, last_active_ts)
+                VALUES (?, ?, ?, CURRENT_TIMESTAMP)
+                ON CONFLICT(user_id) DO UPDATE SET
+                entropy = excluded.entropy,
+                silence_streak = excluded.silence_streak,
+                last_active_ts = CURRENT_TIMESTAMP
+            ''', (user_id, entropy, silence_streak))
 
     def _get_recent_history(self, user_id, limit=10):
         try:
@@ -186,19 +141,23 @@ class MVLManager:
                 cursor = conn.cursor()
                 cursor.execute("SELECT role, text FROM interaction_event WHERE user_id = ? ORDER BY ts DESC LIMIT ?", (user_id, limit))
                 rows = cursor.fetchall()
-            # Reverse to chronological order
-            return [{"role": r[0], "content": r[1]} for r in reversed(rows)]
+                # Reverse to chronological order
+                return [{"role": r[0], "content": r[1]} for r in reversed(rows)]
         except Exception as e:
             PrintStyle().print(f"MVL History Error: {e}")
             return []
 
-    async def detect_pattern(self, user_id, text):
+    async def detect_pattern(self, user_id, text) -> Tuple[Optional[dict], List[str]]:
         if not self.agent:
             return None, []
 
         history = self._get_recent_history(user_id)
 
-        system_prompt = files.read_file("prompts/mvl_pattern_detection.sys.md")
+        try:
+            system_prompt = files.read_file("prompts/mvl_pattern_detection.sys.md")
+        except:
+            # Fallback prompt if file not found
+            system_prompt = """Analyze conversation for psychological patterns (loop, contradiction, etc). Return JSON with pattern_candidates list."""
 
         # Prepare context
         history_text = "\n".join([f"{msg['role'].upper()}: {msg['content']}" for msg in history])
@@ -239,13 +198,11 @@ class MVLManager:
                         ))
                         new_pattern_ids.append(pattern_id)
                     except Exception as e:
-                         PrintStyle().print(f"Pattern Insert Error: {e}")
+                        PrintStyle().print(f"Pattern Insert Error: {e}")
 
         return analysis, new_pattern_ids
 
     async def calculate_novelty_async(self, text: str, user_id: str) -> float:
-        # 1. Try embedding model if available and we had a vector store (not implemented yet)
-        # 2. Fallback to sequence matching with recent history
         try:
             with self._get_db() as conn:
                 cursor = conn.cursor()
@@ -324,8 +281,7 @@ class MVLManager:
             narrative_weight=narrative_weight,
             utility_flag=utility_flag,
             mask_conflict=mask_conflict,
-            self_sabotage=self_sabotage,
-            active_mask=state.get("active_mask", "light")
+            self_sabotage=self_sabotage
         )
 
         # Override with recommendation if strong meaningfulness or self_sabotage

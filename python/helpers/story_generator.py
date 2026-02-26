@@ -4,7 +4,7 @@ import hashlib
 from typing import Dict, Any, List, Optional
 from datetime import datetime
 
-from python.helpers import initialize
+import initialize
 from agents.agent import Agent, UserMessage
 from python.helpers.dirty_json import DirtyJson
 from python.helpers.print_style import PrintStyle

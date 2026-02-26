@@ -13,11 +13,16 @@ class AriaEnhancedInteraction(Tool):
         self.enhancement_system = self._load_enhancement_system()
     
     def _load_enhancement_system(self):
-        user_id = getattr(self.agent.context, 'user_id', 'default_user')
-        return AriaEnhancementSystem(user_id=user_id)
+
+        # Check if memory file exists and load it
+        system = AriaEnhancementSystem()
+        if os.path.exists('aria_memories.json'):
+            system.memory_system.load_memories()
+        return system
     
     def _save_system(self):
-        pass # Database saves automatically
+
+        self.enhancement_system.memory_system.save_memories()
     
     async def execute(self, **kwargs):
         action = kwargs.get("action", "greeting")
@@ -84,59 +89,25 @@ Just tell me the number or describe your choice!"""
                 # Process quiz answer
                 category = kwargs.get("category", "")
                 answer = kwargs.get("answer", "")
-                user_id = getattr(self.agent.context, 'user_id', 'default_user')
                 
                 if category and answer:
                     # Save the answer
-                    conn = self.enhancement_system.mvl.get_connection()
-                    cursor = conn.cursor()
-                    cursor.execute("SELECT quiz_answers FROM personality_quiz WHERE user_id = ?", (user_id,))
-                    row = cursor.fetchone()
-                    answers = json.loads(row[0]) if row and row[0] else {}
-                    answers[category] = {
+                    self.enhancement_system.memory_system.memories['quiz_answers'][category] = {
                         'answer': answer,
                         'timestamp': datetime.now().isoformat()
                     }
-                    cursor.execute('''
-                        INSERT INTO personality_quiz (user_id, quiz_answers)
-                        VALUES (?, ?)
-                        ON CONFLICT(user_id) DO UPDATE SET quiz_answers = excluded.quiz_answers
-                    ''', (user_id, json.dumps(answers)))
-                    conn.commit()
-                    conn.close()
+                    self._save_system()
                     
                     # Generate response
                     response_text = self.enhancement_system.quiz.create_response(answer, category)
                     return Response(message=response_text, break_loop=False)
                     
-            elif action == "switch_mask":
-                # Switch between Light and Dark Aria
-                mask = kwargs.get("mask", "light").lower()
-                user_id = getattr(self.agent.context, 'user_id', 'default_user')
-                if mask not in ["light", "dark"]:
-                    return Response(message="💔 I don't know that mask...", break_loop=False)
-
-                state = self.enhancement_system.mvl.get_state(user_id)
-                self.enhancement_system.mvl.update_state(
-                    user_id,
-                    state["entropy"],
-                    state["silence_streak"],
-                    active_mask=mask
-                )
-
-                if mask == "dark":
-                    message = "🌑 The shadow is here now. Let's look deeper into what you're hiding."
-                else:
-                    message = "☀️ I'm back in the light! Ready to be your helpful and fun companion again! ✨"
-
-                return Response(message=message, break_loop=True) # Break loop to allow prompt to update
-
             elif action == "check_milestones":
                 # Check relationship milestones
-                memories = self.enhancement_system.memory_system.get_all_memories()
+                memories = self.enhancement_system.memory_system.memories
                 
                 # Calculate some fun stats
-                total_memories = sum(len(v) if isinstance(v, list) else 0 for v in memories.values() if isinstance(v, list))
+                total_memories = sum(len(v) if isinstance(v, list) else len(v) for v in memories.values())
                 quiz_progress = len(memories.get('quiz_answers', {}))
                 
                 message = f"""💕 Our Relationship Stats:

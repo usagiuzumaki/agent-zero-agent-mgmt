@@ -1,8 +1,9 @@
 
-import json
-import urllib.request
+import asyncio
+import os
 from python.helpers.tool import Tool, Response
 from python.helpers.aria_story_games import AriaGameSystem
+from python.helpers.stable_diffusion import generate_image
 
 class AriaGames(Tool):
     
@@ -10,6 +11,22 @@ class AriaGames(Tool):
         super().__init__(agent, **kwargs)
         self.game_system = AriaGameSystem()
     
+    async def _generate_image_async(self, prompt: str) -> str:
+        """Helper to generate image asynchronously and return the public URL"""
+        if not prompt:
+            return ""
+
+        try:
+            # Run image generation in a separate thread to avoid blocking the event loop
+            filepath = await asyncio.to_thread(generate_image, prompt)
+
+            # Construct the public URL for the generated image
+            filename = os.path.basename(filepath)
+            return f"/api/public_image?filename={filename}"
+        except Exception as e:
+            self.agent.context.log.log(type="error", content=f"Game image generation failed: {str(e)}")
+            return ""
+
     async def execute(self, **kwargs):
         action = kwargs.get("action", "list")
         
@@ -39,19 +56,7 @@ Just say which one sounds fun! 💕"""
                 scene = self.game_system.start_game('story', story_type)
                 
                 # Generate image for the scene
-                if scene.get('image'):
-                    url = "http://127.0.0.1:5000/api/generate-image"
-                    data = json.dumps({"prompt": scene['image']}).encode('utf-8')
-                    req = urllib.request.Request(url, data=data, headers={'Content-Type': 'application/json'})
-                    
-                    try:
-                        response = urllib.request.urlopen(req, timeout=60)
-                        result = json.loads(response.read())
-                        image_url = result.get('url', '')
-                    except:
-                        image_url = ''
-                else:
-                    image_url = ''
+                image_url = await self._generate_image_async(scene.get('image', ''))
                 
                 # Format the scene
                 choices_text = "\n".join([f"{i+1}. {c['text']}" for i, c in enumerate(scene.get('choices', []))])
@@ -81,19 +86,7 @@ Just say which one sounds fun! 💕"""
 That was wonderful! Want to play another story? 💕"""
                 else:
                     # Generate image for new scene
-                    if scene.get('image'):
-                        url = "http://127.0.0.1:5000/api/generate-image"
-                        data = json.dumps({"prompt": scene['image']}).encode('utf-8')
-                        req = urllib.request.Request(url, data=data, headers={'Content-Type': 'application/json'})
-                        
-                        try:
-                            response = urllib.request.urlopen(req, timeout=60)
-                            result = json.loads(response.read())
-                            image_url = result.get('url', '')
-                        except:
-                            image_url = ''
-                    else:
-                        image_url = ''
+                    image_url = await self._generate_image_async(scene.get('image', ''))
                     
                     choices_text = "\n".join([f"{i+1}. {c['text']}" for i, c in enumerate(scene.get('choices', []))])
                     message = f"""📖 **Continuing our story...**
@@ -116,19 +109,7 @@ That was wonderful! Want to play another story? 💕"""
                 scenario = result.get('scenario', {})
                 
                 # Generate character image
-                if scenario.get('image'):
-                    url = "http://127.0.0.1:5000/api/generate-image"
-                    data = json.dumps({"prompt": scenario['image']}).encode('utf-8')
-                    req = urllib.request.Request(url, data=data, headers={'Content-Type': 'application/json'})
-                    
-                    try:
-                        response = urllib.request.urlopen(req, timeout=60)
-                        img_result = json.loads(response.read())
-                        image_url = img_result.get('url', '')
-                    except:
-                        image_url = ''
-                else:
-                    image_url = ''
+                image_url = await self._generate_image_async(scenario.get('image', ''))
                 
                 message = f"""🎭 **Role-Play Started!**
 

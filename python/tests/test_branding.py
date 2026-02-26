@@ -56,7 +56,6 @@ IGNORE_DIRS = [
     "tests",
     "tmp",
     "logs",
-    "AriasThoughts",
 ]
 
 IGNORE_FILES = [
@@ -110,13 +109,13 @@ def test_no_forbidden_branding():
         pytest.fail("Found forbidden branding:\n" + "\n".join(errors))
 
 def test_branding_in_run_ui_boot_message():
-    # Check both root stub and actual script
+    # Check both root stub and scripts folder
     paths = [
         os.path.join(REPO_ROOT, "run_ui.py"),
-        os.path.join(REPO_ROOT, "scripts/run_ui.py")
+        os.path.join(REPO_ROOT, "scripts", "run_ui.py")
     ]
 
-    found_boot_msg = False
+    found = False
     for path in paths:
         if not os.path.exists(path):
             continue
@@ -125,8 +124,7 @@ def test_branding_in_run_ui_boot_message():
             content = f.read()
 
         if '[BOOT] Aria - AI Creative Companion' in content:
-            found_boot_msg = True
+            found = True
             break
 
-    # Check for Aria - AI Creative Companion in boot message
-    assert found_boot_msg, "Boot message '[BOOT] Aria - AI Creative Companion' should be found in run_ui.py or scripts/run_ui.py"
+    assert found, "Either run_ui.py or scripts/run_ui.py should contain '[BOOT] Aria - AI Creative Companion'"

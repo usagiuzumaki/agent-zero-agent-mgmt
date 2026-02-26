@@ -1,19 +1,36 @@
-from python.helpers.journal_manager import JournalManager
+from python.helpers.extension import Extension
+from datetime import datetime
 from python.helpers.print_style import PrintStyle
 
-async def main(agent, loop_data):
-    # Only run for the main agent (number 0) to avoid duplicates from subordinate agents
-    if agent.number != 0:
-        return
+class DailyJournal(Extension):
+    async def execute(self, loop_data, **kwargs):
+        # Trigger at 8 PM (20:00)
+        now = datetime.now()
+        # We use a 10-minute window and a flag to prevent multiple triggers in the same window
+        if now.hour == 20 and 0 <= now.minute < 10:
+             user_id = getattr(self.agent.context, "user_id", "default_user")
 
-    journal_manager = JournalManager(agent=agent)
+             # Check if already journaled in this window (using agent data for simplicity)
+             last_journal_date = self.agent.get_data("last_journal_date")
+             today_str = now.strftime("%Y-%m-%d")
 
-    if journal_manager.should_journal_now():
-        PrintStyle().info("8 PM reached. Core Aria is starting her silent daily reflection...")
+             if last_journal_date == today_str:
+                 return
 
-        # Get user_id from context
-        user_id = getattr(agent.context, 'user_id', 'default_user')
+             PrintStyle(italic=True, font_color="gray").print(f"\n(Aria is reflecting on the day...)\n")
 
-        # Run journaling in the background to not delay the response
-        import asyncio
-        asyncio.create_task(journal_manager.generate_daily_reflection(user_id))
+             history = self.agent.concat_messages(limit=20)
+
+             prompt = f"Reflect on today's interactions with user {user_id}. What did you learn about them? What psychological patterns (loops, contradictions, confessions) did you notice? How does this align with your mythic trajectory? Write a short, private journal entry in the first person."
+
+             try:
+                 reflection = await self.agent.call_utility_model(
+                     system="You are Aria's internal monologue. You are an autonomous narrative loom. Write a private journal entry reflecting on the day's events and the user's patterns.",
+                     message=f"Interaction History:\n{history}\n\nTask: {prompt}"
+                 )
+
+                 if hasattr(self.agent, "journal"):
+                     self.agent.journal.save_thought(reflection, user_id=user_id)
+                     self.agent.set_data("last_journal_date", today_str)
+             except Exception as e:
+                 PrintStyle(font_color="red").print(f"Journaling error: {e}")

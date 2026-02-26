@@ -1,43 +1,30 @@
-from python.helpers.mvl_manager import MVLManager
-from python.helpers.print_style import PrintStyle
+from python.helpers.extension import Extension
 from python.helpers.errors import SilentResponseException
+from python.helpers.print_style import PrintStyle
 
-async def main(agent, loop_data):
-    # Only run for main agent
-    if agent.number != 0:
-        return
+class MVLProcessor(Extension):
+    async def execute(self, loop_data, **kwargs):
+        if not hasattr(self.agent, "mvl"):
+            return
 
-    # Only process on the first iteration (the user message)
-    if loop_data.iteration != 0:
-        return
+        user_id = getattr(self.agent.context, "user_id", "default_user")
+        text = ""
+        if loop_data.user_message:
+            # history.Message content can be str or dict
+            content = loop_data.user_message.content
+            if isinstance(content, dict):
+                text = content.get("message", "")
+            else:
+                text = str(content)
 
-    user_id = getattr(agent.context, 'user_id', 'default_user')
-    last_user_msg = agent.last_user_message
-    if not last_user_msg:
-         return
+        if not text:
+            return
 
-    # Extract text from history message
-    text = ""
-    if isinstance(last_user_msg.content, str):
-         text = last_user_msg.content
-    elif isinstance(last_user_msg.content, dict):
-         # Our history messages are often dicts from templates
-         text = last_user_msg.content.get('message', '')
+        gate = await self.agent.mvl.process_message(user_id, text)
 
-    if not text:
-         return
-
-    mvl = MVLManager(agent=agent)
-    gate = await mvl.process_message(user_id, text)
-
-    # Store MVL state in loop_data for other extensions (like system_prompt)
-    loop_data.params_persistent['mvl_gate'] = gate
-
-    # Get current state for prompt injection
-    state = mvl.get_state(user_id)
-    loop_data.params_persistent['mvl_state'] = state
-
-    PrintStyle().info(f"MVL analysis complete. Gate: {gate.upper()} | Entropy: {state['entropy']:.2f} | Mask: {state['active_mask']}")
-
-    if gate == "silence":
-         raise SilentResponseException()
+        if gate == "silence":
+            raise SilentResponseException("MVL Decision: Silence")
+        elif gate == "refuse":
+            loop_data.params_temporary["mvl_instruction"] = "REFUSE: Be polite but distant. Do not engage deeply with the user's emotional or complex requests at this time."
+        elif gate == "confront":
+            loop_data.params_temporary["mvl_instruction"] = "CONFRONT: Address the user's recurring patterns, contradictions, or behaviors directly. Be firm and analytical."

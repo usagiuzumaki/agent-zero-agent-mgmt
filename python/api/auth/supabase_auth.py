@@ -9,7 +9,7 @@ from flask import Blueprint, request, redirect, session, url_for, jsonify, curre
 from flask_login import LoginManager, login_user, logout_user, current_user, login_required
 from werkzeug.middleware.proxy_fix import ProxyFix
 
-from .auth_models import db, User, OAuth
+from auth_models import db, User, OAuth
 
 
 supabase_auth = Blueprint('supabase_auth', __name__, url_prefix='/auth')

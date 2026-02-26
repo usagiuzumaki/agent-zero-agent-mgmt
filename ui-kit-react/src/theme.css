@@ -27,8 +27,7 @@
 
 body {
   font-family: var(--font-family);
-  background: var(--bg-gradient, var(--color-background));
-  background-attachment: fixed;
+  background: var(--color-background);
   color: var(--color-text);
   margin: 0;
 }
@@ -199,11 +198,10 @@ body {
 }
 
 .egirl-ui .aria-container {
-  background: var(--color-surface);
-  border: var(--glass-border);
+  background: linear-gradient(135deg, #fce7f3 0%, #e0e7ff 100%);
   border-radius: var(--border-radius);
   padding: 1rem;
-  box-shadow: var(--shadow-card);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -219,23 +217,23 @@ body {
 }
 
 .egirl-ui h2 {
-  font-family: var(--font-family);
-  color: var(--color-primary);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #831843; /* Pink-900 */
   margin-bottom: 0.25rem;
   font-weight: 700;
 }
 
 .egirl-ui .status-indicator {
   font-size: 0.8rem;
-  color: var(--color-secondary);
-  background: rgba(255, 255, 255, 0.1);
+  color: #db2777; /* Pink-600 */
+  background: rgba(255, 255, 255, 0.5);
   padding: 0.2rem 0.6rem;
   border-radius: 9999px;
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 .egirl-ui .agent-chat .messages {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.4);
   border-radius: 8px;
   padding: 0.5rem;
   flex: 1;
@@ -251,16 +249,15 @@ body {
 }
 
 .egirl-ui .agent-chat .msg-user {
-  background-color: var(--color-primary);
-  color: #fff;
+  background-color: #ffffff;
+  color: #374151;
   margin-left: auto;
   border-bottom-right-radius: 0.25rem;
 }
 
 .egirl-ui .agent-chat .msg-agent {
-  background-color: var(--color-surface);
-  border: var(--glass-border);
-  color: var(--color-text);
+  background-color: #fbcfe8; /* Pink-200 */
+  color: #831843;
   margin-right: auto;
   border-bottom-left-radius: 0.25rem;
 }
@@ -288,7 +285,7 @@ body {
 .egirl-ui .agent-chat .input-row button {
   border-radius: 1.5rem;
   padding: 0.5rem 1.25rem;
-  background: var(--color-primary);
+  background: #db2777;
   color: white;
   border: none;
   cursor: pointer;
@@ -296,7 +293,7 @@ body {
 }
 
 .egirl-ui .agent-chat .input-row button:hover {
-  background: var(--color-primary-hover);
+  background: #be185d;
 }
 
 @keyframes slideIn {
