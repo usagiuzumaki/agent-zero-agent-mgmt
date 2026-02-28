@@ -231,6 +231,7 @@ class AgentConfig:
     code_exec_ssh_port: int = 55022
     code_exec_ssh_user: str = "root"
     code_exec_ssh_pass: str = ""
+    uniqueness_engine: bool = True
     additional: Dict[str, Any] = field(default_factory=dict)
 
 
