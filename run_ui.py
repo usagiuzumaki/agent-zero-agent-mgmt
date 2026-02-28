@@ -1,6 +1,8 @@
 from datetime import timedelta
 import os
 import secrets
+from python.helpers.config_validator import validate_config
+from python.helpers.ready_check import perform_ready_check
 import sys
 import time
 import socket
@@ -227,6 +229,14 @@ def health_check():
     return {"status": "healthy", "service": "Aria"}, 200
 
 
+@webapp.route("/readyz")
+def readiness_check():
+    """Deep health check endpoint that validates DB and config"""
+    ok, details = perform_ready_check()
+    status_code = 200 if ok else 503
+    return {"status": "ready" if ok else "not ready", "details": details}, status_code
+
+
 @webapp.route("/login")
 def login_page():
     if _auth_available:
@@ -440,4 +450,6 @@ def init_a0():
 if __name__ == "__main__":
     runtime.initialize()
     dotenv.load_dotenv()
+    # Validate configuration before starting the server
+    validate_config()
     run()

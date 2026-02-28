@@ -45,6 +45,13 @@ def init_stripe():
 @stripe_payments.route('/create-checkout-session', methods=['POST'])
 @login_required
 def create_checkout_session():
+    from python.helpers.safe_mode import is_safe_mode
+    if is_safe_mode():
+        return jsonify({
+            'error': 'Payments are disabled in Safe Mode.',
+            'checkout_url': f"{request.host_url}payment-success?session_id=mock_safe_mode_session"
+        }), 200
+
     if not init_stripe():
         return jsonify({
             'error': 'Stripe is not configured. Please add STRIPE_SECRET_KEY to your environment.'
@@ -147,10 +154,33 @@ def stripe_webhook():
             current_app.logger.error(f"Webhook signature verification failed: {str(e)}")
             return jsonify({'error': 'Invalid signature'}), 400
         
-        if event['type'] == 'checkout.session.completed':
-            session = event['data']['object']
-            current_app.logger.info(f"Payment successful for session {session['id']}")
+        # Enforce idempotency
+        from auth_models import db, ProcessedEvent
+        existing = ProcessedEvent.query.filter_by(event_id=event['id'], provider='stripe').first()
+        if existing:
+            current_app.logger.info(f"Duplicate Stripe event skipped: {event['id']}")
+            return jsonify({'status': 'success', 'note': 'duplicate'}), 200
+
+        # Record event as processed
+        processed = ProcessedEvent(event_id=event['id'], provider='stripe')
+        db.session.add(processed)
         
+        if event['type'] == 'checkout.session.completed':
+            checkout_session = event['data']['object']
+            current_app.logger.info(f"Payment successful for session {checkout_session['id']}")
+            # Here we would update the user has_paid status
+            user_id = checkout_session.get('metadata', {}).get('user_id') or checkout_session.get('client_reference_id')
+            if user_id:
+                from auth_models import User
+                user = User.query.get(user_id)
+                if user:
+                    user.has_paid = True
+                    user.subscription_status = 'active'
+                    user.payment_date = datetime.utcnow()
+                    db.session.commit()
+                    current_app.logger.info(f"User {user_id} status updated to paid.")
+
+        db.session.commit()
         return jsonify({'status': 'success'})
     
     except Exception as e:

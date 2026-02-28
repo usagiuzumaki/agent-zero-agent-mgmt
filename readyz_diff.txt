@@ -1,0 +1,23 @@
+<<<<<<< SEARCH
+@webapp.route("/healthz")
+@webapp.route("/api/health")
+def health_check():
+    """Fast health check endpoint for deployment monitoring - responds under 1 second"""
+    # Minimal response for quick health checks
+    return {"status": "healthy", "service": "Aria"}, 200
+=======
+@webapp.route("/healthz")
+@webapp.route("/api/health")
+def health_check():
+    """Fast health check endpoint for deployment monitoring - responds under 1 second"""
+    # Minimal response for quick health checks
+    return {"status": "healthy", "service": "Aria"}, 200
+
+
+@webapp.route("/readyz")
+def readiness_check():
+    """Deep health check endpoint that validates DB and config"""
+    ok, details = perform_ready_check()
+    status_code = 200 if ok else 503
+    return {"status": "ready" if ok else "not ready", "details": details}, status_code
+>>>>>>> REPLACE
