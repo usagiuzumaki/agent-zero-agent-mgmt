@@ -6,6 +6,7 @@ from flask import Blueprint, request, jsonify
 from python.helpers.screenwriting_manager import ScreenwritingManager
 from python.helpers.story_generator import StoryGenerator
 import json
+from python.helpers.print_style import PrintStyle
 
 # Create Flask blueprint for screenwriting API
 screenwriting_bp = Blueprint('screenwriting', __name__)
