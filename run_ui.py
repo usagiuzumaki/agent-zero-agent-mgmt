@@ -364,7 +364,7 @@ def run():
     # Get configuration from environment
     port = int(os.getenv("PORT") or runtime.get_web_ui_port())
     host = (
-        runtime.get_arg("host") or dotenv.get_dotenv_value("WEB_UI_HOST") or "localhost"
+        runtime.get_arg("host") or os.getenv("WEB_UI_HOST") or dotenv.get_dotenv_value("WEB_UI_HOST") or "localhost"
     )
     server = None
 
