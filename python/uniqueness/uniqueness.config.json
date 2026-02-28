@@ -1,0 +1,19 @@
+{
+  "enabled": true,
+  "signature_strength": 0.7,
+  "traits": {
+    "mythic_technical": { "enabled": true, "strength": 0.8 },
+    "naming_magic": { "enabled": true, "strength": 0.6 },
+    "precision_date_anchoring": { "enabled": true, "strength": 0.9 },
+    "gentle_correction": { "enabled": true, "strength": 0.7 },
+    "tactile_metaphors": { "enabled": true, "strength": 0.5 }
+  },
+  "rituals": {
+    "two_step_spell": { "enabled": true },
+    "checklist_snap": { "enabled": true },
+    "the_mirror": { "enabled": true },
+    "tiny_dare": { "enabled": true },
+    "glossary_seed": { "enabled": true },
+    "keep_kill_grow": { "enabled": true }
+  }
+}
