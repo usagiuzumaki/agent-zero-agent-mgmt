@@ -1,0 +1,16 @@
+<<<<<<< SEARCH
+    async def process_tools(self, msg: str):
+        # search for tool usage requests in agent message
+        tool_request = extract_tools.json_parse_dirty(msg)
+=======
+    async def process_tools(self, msg: str):
+        # Enforce tool budget
+        self.tool_call_count += 1
+        if self.tool_call_count > self.definition.capabilities.max_tool_calls:
+            error_detail = f"Budget exceeded: Too many tool calls ({self.tool_call_count})"
+            self.hist_add_warning(error_detail)
+            return error_detail
+
+        # search for tool usage requests in agent message
+        tool_request = extract_tools.json_parse_dirty(msg)
+>>>>>>> REPLACE

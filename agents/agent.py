@@ -299,6 +299,16 @@ class Agent:
         self.intervention: UserMessage | None = None
         self.data = {}  # free data object all the tools can use
 
+        # Agent Registry and Governance
+        from python.helpers.agent_registry import AgentRegistry
+        self.registry = AgentRegistry.get_instance()
+        self.definition = self.registry.get_agent_definition(config.profile or "default")
+
+        # Budget tracking
+        self.tool_call_count = 0
+        self.total_tokens_used = 0
+        self.delegation_depth = getattr(self.context, 'delegation_depth', 0)
+
 
         asyncio.run(self.call_extensions("agent_init"))
 
@@ -768,6 +778,13 @@ class Agent:
             await asyncio.sleep(0.1)
 
     async def process_tools(self, msg: str):
+        # Enforce tool budget
+        self.tool_call_count += 1
+        if self.tool_call_count > self.definition.capabilities.max_tool_calls:
+            error_detail = f"Budget exceeded: Too many tool calls ({self.tool_call_count})"
+            self.hist_add_warning(error_detail)
+            return error_detail
+
         # search for tool usage requests in agent message
         tool_request = extract_tools.json_parse_dirty(msg)
 

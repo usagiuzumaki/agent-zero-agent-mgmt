@@ -1,0 +1,21 @@
+<<<<<<< SEARCH
+        self.history = history.History(self)
+        self.last_user_message: history.Message | None = None
+        self.intervention: UserMessage | None = None
+        self.data = {}  # free data object all the tools can use
+=======
+        self.history = history.History(self)
+        self.last_user_message: history.Message | None = None
+        self.intervention: UserMessage | None = None
+        self.data = {}  # free data object all the tools can use
+
+        # Agent Registry and Governance
+        from python.helpers.agent_registry import AgentRegistry
+        self.registry = AgentRegistry.get_instance()
+        self.definition = self.registry.get_agent_definition(config.profile or "default")
+
+        # Budget tracking
+        self.tool_call_count = 0
+        self.total_tokens_used = 0
+        self.delegation_depth = getattr(self.context, 'delegation_depth', 0)
+>>>>>>> REPLACE

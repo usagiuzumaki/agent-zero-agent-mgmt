@@ -98,6 +98,18 @@ class UserScreenwriting(db.Model):
         return f'<UserScreenwriting {self.user_id} - {self.data_type}>'
 
 
+class ProcessedEvent(db.Model):
+    """Table to record processed event IDs for idempotency (e.g., Stripe webhooks)"""
+    __tablename__ = 'processed_events'
+
+    event_id = db.Column(db.String(255), primary_key=True)
+    provider = db.Column(db.String(50), nullable=False)
+    processed_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<ProcessedEvent {self.event_id} - {self.provider}>'
+
+
 def init_db(app):
     database_url = os.getenv('SUPABASE_DB_URL') or os.getenv('DATABASE_URL')
     if not database_url:

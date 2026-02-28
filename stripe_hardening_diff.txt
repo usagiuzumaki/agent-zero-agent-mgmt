@@ -1,0 +1,28 @@
+<<<<<<< SEARCH
+@stripe_payments.route('/create-checkout-session', methods=['POST'])
+@login_required
+def create_checkout_session():
+    if not init_stripe():
+        return jsonify({
+            'error': 'Stripe is not configured. Please add STRIPE_SECRET_KEY to your environment.'
+        }), 503
+
+    try:
+=======
+@stripe_payments.route('/create-checkout-session', methods=['POST'])
+@login_required
+def create_checkout_session():
+    from python.helpers.safe_mode import is_safe_mode
+    if is_safe_mode():
+        return jsonify({
+            'error': 'Payments are disabled in Safe Mode.',
+            'checkout_url': f"{request.host_url}payment-success?session_id=mock_safe_mode_session"
+        }), 200
+
+    if not init_stripe():
+        return jsonify({
+            'error': 'Stripe is not configured. Please add STRIPE_SECRET_KEY to your environment.'
+        }), 503
+
+    try:
+>>>>>>> REPLACE

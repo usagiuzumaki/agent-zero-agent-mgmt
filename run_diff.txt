@@ -1,0 +1,15 @@
+<<<<<<< SEARCH
+# run the internal server
+if __name__ == "__main__":
+    runtime.initialize()
+    dotenv.load_dotenv()
+    run()
+=======
+# run the internal server
+if __name__ == "__main__":
+    runtime.initialize()
+    dotenv.load_dotenv()
+    # Validate configuration before starting the server
+    validate_config()
+    run()
+>>>>>>> REPLACE
