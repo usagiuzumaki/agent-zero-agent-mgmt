@@ -1,7 +1,7 @@
 import sqlite3
 import uuid
 import asyncio
-from typing import Optional, List, Any
+from typing import Optional, List, Any, Dict, Tuple
 import logging
 from datetime import datetime
 import json
@@ -14,27 +14,82 @@ from python.helpers.dirty_json import DirtyJson
 from difflib import SequenceMatcher
 
 class MVLManager:
-    def __init__(self, db_path="loom.db", agent=None):
+    def __init__(self, db_path: str = "loom.db", agent: Any = None):
         self.db_path = files.get_abs_path(db_path)
         self.agent = agent
         self._init_db()
 
-    @contextmanager
-    def _get_db(self):
-        conn = sqlite3.connect(self.db_path, timeout=10.0)
-        conn.execute("PRAGMA journal_mode=WAL")
-        try:
-            yield conn
-            conn.commit()
-        except Exception:
-            conn.rollback()
-            raise
-        finally:
-            conn.close()
+    def get_connection(self) -> sqlite3.Connection:
+        return sqlite3.connect(self.db_path)
 
-    def _init_db(self):
-        with self._get_db() as conn:
-            cursor = conn.cursor()
+    def _init_db(self) -> None:
+        conn = self.get_connection()
+        cursor = conn.cursor()
+
+        # Always run CREATE TABLE IF NOT EXISTS
+        cursor.execute('''
+        CREATE TABLE IF NOT EXISTS interaction_event (
+            id TEXT PRIMARY KEY,
+            user_id TEXT NOT NULL,
+            ts DATETIME DEFAULT CURRENT_TIMESTAMP,
+            role TEXT CHECK(role IN ('user', 'aria', 'system')),
+            text TEXT,
+            tokens INTEGER,
+            channel TEXT CHECK(channel IN ('chat', 'voice', 'image', 'file')),
+            intent_tag TEXT,
+            utility_flag BOOLEAN,
+            novelty REAL CHECK(novelty BETWEEN 0 AND 1),
+            narrative_weight REAL CHECK(narrative_weight BETWEEN 0 AND 1),
+            entropy_delta REAL CHECK(entropy_delta BETWEEN -1 AND 1),
+            meaningfulness REAL CHECK(meaningfulness BETWEEN 0 AND 1),
+            mt_gate TEXT CHECK(mt_gate IN ('silence', 'reply', 'refuse', 'delay', 'confront')),
+            pattern_ids TEXT,
+            embedding_id TEXT
+        )
+        ''')
+
+        cursor.execute('''
+        CREATE TABLE IF NOT EXISTS pattern_echo (
+            id TEXT PRIMARY KEY,
+            user_id TEXT NOT NULL,
+            type TEXT CHECK(type IN ('contradiction', 'loop', 'confession', 'boundary', 'desire', 'fear', 'goal', 'identity_claim', 'trigger')),
+            summary TEXT,
+            evidence_event_ids TEXT,
+            first_seen_ts DATETIME,
+            last_seen_ts DATETIME,
+            strength REAL CHECK(strength BETWEEN 0 AND 1),
+            recency REAL CHECK(recency BETWEEN 0 AND 1),
+            lore_weight REAL CHECK(lore_weight BETWEEN 0 AND 1),
+            status TEXT CHECK(status IN ('active', 'resolved', 'dormant', 'retired')),
+            embedding_id TEXT
+        )
+        ''')
+
+        cursor.execute('''
+        CREATE TABLE IF NOT EXISTS archetype_state (
+            id TEXT PRIMARY KEY,
+            user_id TEXT NOT NULL,
+            ts DATETIME DEFAULT CURRENT_TIMESTAMP,
+            axes TEXT,
+            delta_axes TEXT,
+            confidence REAL CHECK(confidence BETWEEN 0 AND 1),
+            source_pattern_ids TEXT
+        )
+        ''')
+
+        cursor.execute('''
+        CREATE TABLE IF NOT EXISTS loom_state (
+            user_id TEXT PRIMARY KEY,
+            entropy REAL CHECK(entropy BETWEEN 0 AND 1),
+            dormancy BOOLEAN,
+            last_active_ts DATETIME,
+            silence_streak INTEGER,
+            dependency_risk REAL CHECK(dependency_risk BETWEEN 0 AND 1),
+            mask_weights TEXT,
+            last_archetype_state_id TEXT,
+            FOREIGN KEY(last_archetype_state_id) REFERENCES archetype_state(id)
+        )
+        ''')
 
             # Always run CREATE TABLE IF NOT EXISTS
             cursor.execute('''
@@ -137,7 +192,7 @@ class MVLManager:
                 last_active_ts = CURRENT_TIMESTAMP
             ''', (user_id, entropy, silence_streak))
 
-    def _get_recent_history(self, user_id, limit=10):
+    def _get_recent_history(self, user_id: str, limit: int = 10) -> List[Dict[str, str]]:
         try:
             with self._get_db() as conn:
                 cursor = conn.cursor()
@@ -149,23 +204,42 @@ class MVLManager:
             PrintStyle().print(f"MVL History Error: {e}")
             return []
 
-    async def detect_pattern(self, user_id, text):
+    async def detect_pattern(self, user_id: str, text: str) -> Tuple[Optional[Dict[str, Any]], List[str]]:
         if not self.agent:
+            PrintStyle(font_color="yellow").print("MVL: No agent attached, skipping pattern detection.")
             return None, []
 
         history = self._get_recent_history(user_id)
 
-        system_prompt = files.read_file("prompts/mvl_pattern_detection.sys.md")
+        try:
+            system_prompt = files.read_file("prompts/mvl_pattern_detection.sys.md")
+        except Exception as e:
+            PrintStyle(font_color="red").print(f"MVL: Could not read prompt file: {e}")
+            return None, []
 
         # Prepare context
         history_text = "\n".join([f"{msg['role'].upper()}: {msg['content']}" for msg in history])
         user_message = f"HISTORY:\n{history_text}\n\nCURRENT MESSAGE:\nUSER: {text}"
 
         try:
-            response_json = await self.agent.call_utility_model(system_prompt, user_message)
-            analysis = DirtyJson.parse_string(response_json)
+            # Check if agent has call_utility_model method
+            if not hasattr(self.agent, "call_utility_model"):
+                PrintStyle(font_color="red").print("MVL: Agent does not support call_utility_model.")
+                return None, []
+
+            response_json_str = await self.agent.call_utility_model(system_prompt, user_message)
+
+            if not response_json_str:
+                return None, []
+
+            analysis = DirtyJson.parse_string(response_json_str)
+
+            if not isinstance(analysis, dict):
+                 PrintStyle(font_color="yellow").print(f"MVL: Invalid JSON analysis type: {type(analysis)}")
+                 return None, []
+
         except Exception as e:
-            PrintStyle().print(f"MVL Analysis Error: {e}")
+            PrintStyle(font_color="red").print(f"MVL Analysis Error: {e}")
             return None, []
 
         new_pattern_ids = []
