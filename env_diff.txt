@@ -1,0 +1,13 @@
+<<<<<<< SEARCH
+# === AUTHENTICATION ===
+# Flask Secret Key (auto-generated if not set)
+FLASK_SECRET_KEY=
+SESSION_SECRET=
+=======
+# === AUTHENTICATION ===
+# Flask Secret Key (auto-generated if not set)
+FLASK_SECRET_KEY=
+# SESSION_SECRET is REQUIRED for production auth and session management.
+# The application will fail to start if this is not set.
+SESSION_SECRET=
+>>>>>>> REPLACE
