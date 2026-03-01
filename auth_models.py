@@ -139,10 +139,6 @@ def init_db(app):
         'pool_size': 5,  # Conservative pool size for hosted Postgres
         'max_overflow': 10,  # Reduced overflow
         'pool_timeout': 30,  # Add timeout
-        'connect_args': {
-            'ssl_context': True
-            # pg8000 doesn't accept connect_timeout as a parameter
-        }
     }
     
     try:
