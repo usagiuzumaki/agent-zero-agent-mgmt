@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "EB Garamond", serif;
+  --font-handwriting: "Dancing Script", cursive;
+}
+
+:root {
+  --background: #f8f5f0;
+  --foreground: #2d2a26;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png");
+}
+
+/* Custom transitions for viscous/organic feel */
+.page-turn-enter {
+  transform: rotateY(90deg);
+  transform-origin: left;
+}
+.page-turn-enter-active {
+  transform: rotateY(0deg);
+  transition: transform 0.8s cubic-bezier(0.43, 0.13, 0.23, 0.96);
+}
+
+.handwritten {
+  font-family: var(--font-handwriting);
+}
+
+.aria-margin-note {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  color: #78716c;
+  line-height: 1.6;
+}
+
+/* Custom cursor for drawing on moodboard */
+.canvas-container {
+  cursor: url('https://api.iconify.design/lucide:feather.svg?color=%23888888'), auto;
+}
