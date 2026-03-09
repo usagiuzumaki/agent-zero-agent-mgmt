@@ -8,22 +8,20 @@ from unittest.mock import MagicMock, patch, AsyncMock
 # Add repo root to path
 sys.path.append(os.getcwd())
 
-# Mock imports before loading the module under test
-sys.modules['initialize'] = MagicMock()
-sys.modules['webcolors'] = MagicMock()
-# We need to mock agents.agent completely to avoid side effects
-mock_agent_module = MagicMock()
-sys.modules['agents.agent'] = mock_agent_module
-sys.modules['agents'] = MagicMock()
-
-# Now import the class
-from python.helpers.story_generator import StoryGenerator
-
 class TestStoryGenerator(unittest.IsolatedAsyncioTestCase):
 
     def setUp(self):
-        # Reset mocks
-        mock_agent_module.reset_mock()
+        self.patcher = patch.dict('sys.modules', {
+            'initialize': MagicMock(),
+            'webcolors': MagicMock(),
+            'agents.agent': MagicMock(),
+            'agents': MagicMock()
+        })
+        self.patcher.start()
+
+        # Import inside after mocks are applied
+        from python.helpers.story_generator import StoryGenerator
+        self.StoryGenerator = StoryGenerator
 
         # Setup the Agent mock behavior
         self.mock_agent_instance = MagicMock()
@@ -41,6 +39,7 @@ class TestStoryGenerator(unittest.IsolatedAsyncioTestCase):
     def tearDown(self):
         self.agent_patcher.stop()
         self.init_patcher.stop()
+        self.patcher.stop()
 
     async def test_generate_story_flow(self):
         # Mock responses for each stage
