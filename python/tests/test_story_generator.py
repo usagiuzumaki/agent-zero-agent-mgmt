@@ -11,14 +11,13 @@ sys.path.append(os.getcwd())
 class TestStoryGenerator(unittest.IsolatedAsyncioTestCase):
 
     def setUp(self):
-        # Setup mocks for dependencies
-        self.modules_patcher = patch.dict(sys.modules, {
+        self.patcher = patch.dict('sys.modules', {
             'initialize': MagicMock(),
             'webcolors': MagicMock(),
             'agents.agent': MagicMock(),
             'agents': MagicMock()
         })
-        self.modules_patcher.start()
+        self.patcher.start()
 
         # Import inside after mocks are applied
         from python.helpers.story_generator import StoryGenerator
@@ -40,7 +39,7 @@ class TestStoryGenerator(unittest.IsolatedAsyncioTestCase):
     def tearDown(self):
         self.agent_patcher.stop()
         self.init_patcher.stop()
-        self.modules_patcher.stop()
+        self.patcher.stop()
 
     async def test_generate_story_flow(self):
         # Mock responses for each stage
