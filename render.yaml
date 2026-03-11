@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: aria
+    env: python
+    buildCommand: pip install -r requirements_production.txt
+    startCommand: bash scripts/start_production.sh
