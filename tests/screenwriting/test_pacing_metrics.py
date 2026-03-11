@@ -33,6 +33,7 @@ mock_module("langchain")
 mock_module("langchain_community")
 
 lc = mock_module("langchain_core")
+mock_module("langchain_core.embeddings")
 mock_module("langchain_core.language_models")
 mock_module("langchain_core.language_models.chat_models")
 mock_module("langchain_core.language_models.llms")

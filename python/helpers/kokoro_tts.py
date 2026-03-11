@@ -37,7 +37,7 @@ async def preload():
     Preload the Kokoro TTS model.
     This initializes the KPipeline, which triggers model download if needed.
     """
-    global _pipeline, _model_downloaded
+    global _model_downloaded, _pipeline
 
     if _pipeline is not None:
         return
@@ -66,7 +66,7 @@ async def synthesize_sentences(sentences: List[str], voice: str = 'af_heart', sp
     Synthesize a list of sentences into audio.
     Returns a base64 encoded WAV string.
     """
-    global _pipeline
+
 
     if _pipeline is None:
         PrintStyle().warning("Kokoro TTS model not initialized, attempting to preload...")

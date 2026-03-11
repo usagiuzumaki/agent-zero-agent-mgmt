@@ -9,8 +9,7 @@ def set_server(server):
     global _server
     _server = server
 
-def get_server(server):
-    global _server
+def get_server():
     return _server
 
 def stop_server():

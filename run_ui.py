@@ -12,7 +12,7 @@ import inspect
 from functools import wraps
 import threading
 import signal
-from flask import Flask, request, Response, session, render_template_string, send_from_directory
+from flask import Flask, request, Response, session, render_template_string, send_from_directory, redirect
 from flask_basicauth import BasicAuth
 import initialize
 from python.helpers import files, git, mcp_server
