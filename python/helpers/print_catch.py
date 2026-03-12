@@ -17,7 +17,7 @@ def capture_prints_async(
         return captured_output.getvalue()
 
     async def wrapped_func() -> Any:
-        nonlocal captured_output, original_stdout
+
         try:
             # Redirect sys.stdout to the StringIO object
             sys.stdout = captured_output

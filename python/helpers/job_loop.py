@@ -14,7 +14,7 @@ pause_time = 0
 
 
 async def run_loop():
-    global pause_time, keep_running
+
 
     # Initialize last_tick to trigger a check immediately with a 60s window
     # This preserves original startup behavior (checking last minute for missed jobs)

@@ -67,7 +67,7 @@ def train_dreambooth(instance_data_dir: str, class_data_dir: str = None, max_ste
 
 _persona_pipe = None
 def load_persona_pipeline(model_dir: str = OUTPUT_DIR):
-    global _persona_pipe
+
     if StableDiffusionPipeline is None or torch is None:
         raise RuntimeError("Stable Diffusion dependencies missing.")
     _persona_pipe = StableDiffusionPipeline.from_pretrained(model_dir, torch_dtype=torch.float32)
@@ -76,7 +76,7 @@ def load_persona_pipeline(model_dir: str = OUTPUT_DIR):
     return _persona_pipe
 
 def generate_persona_image(prompt: str, output_path: str = "outputs/sample_image.png", seed: int = 42):
-    global _persona_pipe
+
     if _persona_pipe is None:
         load_persona_pipeline()
     generator = torch.Generator(device=_persona_pipe.device).manual_seed(seed)

@@ -80,7 +80,7 @@ class TestStoryGenerator(unittest.IsolatedAsyncioTestCase):
             beats_json
         ]
 
-        generator = StoryGenerator()
+        generator = self.StoryGenerator()
         document = await generator.generate_story("A story about testing")
 
         # Verify structure

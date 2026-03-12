@@ -44,7 +44,7 @@ def _get_file_from_module(module_name: str) -> str:
 
 _cache: dict[str, list[type[Extension]]] = {}
 async def _get_extensions(folder:str):
-    global _cache
+
     folder = files.get_abs_path(folder)
     if folder in _cache:
         classes = _cache[folder]
