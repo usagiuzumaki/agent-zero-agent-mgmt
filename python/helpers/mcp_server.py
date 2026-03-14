@@ -290,16 +290,16 @@ class DynamicMcpProxy:
         message_path = f"/t-{self.token}/messages/"
 
         # Update settings in the MCP server instance if provided
-        mcp_server.settings.message_path = message_path
-        mcp_server.settings.sse_path = sse_path
+        # mcp_server.settings.message_path = message_path
+        # mcp_server.settings.sse_path = sse_path
 
         # Create a new MCP app with updated settings
         with self._lock:
             kwargs = dict(
                 server=mcp_server,
-                message_path=mcp_server.settings.message_path,
-                sse_path=mcp_server.settings.sse_path,
-                debug=mcp_server.settings.debug,
+                message_path="/mcp/messages",
+                sse_path="/mcp/sse",
+                debug=False,
                 routes=mcp_server._additional_http_routes,
                 middleware=[Middleware(BaseHTTPMiddleware, dispatch=mcp_middleware)],
             )
