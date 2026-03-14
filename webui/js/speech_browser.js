@@ -199,6 +199,11 @@ class MicrophoneInput {
         const analyzeFrame = () => {
             if (this.status === Status.INACTIVE) return;
 
+            if (speech.isSpeaking()) {
+                this.analysisFrame = requestAnimationFrame(analyzeFrame);
+                return;
+            }
+
             const dataArray = new Uint8Array(this.analyserNode.fftSize);
             this.analyserNode.getByteTimeDomainData(dataArray);
 
@@ -218,8 +223,7 @@ class MicrophoneInput {
                 this.silenceStartTime = null;
 
                 if (this.status === Status.LISTENING || this.status === Status.WAITING) {
-                    if (!speech.isSpeaking()) // TODO? a better way to ignore agent's voice?
-                        this.status = Status.RECORDING;
+                    this.status = Status.RECORDING;
                 }
             } else if (this.status === Status.RECORDING) {
                 if (!this.silenceStartTime) {
@@ -357,6 +361,7 @@ class Speech {
     constructor() {
         this.synth = window.speechSynthesis;
         this.utterance = null;
+        this.lastSpeechEndTime = 0;
     }
 
     stripEmojis(str) {
@@ -375,6 +380,13 @@ class Speech {
         text = this.stripEmojis(text);
         this.utterance = new SpeechSynthesisUtterance(text);
 
+        this.utterance.onend = () => {
+            this.lastSpeechEndTime = Date.now();
+        };
+        this.utterance.onerror = () => {
+            this.lastSpeechEndTime = Date.now();
+        };
+
         // Speak the new utterance
         this.synth.speak(this.utterance);
     }
@@ -382,11 +394,14 @@ class Speech {
     stop() {
         if (this.isSpeaking()) {
             this.synth.cancel();
+            this.lastSpeechEndTime = Date.now();
         }
     }
 
     isSpeaking() {
-        return this.synth?.speaking || false;
+        const isSynthSpeaking = this.synth?.speaking || false;
+        const cooldownActive = (Date.now() - this.lastSpeechEndTime) < 500;
+        return isSynthSpeaking || cooldownActive;
     }
 }
 

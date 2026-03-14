@@ -10,7 +10,7 @@ def mock_module(name):
 # DO NOT mock nest_asyncio
 mock_module("litellm")
 mock_module("regex")
-mock_module("tiktoken")
+# mock_module("tiktoken")
 mock_module("git")
 mock_module("psutil")
 mock_module("diskcache")
@@ -33,6 +33,7 @@ mock_module("langchain")
 mock_module("langchain_community")
 
 lc = mock_module("langchain_core")
+mock_module("langchain_core.embeddings")
 mock_module("langchain_core.language_models")
 mock_module("langchain_core.language_models.chat_models")
 mock_module("langchain_core.language_models.llms")

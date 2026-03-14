@@ -1317,7 +1317,6 @@ def get_default_settings() -> Settings:
 
 
 async def _apply_settings(previous: Settings | None):
-    global _settings
     if _settings:
         from agents import AgentContext
         from initialize import initialize_agent
