@@ -11,14 +11,14 @@ webcolors==25.10.0
 nest_asyncio==1.6.0
 litellm==1.81.16
 langchain-core
-langchain-openai>=0.1.15
+langchain-openai
 misaki==0.9.4
 soundfile==0.13.1
 scipy==1.17.1
 pydantic==2.12.5
 pyyaml==6.0.3
 aiohttp==3.13.3
-tenacity>=8.1.0
+tenacity==9.1.4
 lxml==6.0.2
 gspread==6.2.1
 google-auth==2.48.0
@@ -40,8 +40,8 @@ fastapi
 fastmcp>=1.0.0
 python-crontab
 faiss-cpu
-langchain-community>=0.2.7
-openai>=2.8.0
+langchain-community==0.2.7
+openai<2.0.0
 torch
 flaredantic
 paramiko
