@@ -1,16 +1,22 @@
-### screenwriting_specialist:
-- Consult a specific screenwriting specialist agent for a targeted task.
-- Available specialists: `PlotAnalyzer`, `CreativeIdeas`, `CoWriter`, `DialogueEvaluator`, `ScriptFormatter`, `CharacterAnalyzer`, `PacingMetrics`, `EmotionalTension`, `Marketability`, `MBTIEvaluator`, `ScreamAnalyzer`, `StoryboardGenerator`, `WorldBuilder`.
-- Use with `specialist` (name) and `task` (description).
+### ScreenwritingSpecialist
+Smart router for screenwriting tools, handles pipeline or direct mode.
 
-**Example usage**:
-~~~json
+**Usage:**
+```json
 {
-    "thoughts": ["I need to analyze the pacing of this scene."],
-    "tool_name": "screenwriting_specialist",
-    "tool_args": {
-        "specialist": "PacingMetrics",
-        "task": "Analyze the pacing of the chase scene in Act 2."
-    }
+  "thoughts": ["why I am using this tool"],
+  "tool_name": "screenwriting_specialist",
+  "tool_args": {
+        "prompt": "value",
+    "mode": "direct",
+    "tool_name": "CharacterAnalyzer"
+  }
 }
-~~~
+```
+
+**Arguments:**
+- `prompt` (string, required): The screenwriting prompt.
+- `mode` (string, optional): 'pipeline' or 'direct'.
+- `tool_name` (string, optional): The specific tool to invoke in 'direct' mode (e.g. 'CharacterAnalyzer').
+
+**Returns:** The processed text from the tool.
