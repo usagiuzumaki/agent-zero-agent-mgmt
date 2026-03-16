@@ -9,7 +9,7 @@ def mock_module(name):
 
 # DO NOT mock nest_asyncio
 mock_module("litellm")
-mock_module("regex")
+# mock_module("regex")
 # mock_module("tiktoken")
 mock_module("git")
 mock_module("psutil")
