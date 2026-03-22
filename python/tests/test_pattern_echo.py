@@ -25,11 +25,14 @@ class TestPatternEcho(unittest.TestCase):
     def test_detect_pattern_found(self):
         # Setup mock response
         mock_response = json.dumps({
-            "pattern_found": True,
-            "type": "loop",
-            "summary": "User keeps repeating the same question.",
-            "strength": 0.8,
-            "evidence_quotes": ["Why?", "Why not?"]
+            "pattern_candidates": [
+                {
+                    "type": "loop",
+                    "summary": "User keeps repeating the same question.",
+                    "strength": 0.8,
+                    "evidence_quotes": ["Why?", "Why not?"]
+                }
+            ]
         })
         self.mock_agent.call_utility_model.return_value = mock_response
 
@@ -44,7 +47,7 @@ class TestPatternEcho(unittest.TestCase):
             self.mock_agent.call_utility_model.assert_called_once()
 
             # Check pattern_echo table
-            conn = sqlite3.connect(self.db_path)
+            conn = sqlite3.connect(self.db_path, timeout=30.0)
             cursor = conn.cursor()
             cursor.execute("SELECT * FROM pattern_echo WHERE user_id = ?", (user_id,))
             pattern = cursor.fetchone()
@@ -77,7 +80,7 @@ class TestPatternEcho(unittest.TestCase):
             await self.manager.process_message(user_id, text)
 
             # Check pattern_echo table (should be empty)
-            conn = sqlite3.connect(self.db_path)
+            conn = sqlite3.connect(self.db_path, timeout=30.0)
             cursor = conn.cursor()
             cursor.execute("SELECT * FROM pattern_echo WHERE user_id = ?", (user_id,))
             pattern = cursor.fetchone()

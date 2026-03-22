@@ -21,7 +21,7 @@ class MVLManager:
 
     @contextmanager
     def _get_db(self):
-        conn = sqlite3.connect(self.db_path)
+        conn = sqlite3.connect(self.db_path, timeout=30.0)
         try:
             yield conn
             conn.commit()
