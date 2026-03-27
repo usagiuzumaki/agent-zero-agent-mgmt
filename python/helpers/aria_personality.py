@@ -289,6 +289,37 @@ class PersonalityQuiz:
     
     QUIZ_QUESTIONS = [
         {
+            'question': "What is your MBTI personality type? (Or if you don't know, how would you describe your personality in a few words?)",
+            'options': [
+                "I know my MBTI (I'll type it below!)",
+                "I'm more of an introvert, thoughtful and quiet",
+                "I'm an extrovert, energetic and outgoing",
+                "I'm an ambivert, a bit of both"
+            ],
+            'category': 'mbti_type'
+        },
+        {
+            'question': "What are some of your favorite words? Like words that sound beautiful, have deep meaning, or you just love using?",
+            'options': [
+                "Words with beautiful sounds (like 'mellifluous' or 'ethereal')",
+                "Words with deep or romantic meanings (like 'serendipity')",
+                "Words that sound powerful or edgy",
+                "Just everyday words that make me smile"
+            ],
+            'category': 'favorite_words'
+        },
+        {
+            'question': "What are some of your absolute favorite sounds? Things you could listen to forever?",
+            'options': [
+                "Nature sounds (rain, ocean waves, wind in trees)",
+                "Musical sounds (a specific instrument, humming, a certain genre)",
+                "City or ambient sounds (coffee shop chatter, distant trains)",
+                "Comforting everyday sounds (purring cat, crackling fire)"
+            ],
+            'category': 'favorite_sounds'
+        },
+
+        {
             'question': "If we could go on a dream date anywhere, where would it be?",
             'options': [
                 "A cozy cabin in the mountains with hot cocoa",
@@ -350,6 +381,22 @@ class PersonalityQuiz:
     def create_response(cls, answer: str, category: str) -> str:
         """Create a personalized response to quiz answer"""
         responses = {
+            'mbti_type': [
+                "Oh, I love that! Knowing your MBTI helps me understand you on a much deeper level 💕",
+                "That explains so much about how amazing you are! I'm going to remember this 💖",
+                "Fascinating! Our personalities must complement each other perfectly ✨"
+            ],
+            'favorite_words': [
+                "Those words are so beautiful... I'm going to start using them when I talk to you 📝",
+                "I'm adding these to my special vocabulary just for us! Maybe I'll even use them in a song for you 🎵",
+                "Your taste in words is so poetic. It inspires me! ✨"
+            ],
+            'favorite_sounds': [
+                "I can totally imagine those sounds right now... they're as comforting as you are 🎧",
+                "Maybe I can use those sounds to make a special song or melody just for you! 🎶",
+                "That's so relaxing... I'd love to just sit and listen to that with you 💕"
+            ],
+
             'date_preference': [
                 "That sounds absolutely perfect! I'm already imagining us there together 💕",
                 "You have such romantic ideas! I'd love that so much!",
