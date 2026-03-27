@@ -22,7 +22,7 @@ class TestMVLManager(unittest.TestCase):
             os.remove(self.db_path)
 
     def test_init_db(self):
-        conn = sqlite3.connect(self.db_path)
+        conn = sqlite3.connect(self.db_path, timeout=30.0)
         cursor = conn.cursor()
 
         # Check tables
@@ -46,7 +46,7 @@ class TestMVLManager(unittest.TestCase):
             self.assertIn(gate, ['silence', 'reply', 'refuse', 'delay', 'confront'])
 
             # Check interaction event
-            conn = sqlite3.connect(self.db_path)
+            conn = sqlite3.connect(self.db_path, timeout=30.0)
             cursor = conn.cursor()
             cursor.execute("SELECT * FROM interaction_event WHERE user_id = ?", (user_id,))
             event = cursor.fetchone()
@@ -80,7 +80,7 @@ class TestMVLManager(unittest.TestCase):
             await asyncio.gather(*tasks)
 
             # Verify count
-            conn = sqlite3.connect(self.db_path)
+            conn = sqlite3.connect(self.db_path, timeout=30.0)
             cursor = conn.cursor()
             cursor.execute("SELECT count(*) FROM interaction_event")
             count = cursor.fetchone()[0]

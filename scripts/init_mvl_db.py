@@ -3,7 +3,7 @@ import os
 
 def init_db():
     db_path = 'loom.db'
-    conn = sqlite3.connect(db_path)
+    conn = sqlite3.connect(db_path, timeout=30.0)
     cursor = conn.cursor()
 
     # interaction_event

@@ -28,7 +28,7 @@ class TestMVLManagerRobust(unittest.TestCase):
 
     def test_init_db_schema(self):
         """Test that the database is initialized with correct tables and columns."""
-        conn = sqlite3.connect(self.db_path)
+        conn = sqlite3.connect(self.db_path, timeout=30.0)
         cursor = conn.cursor()
 
         # Check interaction_event table
@@ -66,7 +66,7 @@ class TestMVLManagerRobust(unittest.TestCase):
         self.assertEqual(len(new_ids), 1)
 
         # Verify it was saved to DB
-        conn = sqlite3.connect(self.db_path)
+        conn = sqlite3.connect(self.db_path, timeout=30.0)
         cursor = conn.cursor()
         cursor.execute("SELECT type FROM pattern_echo WHERE id=?", (new_ids[0],))
         row = cursor.fetchone()
@@ -135,7 +135,7 @@ class TestMVLManagerRobust(unittest.TestCase):
         self.assertIn(gate, ["silence", "reply", "refuse", "delay", "confront"])
 
         # Verify interaction event saved
-        conn = sqlite3.connect(self.db_path)
+        conn = sqlite3.connect(self.db_path, timeout=30.0)
         cursor = conn.cursor()
         cursor.execute("SELECT text, mt_gate FROM interaction_event WHERE user_id=?", ("test_user",))
         row = cursor.fetchone()

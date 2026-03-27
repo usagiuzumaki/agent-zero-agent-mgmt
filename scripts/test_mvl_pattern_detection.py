@@ -39,7 +39,7 @@ async def run_test():
     print(f"Gate decision: {gate}")
 
     # Verify DB
-    conn = sqlite3.connect(db_path)
+    conn = sqlite3.connect(db_path, timeout=30.0)
     cursor = conn.cursor()
 
     # Check interaction_event
