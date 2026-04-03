@@ -143,5 +143,17 @@ class TestMVLManagerRobust(unittest.TestCase):
         self.assertEqual(row[1], gate)
         conn.close()
 
+    def test_pragma_journal_mode(self):
+        """Test that the PRAGMA journal_mode is WAL for standard connections."""
+        with self.manager._get_db() as conn:
+            cursor = conn.cursor()
+            cursor.execute("PRAGMA journal_mode")
+            mode = cursor.fetchone()[0]
+            self.assertEqual(mode.upper(), "WAL")
+
+            cursor.execute("PRAGMA synchronous")
+            sync = cursor.fetchone()[0]
+            self.assertEqual(sync, 1) # NORMAL is 1
+
 if __name__ == "__main__":
     unittest.main()
