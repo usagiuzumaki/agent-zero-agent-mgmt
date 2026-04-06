@@ -40,6 +40,8 @@ async def run_test():
 
     # Verify DB
     conn = sqlite3.connect(db_path, timeout=30.0)
+    conn.execute("PRAGMA journal_mode=WAL;")
+    conn.execute("PRAGMA synchronous=NORMAL;")
     cursor = conn.cursor()
 
     # Check interaction_event
