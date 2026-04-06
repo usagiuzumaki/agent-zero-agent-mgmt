@@ -48,6 +48,8 @@ class TestPatternEcho(unittest.TestCase):
 
             # Check pattern_echo table
             conn = sqlite3.connect(self.db_path, timeout=30.0)
+            conn.execute("PRAGMA journal_mode=WAL;")
+            conn.execute("PRAGMA synchronous=NORMAL;")
             cursor = conn.cursor()
             cursor.execute("SELECT * FROM pattern_echo WHERE user_id = ?", (user_id,))
             pattern = cursor.fetchone()
@@ -81,6 +83,8 @@ class TestPatternEcho(unittest.TestCase):
 
             # Check pattern_echo table (should be empty)
             conn = sqlite3.connect(self.db_path, timeout=30.0)
+            conn.execute("PRAGMA journal_mode=WAL;")
+            conn.execute("PRAGMA synchronous=NORMAL;")
             cursor = conn.cursor()
             cursor.execute("SELECT * FROM pattern_echo WHERE user_id = ?", (user_id,))
             pattern = cursor.fetchone()
