@@ -12,6 +12,8 @@ class TestMigration(unittest.TestCase):
         # Create OLD schema manually (without pattern_echo and pattern_ids)
         conn = sqlite3.connect(self.db_path, timeout=30.0)
         cursor = conn.cursor()
+        cursor.execute('PRAGMA journal_mode=WAL;')
+        cursor.execute('PRAGMA synchronous=NORMAL;')
 
         # Create loom_state so _init_db thinks DB exists
         cursor.execute('''
@@ -63,6 +65,8 @@ class TestMigration(unittest.TestCase):
 
         conn = sqlite3.connect(self.db_path, timeout=30.0)
         cursor = conn.cursor()
+        cursor.execute('PRAGMA journal_mode=WAL;')
+        cursor.execute('PRAGMA synchronous=NORMAL;')
 
         # Check if pattern_echo exists
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='pattern_echo'")
