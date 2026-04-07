@@ -41,6 +41,8 @@ async def run_test():
     # Verify DB
     conn = sqlite3.connect(db_path, timeout=30.0)
     cursor = conn.cursor()
+    cursor.execute('PRAGMA journal_mode=WAL;')
+    cursor.execute('PRAGMA synchronous=NORMAL;')
 
     # Check interaction_event
     cursor.execute("SELECT pattern_ids, mt_gate FROM interaction_event WHERE user_id = ?", (user_id,))

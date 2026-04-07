@@ -30,6 +30,8 @@ class TestMVLManagerRobust(unittest.TestCase):
         """Test that the database is initialized with correct tables and columns."""
         conn = sqlite3.connect(self.db_path, timeout=30.0)
         cursor = conn.cursor()
+        cursor.execute('PRAGMA journal_mode=WAL;')
+        cursor.execute('PRAGMA synchronous=NORMAL;')
 
         # Check interaction_event table
         cursor.execute("PRAGMA table_info(interaction_event)")
@@ -68,6 +70,8 @@ class TestMVLManagerRobust(unittest.TestCase):
         # Verify it was saved to DB
         conn = sqlite3.connect(self.db_path, timeout=30.0)
         cursor = conn.cursor()
+        cursor.execute('PRAGMA journal_mode=WAL;')
+        cursor.execute('PRAGMA synchronous=NORMAL;')
         cursor.execute("SELECT type FROM pattern_echo WHERE id=?", (new_ids[0],))
         row = cursor.fetchone()
         self.assertEqual(row[0], "trigger")
@@ -137,6 +141,8 @@ class TestMVLManagerRobust(unittest.TestCase):
         # Verify interaction event saved
         conn = sqlite3.connect(self.db_path, timeout=30.0)
         cursor = conn.cursor()
+        cursor.execute('PRAGMA journal_mode=WAL;')
+        cursor.execute('PRAGMA synchronous=NORMAL;')
         cursor.execute("SELECT text, mt_gate FROM interaction_event WHERE user_id=?", ("test_user",))
         row = cursor.fetchone()
         self.assertEqual(row[0], "Hello world")
