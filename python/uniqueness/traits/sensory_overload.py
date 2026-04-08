@@ -2,6 +2,7 @@ from python.uniqueness.base_signature import SignatureTrait
 from typing import Any, Dict
 import re
 import random
+import hashlib
 
 class SensoryOverloadTrait(SignatureTrait):
     def get_system_prompt(self) -> str:
@@ -19,13 +20,17 @@ class SensoryOverloadTrait(SignatureTrait):
 
         # We'll gently substitute some generic adjectives or nouns with sensory-rich ones.
         # This is a basic implementation to match tactile metaphors pattern.
+
+        local_seed = int(hashlib.md5(draft_response.encode()).hexdigest(), 16)
+        rng = random.Random(local_seed)
+
         sensory_replacements = {
-            r"(?i)\bthe room\b": random.choice(["the echoey space", "the dust-moted room", "the cramped, airless room"]),
-            r"(?i)\bit was quiet\b": random.choice(["it was heavy with silence", "the quiet hummed in the ears", "it felt muffled, like cotton"]),
-            r"(?i)\bhe said\b": random.choice(["he breathed", "he rasped out", "he said, words clipping the air"]),
-            r"(?i)\bshe said\b": random.choice(["she breathed", "she murmured", "she said, her voice sharp like flint"]),
-            r"(?i)\bsuddenly\b": random.choice(["like a snapped wire", "with a sudden crack", "violently"]),
-            r"(?i)\bvery dark\b": random.choice(["pitch-black and thick", "dark enough to taste", "swallowed in shadows"])
+            r"(?i)\bthe room\b": rng.choice(["the echoey space", "the dust-moted room", "the cramped, airless room"]),
+            r"(?i)\bit was quiet\b": rng.choice(["it was heavy with silence", "the quiet hummed in the ears", "it felt muffled, like cotton"]),
+            r"(?i)\bhe said\b": rng.choice(["he breathed", "he rasped out", "he said, words clipping the air"]),
+            r"(?i)\bshe said\b": rng.choice(["she breathed", "she murmured", "she said, her voice sharp like flint"]),
+            r"(?i)\bsuddenly\b": rng.choice(["like a snapped wire", "with a sudden crack", "violently"]),
+            r"(?i)\bvery dark\b": rng.choice(["pitch-black and thick", "dark enough to taste", "swallowed in shadows"])
         }
 
         # Apply sparingly based on trait strength (if strength is low, maybe 1 substitution, if high maybe 3)
@@ -37,8 +42,7 @@ class SensoryOverloadTrait(SignatureTrait):
 
         # Shuffle keys so we don't always replace "the room" first
         keys = list(sensory_replacements.keys())
-        random.seed(len(draft_response)) # deterministic randomness for this draft
-        random.shuffle(keys)
+        rng.shuffle(keys)
 
         for pattern in keys:
             if re.search(pattern, draft_response) and replacements_made < max_replacements:
