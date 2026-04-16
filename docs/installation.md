@@ -305,8 +305,12 @@ Aria - AI Creative Companion's Web UI is accessible from any device on your netw
 > [!NOTE]
 > If you're running Aria - AI Creative Companion directly on your system (legacy approach) instead of
 > using Docker, you'll need to configure the host manually in `run_ui.py` to run on all interfaces using `host="0.0.0.0"`.
+>
+> **Important:** To run `run_ui.py` locally without Docker, you must:
+> 1. Install dependencies: `pip install -r requirements.txt`
+> 2. Initialize environment variables: `cp .env.example .env` and explicitly set `SESSION_SECRET=your_dev_secret_here` inside the `.env` file (the application will fail to start without this secret).
 
-For developers or users who need to run Aria - AI Creative Companion directly on their system,see the [In-Depth Guide for Full Binaries Installation](#in-depth-guide-for-full-binaries-installation).
+For developers or users who need to run Aria - AI Creative Companion directly on their system, see the [Development Guide](./development.md) for full installation details.
 
 # How to update Aria - AI Creative Companion
 

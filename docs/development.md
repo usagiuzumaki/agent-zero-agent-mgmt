@@ -67,6 +67,16 @@ playwright install chromium
 These will install all the python packages and browser binaries for playwright (browser agent).
 Errors in the code editor caused by missing packages should now be gone. If not, try reloading the window.
 
+4. Initialize environment variables. Create your `.env` file by copying the example:
+```bash
+cp .env.example .env
+```
+Open the `.env` file and set the required session secret:
+```
+SESSION_SECRET=your_dev_secret_here
+```
+*(Note: `run_ui.py` will throw a fatal error if this variable is missing).*
+
 
 ## Step 4: Run Aria - AI Creative Companion in the IDE
 Great work! Now you should be able to run Aria - AI Creative Companion from your IDE including real-time debugging.
