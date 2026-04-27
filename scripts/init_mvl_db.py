@@ -5,6 +5,8 @@ def init_db():
     db_path = 'loom.db'
     conn = sqlite3.connect(db_path, timeout=30.0)
     cursor = conn.cursor()
+    cursor.execute('PRAGMA journal_mode=WAL;')
+    cursor.execute('PRAGMA synchronous=NORMAL;')
 
     # interaction_event
     cursor.execute('''

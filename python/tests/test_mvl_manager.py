@@ -24,6 +24,8 @@ class TestMVLManager(unittest.TestCase):
     def test_init_db(self):
         conn = sqlite3.connect(self.db_path, timeout=30.0)
         cursor = conn.cursor()
+        cursor.execute('PRAGMA journal_mode=WAL;')
+        cursor.execute('PRAGMA synchronous=NORMAL;')
 
         # Check tables
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='loom_state'")
@@ -48,6 +50,8 @@ class TestMVLManager(unittest.TestCase):
             # Check interaction event
             conn = sqlite3.connect(self.db_path, timeout=30.0)
             cursor = conn.cursor()
+            cursor.execute('PRAGMA journal_mode=WAL;')
+            cursor.execute('PRAGMA synchronous=NORMAL;')
             cursor.execute("SELECT * FROM interaction_event WHERE user_id = ?", (user_id,))
             event = cursor.fetchone()
             self.assertIsNotNone(event)
@@ -82,6 +86,8 @@ class TestMVLManager(unittest.TestCase):
             # Verify count
             conn = sqlite3.connect(self.db_path, timeout=30.0)
             cursor = conn.cursor()
+            cursor.execute('PRAGMA journal_mode=WAL;')
+            cursor.execute('PRAGMA synchronous=NORMAL;')
             cursor.execute("SELECT count(*) FROM interaction_event")
             count = cursor.fetchone()[0]
             conn.close()
