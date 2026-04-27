@@ -22,9 +22,8 @@ class MVLManager:
     @contextmanager
     def _get_db(self):
         conn = sqlite3.connect(self.db_path, timeout=30.0)
-        cursor = conn.cursor()
-        cursor.execute('PRAGMA journal_mode=WAL;')
-        cursor.execute('PRAGMA synchronous=NORMAL;')
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA synchronous=NORMAL;")
         try:
             yield conn
             conn.commit()
