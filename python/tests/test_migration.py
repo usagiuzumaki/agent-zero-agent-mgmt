@@ -11,6 +11,8 @@ class TestMigration(unittest.TestCase):
 
         # Create OLD schema manually (without pattern_echo and pattern_ids)
         conn = sqlite3.connect(self.db_path, timeout=30.0)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA synchronous=NORMAL;")
         cursor = conn.cursor()
         cursor.execute('PRAGMA journal_mode=WAL;')
         cursor.execute('PRAGMA synchronous=NORMAL;')
@@ -64,6 +66,8 @@ class TestMigration(unittest.TestCase):
         manager = MVLManager(db_path=self.db_path)
 
         conn = sqlite3.connect(self.db_path, timeout=30.0)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA synchronous=NORMAL;")
         cursor = conn.cursor()
         cursor.execute('PRAGMA journal_mode=WAL;')
         cursor.execute('PRAGMA synchronous=NORMAL;')

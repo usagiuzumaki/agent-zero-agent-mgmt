@@ -23,6 +23,8 @@ class TestMVLManager(unittest.TestCase):
 
     def test_init_db(self):
         conn = sqlite3.connect(self.db_path, timeout=30.0)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA synchronous=NORMAL;")
         cursor = conn.cursor()
         cursor.execute('PRAGMA journal_mode=WAL;')
         cursor.execute('PRAGMA synchronous=NORMAL;')
@@ -49,6 +51,8 @@ class TestMVLManager(unittest.TestCase):
 
             # Check interaction event
             conn = sqlite3.connect(self.db_path, timeout=30.0)
+            conn.execute("PRAGMA journal_mode=WAL;")
+            conn.execute("PRAGMA synchronous=NORMAL;")
             cursor = conn.cursor()
             cursor.execute('PRAGMA journal_mode=WAL;')
             cursor.execute('PRAGMA synchronous=NORMAL;')
@@ -85,6 +89,8 @@ class TestMVLManager(unittest.TestCase):
 
             # Verify count
             conn = sqlite3.connect(self.db_path, timeout=30.0)
+            conn.execute("PRAGMA journal_mode=WAL;")
+            conn.execute("PRAGMA synchronous=NORMAL;")
             cursor = conn.cursor()
             cursor.execute('PRAGMA journal_mode=WAL;')
             cursor.execute('PRAGMA synchronous=NORMAL;')

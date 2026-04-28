@@ -29,6 +29,8 @@ class TestMVLManagerRobust(unittest.TestCase):
     def test_init_db_schema(self):
         """Test that the database is initialized with correct tables and columns."""
         conn = sqlite3.connect(self.db_path, timeout=30.0)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA synchronous=NORMAL;")
         cursor = conn.cursor()
         cursor.execute('PRAGMA journal_mode=WAL;')
         cursor.execute('PRAGMA synchronous=NORMAL;')
@@ -69,6 +71,8 @@ class TestMVLManagerRobust(unittest.TestCase):
 
         # Verify it was saved to DB
         conn = sqlite3.connect(self.db_path, timeout=30.0)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA synchronous=NORMAL;")
         cursor = conn.cursor()
         cursor.execute('PRAGMA journal_mode=WAL;')
         cursor.execute('PRAGMA synchronous=NORMAL;')
@@ -140,6 +144,8 @@ class TestMVLManagerRobust(unittest.TestCase):
 
         # Verify interaction event saved
         conn = sqlite3.connect(self.db_path, timeout=30.0)
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA synchronous=NORMAL;")
         cursor = conn.cursor()
         cursor.execute('PRAGMA journal_mode=WAL;')
         cursor.execute('PRAGMA synchronous=NORMAL;')
